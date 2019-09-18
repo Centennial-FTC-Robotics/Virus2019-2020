@@ -22,8 +22,8 @@ public class VectorND {
 
         type = types.Cartesian;
         components = newComponents;
-        reCalcMagnitude();
         reCalcAngles();
+        reCalcMagnitude();
     }
 
     VectorND(double[] newAngles, double newMagnitude) {
@@ -40,11 +40,20 @@ public class VectorND {
 
         angles = new double[components.length];
 
-        for (int a = 0; a < angles.length; a++) {
+        for (int c = 0; c < components.length; c++) {
 
-            double dotProduct = components[a];
+            angles[c] = Math.atan2(components[(c + 1) % components.length], components[c]);
 
-            angles[a] = Math.acos(dotProduct / magnitude);
+            if (components[c] < 0) {
+
+                if (components[(c + 1) % components.length] > 0) {
+
+                    angles[c] += Math.PI;
+                } else if (components[(c + 1) % components.length] < 0) {
+
+                    angles[c] -= Math.PI;
+                }
+            }
         }
     }
 
@@ -59,7 +68,7 @@ public class VectorND {
 
         for (int a = 0; a < angles.length; a++) {
 
-            components[a] = Math.round(Math.cos(angles[a]) * magnitude * 100000.0) / 100000.0;
+            components[a] = (Math.cos(angles[(a + 1) % angles.length]) * magnitude) * Math.cos(angles[a]);
         }
     }
 
@@ -134,6 +143,19 @@ public class VectorND {
 
         return component;
     }
+
+    public double[] getComponentsWrap(int start, int end) {
+
+        double[] componentSubSet = new double[end - start];
+
+        for (int c = start; c < end; c++) {
+
+            componentSubSet[c - start] = components[c % components.length];
+        }
+
+        return componentSubSet;
+    }
+
 
     public void add(VectorND second) {
 
@@ -270,20 +292,15 @@ public class VectorND {
      * This function rotates the vector in the x-y plane
      * @param degrees
      */
-    public void rotate(double degrees) {
-        // make this store the rest of the components and also be able to rotate in more dimensions
-        this.collapse(2);
+    public void rotate(double degrees, int component) {
 
-        double currentAngle = VectorND.standardPosAngle(this);
 
-//        double[] newComponents = new double[components.length];
-//
-//        for (int c = 0; c < newComponents.length; c++) {
-//
-//            newComponents[c] =
-//        }
     }
 
+    /**
+     * reverses specified component of the vector
+     * @param dimension
+     */
     public void flipDimension(int dimension) {
 
         if (dimension < components.length) {
@@ -354,6 +371,8 @@ public class VectorND {
 
     public static void main(String[] args) {
 
-        VectorNDTester();
+        VectorND v = new VectorND(new double[] {3, 2, 4});
+        VectorND v1 = new VectorND(v.getAngles(), v.getMagnitude());
+        System.out.println(v + " ?= " + v1);
     }
 }
