@@ -1,17 +1,22 @@
-package org.exponential.blueshift;
+package org.virus.example;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.exponential.superclasses.Robot;
-import org.exponential.superclasses.Subsystem;
 import org.openftc.revextensions2.ExpansionHubEx;
 
-public class Blueshift extends Robot {
+import org.virus.superclasses.Robot;
+import org.virus.superclasses.Subsystem;
 
-    public static TankDrivetrain drivetrain = new TankDrivetrain();
+public class ExampleBot extends Robot {
+
+    public static ExampleDrivetrain drivetrain = new ExampleDrivetrain();
+    public static ExampleSlides verticalSlides = new ExampleSlides();
+    public static ExampleSlides horizontalSlides = new ExampleSlides();
+
+
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain};
+    static Subsystem[] subsystems = {drivetrain, verticalSlides, horizontalSlides};
 
     public static void initialize(OpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
