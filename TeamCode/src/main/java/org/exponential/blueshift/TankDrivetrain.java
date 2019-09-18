@@ -233,7 +233,7 @@ public class TankDrivetrain extends Drivetrain {
         }
     }
 
-    public void runMotors(float right,float left){
+    public void runMotors(float right, float left){
         if(prevLeft!=left){
             lFront.setPower(Range.clip(left,-1,1));
             lBack.setPower(Range.clip(left, -1, 1));

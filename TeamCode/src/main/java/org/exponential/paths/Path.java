@@ -2,10 +2,13 @@ package org.exponential.paths;
 
 
 public class Path {
+
     public static final int ENCODER=0;
     public static final int INCH=1;
+
     PathComponent[] pathComponents;
     TrapezoidalCurve motorCurve;
+
     public Path(PathComponent[] pathComponents, float accel, float deaccel, float max, float bias){
         this.pathComponents = pathComponents;
         float distance=0;
@@ -14,6 +17,7 @@ public class Path {
         }
         motorCurve = new TrapezoidalCurve(accel,  deaccel, Math.round(distance), max, bias);
     }
+
     public float getHeading(float distance){
         float heading=0;
         int i=0;
@@ -28,6 +32,7 @@ public class Path {
         }
         return heading;
     }
+
     public PathComponent getCurrentPathComponent(float distance){
         int i=0;
         for(; i<pathComponents.length && !(distance<pathComponents[i].getDistance()); i++){
@@ -42,6 +47,7 @@ public class Path {
             return pathComponents[i-1];
         }
     }
+
     public float getDistance(){
         return motorCurve.getLength();
     }
@@ -49,6 +55,7 @@ public class Path {
     public float getPower(float distance){
         return motorCurve.getValue(distance);
     }
+
     public float getMaxPower(){
         return motorCurve.getMaxVal();
     }
