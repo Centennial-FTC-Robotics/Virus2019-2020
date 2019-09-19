@@ -8,14 +8,16 @@ public class VectorND {
     private String name = "Vector";
     private double[] components;
     private double[] angles; // in radians
-    private double magnitude;
+    private double [] magnitudes;
+    private double totalMagnitude;
 
     VectorND(VectorND oldV) {
 
         type = types.Vector;
         components = oldV.getComponents();
         angles = oldV.getAngles();
-        magnitude = oldV.getMagnitude();
+        magnitudes = oldV.getMagnitudes();
+        totalMagnitude = oldV.getTotalMagnitude();
     }
 
     VectorND(double[] newComponents) {
@@ -26,10 +28,10 @@ public class VectorND {
         reCalcMagnitude();
     }
 
-    VectorND(double[] newAngles, double newMagnitude) {
+    VectorND(double[] newAngles, double[] newMagnitudes) {
 
         type = types.Polar;
-        magnitude = newMagnitude;
+        magnitudes = newMagnitudes;
         angles = newAngles;
         reCalcComponents();
     }
@@ -39,6 +41,7 @@ public class VectorND {
     private void reCalcAngles() {
 
         angles = new double[components.length];
+        magnitudes = new double[components.length];
 
         for (int c = 0; c < components.length; c++) {
 
@@ -54,12 +57,14 @@ public class VectorND {
                     angles[c] -= Math.PI;
                 }
             }
+
+            magnitudes[c] =  length(new double[] {components[c], components[(c + 1) % components.length]});
         }
     }
 
     private void reCalcMagnitude() {
 
-        magnitude = length(components);
+        totalMagnitude = length(components);
     }
 
     private void reCalcComponents() {
@@ -68,7 +73,7 @@ public class VectorND {
 
         for (int a = 0; a < angles.length; a++) {
 
-            components[a] = (Math.cos(angles[(a + 1) % angles.length]) * magnitude) * Math.cos(angles[a]);
+            components[a] = Math.round(Math.cos(angles[a]) * magnitudes[a] * Math.pow(10, 8)) / Math.pow(10, 8);
         }
     }
 
@@ -119,9 +124,13 @@ public class VectorND {
         return Arrays.copyOf(components, components.length);
     }
 
-    public double getMagnitude() {
+    public double[] getMagnitudes() {
 
-        return magnitude;
+        return Arrays.copyOf(magnitudes, magnitudes.length);
+    }
+    public double getTotalMagnitude() {
+
+        return totalMagnitude;
     }
 
     public int dimension() {
@@ -182,7 +191,7 @@ public class VectorND {
 
     public void scale(double scalar) {
 
-        magnitude *= scalar;
+        totalMagnitude *= scalar;
 
         for (int c = 0; c < this.dimension(); c++) {
 
@@ -237,14 +246,14 @@ public class VectorND {
 
     public double dot(double secondMagnitude, double angleBetween) {
 
-        double dotProduct = magnitude * secondMagnitude * Math.cos(angleBetween);
+        double dotProduct = totalMagnitude * secondMagnitude * Math.cos(angleBetween);
 
         return dotProduct;
     }
 
     public double cross(double secondMagnitude, double angleBetween) {
 
-        double crossProduct = magnitude * secondMagnitude * Math.sin(angleBetween);
+        double crossProduct = totalMagnitude * secondMagnitude * Math.sin(angleBetween);
 
         return crossProduct;
     }
@@ -252,7 +261,7 @@ public class VectorND {
     public double angleBetween(VectorND v2) {
 
         double dotProduct = this.dot(v2);
-        double magnitudeProducts = magnitude * v2.getMagnitude();
+        double magnitudeProducts = totalMagnitude * v2.getTotalMagnitude();
 
         double angle = Math.toDegrees(Math.acos(dotProduct / magnitudeProducts));
         return Math.round(angle * 1000.0) / 1000.0;
@@ -332,7 +341,7 @@ public class VectorND {
 
         VectorND first = new VectorND(components);
 
-        VectorND second = new VectorND(first.getAngles(), first.getMagnitude());
+        VectorND second = new VectorND(first.getAngles(), first.getMagnitudes());
         System.out.println(second.toString());
 
         VectorND third = new VectorND(new double[] {0, 0, 5});
@@ -372,7 +381,7 @@ public class VectorND {
     public static void main(String[] args) {
 
         VectorND v = new VectorND(new double[] {3, 2, 4});
-        VectorND v1 = new VectorND(v.getAngles(), v.getMagnitude());
+        VectorND v1 = new VectorND(v.getAngles(), v.getMagnitudes());
         System.out.println(v + " ?= " + v1);
     }
 }
