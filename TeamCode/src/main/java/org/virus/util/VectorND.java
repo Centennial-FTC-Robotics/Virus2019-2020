@@ -8,16 +8,14 @@ public class VectorND {
     private String name = "Vector";
     private double[] components;
     private double[] angles; // in radians
-    private double [] magnitudes;
-    private double totalMagnitude;
+    private double magnitude;
 
     VectorND(VectorND oldV) {
 
         type = types.Vector;
         components = oldV.getComponents();
         angles = oldV.getAngles();
-        magnitudes = oldV.getMagnitudes();
-        totalMagnitude = oldV.getTotalMagnitude();
+        magnitude = oldV.getMagnitude();
     }
 
     VectorND(double[] newComponents) {
@@ -28,10 +26,10 @@ public class VectorND {
         reCalcMagnitude();
     }
 
-    VectorND(double[] newAngles, double[] newMagnitudes) {
+    VectorND(double[] newAngles, double newMagnitude) {
 
         type = types.Polar;
-        magnitudes = newMagnitudes;
+        magnitude = newMagnitude;
         angles = newAngles;
         reCalcComponents();
     }
@@ -41,7 +39,6 @@ public class VectorND {
     private void reCalcAngles() {
 
         angles = new double[components.length];
-        magnitudes = new double[components.length];
 
         for (int c = 0; c < components.length; c++) {
 
@@ -57,23 +54,28 @@ public class VectorND {
                     angles[c] -= Math.PI;
                 }
             }
-
-            magnitudes[c] =  length(new double[] {components[c], components[(c + 1) % components.length]});
         }
     }
 
     private void reCalcMagnitude() {
 
-        totalMagnitude = length(components);
+        magnitude = length(components);
     }
 
     private void reCalcComponents() {
-
         components = new double[angles.length];
 
         for (int a = 0; a < angles.length; a++) {
 
-            components[a] = Math.round(Math.cos(angles[a]) * magnitudes[a] * Math.pow(10, 8)) / Math.pow(10, 8);
+            double component = magnitude;
+            double denominatorSum = 1;
+
+            for (int c = 1; c < components.length; c++) {
+                denominatorSum = (denominatorSum * (1 / Math.pow(Math.tan(angles[(a + c) % angles.length]), 2))) + 1;
+            }
+
+            component /= Math.sqrt(denominatorSum);
+            components[a] = component;
         }
     }
 
@@ -123,14 +125,10 @@ public class VectorND {
 
         return Arrays.copyOf(components, components.length);
     }
+    
+    public double getMagnitude() {
 
-    public double[] getMagnitudes() {
-
-        return Arrays.copyOf(magnitudes, magnitudes.length);
-    }
-    public double getTotalMagnitude() {
-
-        return totalMagnitude;
+        return magnitude;
     }
 
     public int dimension() {
@@ -153,22 +151,9 @@ public class VectorND {
         return component;
     }
 
-    public double[] getComponentsWrap(int start, int end) {
-
-        double[] componentSubSet = new double[end - start];
-
-        for (int c = start; c < end; c++) {
-
-            componentSubSet[c - start] = components[c % components.length];
-        }
-
-        return componentSubSet;
-    }
-
-
     public void add(VectorND second) {
 
-        double[] ΔVectorND = second.getComponents();
+        double[] ΔVectorND = Arrays.copyOf(second.getComponents(), second.dimension());
 
         if (this.dimension() < second.dimension()) {
 
@@ -191,7 +176,7 @@ public class VectorND {
 
     public void scale(double scalar) {
 
-        totalMagnitude *= scalar;
+        magnitude *= scalar;
 
         for (int c = 0; c < this.dimension(); c++) {
 
@@ -246,14 +231,14 @@ public class VectorND {
 
     public double dot(double secondMagnitude, double angleBetween) {
 
-        double dotProduct = totalMagnitude * secondMagnitude * Math.cos(angleBetween);
+        double dotProduct = magnitude * secondMagnitude * Math.cos(angleBetween);
 
         return dotProduct;
     }
 
     public double cross(double secondMagnitude, double angleBetween) {
 
-        double crossProduct = totalMagnitude * secondMagnitude * Math.sin(angleBetween);
+        double crossProduct = magnitude * secondMagnitude * Math.sin(angleBetween);
 
         return crossProduct;
     }
@@ -261,7 +246,7 @@ public class VectorND {
     public double angleBetween(VectorND v2) {
 
         double dotProduct = this.dot(v2);
-        double magnitudeProducts = totalMagnitude * v2.getTotalMagnitude();
+        double magnitudeProducts = magnitude * v2.getMagnitude();
 
         double angle = Math.toDegrees(Math.acos(dotProduct / magnitudeProducts));
         return Math.round(angle * 1000.0) / 1000.0;
@@ -298,10 +283,10 @@ public class VectorND {
     }
 
     /**
-     * This function rotates the vector in the x-y plane
+     * This function rotates the vector in the nth plane ex. 0th plane is the xy plane
      * @param degrees
      */
-    public void rotate(double degrees, int component) {
+    public void rotate(double degrees, int plane) {
 
 
     }
@@ -341,8 +326,9 @@ public class VectorND {
 
         VectorND first = new VectorND(components);
 
-        VectorND second = new VectorND(first.getAngles(), first.getMagnitudes());
-        System.out.println(second.toString());
+        VectorND second = new VectorND(first.getAngles(), first.getMagnitude());
+        System.out.println(first);
+        System.out.println(second.toString() + "\n");
 
         VectorND third = new VectorND(new double[] {0, 0, 5});
         third.add(first);
@@ -350,7 +336,7 @@ public class VectorND {
         System.out.println(third.toString());
 
         third.add(VectorND.invert(first));
-        third.collapse(2);
+        third.collapse(3);
         System.out.println(third);
 
         VectorND v = new VectorND(new double[] {3, 1});
@@ -380,8 +366,9 @@ public class VectorND {
 
     public static void main(String[] args) {
 
-        VectorND v = new VectorND(new double[] {3, 2, 4});
-        VectorND v1 = new VectorND(v.getAngles(), v.getMagnitudes());
+        VectorND v = new VectorND(new double[] {3.2763, 2.544, 4.23});
+        VectorND v1 = new VectorND(v.getAngles(), v.getMagnitude());
         System.out.println(v + " ?= " + v1);
+        VectorNDTester();
     }
 }
