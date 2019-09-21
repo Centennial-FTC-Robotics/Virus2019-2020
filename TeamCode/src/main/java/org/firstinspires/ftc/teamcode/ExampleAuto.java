@@ -23,14 +23,14 @@ public class ExampleAuto extends LinearOpMode {
         //creates continuous path
         ExampleBot.initialize(this);
         //inits all hardware
-
+        ExampleBot.drivetrain.initializeIMU();
         waitForStart();
 
-        ExampleBot.horizontalSlides.move(500);
+        //ExampleBot.horizontalSlides.move(500);
         //move horizontal slides
 
-        while (ExampleBot.drivetrain.move(path)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
-            ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
+        while (!ExampleBot.drivetrain.movePath(path)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+            //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
 
         while (ExampleBot.drivetrain.pivot(90f, .5f)); //turns the robot another 90 degrees
