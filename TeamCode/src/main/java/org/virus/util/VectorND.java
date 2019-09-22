@@ -99,6 +99,11 @@ public class VectorND {
 
     //---------- Get Methods ----------//
 
+    public String getName() {
+
+        return name;
+    }
+
     private double length(double[] legs) {
 
         double hypotenuse = 0;
@@ -125,7 +130,7 @@ public class VectorND {
 
         return Arrays.copyOf(components, components.length);
     }
-    
+
     public double getMagnitude() {
 
         return magnitude;
@@ -150,6 +155,25 @@ public class VectorND {
 
         return component;
     }
+
+    public static double standardPosAngle(VectorND v) {
+
+        v.collapse(2);
+
+        VectorND i = new VectorND(new double[] {1, 0});
+        VectorND j = new VectorND(new double[] {0, 1});
+
+        double iAngle = v.angleBetween(i);
+
+        if (v.angleBetween(j) > 90) {
+
+            iAngle = 360 - iAngle;
+        }
+
+        return iAngle;
+    }
+
+    //---------- Vector Algebra ----------//
 
     public void add(VectorND second) {
 
@@ -209,6 +233,21 @@ public class VectorND {
         }
     }
 
+    /**
+     * reverses specified component of the vector
+     * @param dimension
+     */
+    public void flipDimension(int dimension) {
+
+        if (dimension < components.length) {
+
+            components[dimension] *= -1;
+        }
+
+        reCalcMagnitude();
+        reCalcAngles();
+    }
+
     public double dot(VectorND second) {
 
         double dotProduct = 0;
@@ -265,22 +304,7 @@ public class VectorND {
         return i;
     }
 
-    public static double standardPosAngle(VectorND v) {
-
-        v.collapse(2);
-
-        VectorND i = new VectorND(new double[] {1, 0});
-        VectorND j = new VectorND(new double[] {0, 1});
-
-        double iAngle = v.angleBetween(i);
-
-        if (v.angleBetween(j) > 90) {
-
-            iAngle = 360 - iAngle;
-        }
-
-        return iAngle;
-    }
+    //---------- Angle Manipulation ----------//
 
     /**
      * This function rotates the vector in the nth plane ex. 0th plane is the xy plane
@@ -289,21 +313,6 @@ public class VectorND {
     public void rotate(double degrees, int plane) {
 
 
-    }
-
-    /**
-     * reverses specified component of the vector
-     * @param dimension
-     */
-    public void flipDimension(int dimension) {
-
-        if (dimension < components.length) {
-
-            components[dimension] *= -1;
-        }
-
-        reCalcMagnitude();
-        reCalcAngles();
     }
 
     public String toString() {
@@ -369,6 +378,7 @@ public class VectorND {
         VectorND v = new VectorND(new double[] {3.2763, 2.544, 4.23});
         VectorND v1 = new VectorND(v.getAngles(), v.getMagnitude());
         System.out.println(v + " ?= " + v1);
+
         VectorNDTester();
     }
 }

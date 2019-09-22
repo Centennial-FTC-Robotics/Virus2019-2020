@@ -22,7 +22,7 @@ public class Pose {
     }
 
     public float getAngle() {
-        return y;
+        return angle;
     }
 
     public float distance(Pose pose){
