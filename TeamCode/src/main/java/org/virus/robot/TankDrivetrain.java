@@ -33,7 +33,8 @@ public class TankDrivetrain extends Drivetrain {
     public static final float MAXACCEL = .015f;
     public static final float MAXDEACCEL = 0.0006f;
     public static final float TRACKWIDTHIN = 16.75f;
-    public static final float COUNTSPERREV = 537.6f;
+    public static final float COUNTSPERREV = 383.6f;
+    public static final float GEARRATIO = 1.0f;
     //private Orientation targetHeading = new Orientation();
     private Orientation currentHeading;
     private Position currentPosition = new Position();
@@ -48,6 +49,8 @@ public class TankDrivetrain extends Drivetrain {
     float initialPitch;
     float initialRoll;
     PIDController headingController;
+    PIDController moveController = new PIDController(.013f ,0.002f ,.00000f);
+    PIDController arcController;
     float prevLeft;
     float prevRight;
     //Orientation orientation = new Orientation();
@@ -60,14 +63,14 @@ public class TankDrivetrain extends Drivetrain {
     }
     @Override
     public float encoderToInch(int encoder){
-        float revs = (24f/22f) * (float)(encoder)/COUNTSPERREV;
+        float revs = 1f/GEARRATIO * (float)(encoder)/COUNTSPERREV;
         float distance = (float) (revs * 4f * Math.PI);
         return distance;
     }
     @Override
     public int inchToEncoder(float inches){
         float revs = (float)(inches /  (4f * Math.PI));
-        float encoder = revs * COUNTSPERREV * (22f/24f);
+        float encoder = revs * COUNTSPERREV * GEARRATIO;
         return Math.round(encoder);
 
     }
@@ -120,10 +123,10 @@ public class TankDrivetrain extends Drivetrain {
         opMode.telemetry.addData("Heading", currentHeading.firstAngle - initialHeading);
     }
 
-    public boolean movePath(Path path){
+    public boolean movePath(Path path, PIDController pid){
         if(headingController == null){
             //.0004
-            headingController = new PIDController(.013f ,0.002f ,.00000f);
+            headingController = pid;
 
             //headingController = new PIDController(.016f ,0.000f ,.0000f);
             headingController.start();
@@ -187,9 +190,11 @@ public class TankDrivetrain extends Drivetrain {
         else{
             return false;
         }
-
     }
 
+    public boolean movePath(Path path){
+        return movePath(path, moveController);
+    }
 
     public void driveIMU(float targetHeading, float power){
         if(headingController == null){

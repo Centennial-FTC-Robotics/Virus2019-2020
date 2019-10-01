@@ -1,4 +1,5 @@
 package org.virus.util;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class VectorND {
@@ -311,6 +312,8 @@ public class VectorND {
      * @param degrees
      */
     public void rotate(double degrees, int plane) {
+
+        ArrayList baseThetas = new ArrayList();
 
 
     }

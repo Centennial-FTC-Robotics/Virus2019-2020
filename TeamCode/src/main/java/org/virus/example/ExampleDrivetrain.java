@@ -39,6 +39,8 @@ public class ExampleDrivetrain extends Drivetrain {
     float initialRoll;
     private Orientation currentHeading;
     PIDController headingController;
+    final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
+    final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
     private OpMode opMode;
 
     float prevLeft;
@@ -84,8 +86,8 @@ public class ExampleDrivetrain extends Drivetrain {
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");
         rBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rBack");
-        lFront.setDirection(DcMotor.Direction.REVERSE);
-        lBack.setDirection(DcMotor.Direction.REVERSE);
+        rFront.setDirection(DcMotor.Direction.REVERSE);
+        rBack.setDirection(DcMotor.Direction.REVERSE);
         this.opMode=opMode;
         resetAllEncoders();
         waitAllMotors();
@@ -137,24 +139,38 @@ public class ExampleDrivetrain extends Drivetrain {
 //        return false;
 //        //once implemented should return true or false based on whether path is complete
 //    }
+    public void moveLeftTest() {
+        lFront.setPower(1);
+        lBack.setPower(1);
+
+    }
 
     public boolean movePath(Path path){
+        return movePath(path, moveController);
+    }
+
+    public boolean movePath(Path path, PIDController pid){
         opMode.telemetry.addData("heading", currentHeading.firstAngle - initialHeading);
         opMode.telemetry.addData("leftEncoder", getLeftPos());
         opMode.telemetry.addData("righttEncoder",getRightPos());
         opMode.telemetry.update();
-        if(headingController == null){
-            //.0004
-            headingController = new PIDController(.013f ,0.002f ,.00000f);
+//        if(headingController == null){
+//            //.0004
+//            headingController = pid;
+//
+//            //headingController = new PIDController(.016f   ` ,0.000f ,.0000f);
+//            headingController.start();
+//        }
+        headingController = pid;
 
-            //headingController = new PIDController(.016f ,0.000f ,.0000f);
-            headingController.start();
-        }
         updateOrientation();
         float position = (getRightPos() + getLeftPos())/2;
         float targetHeading = path.getHeading(position);
         float correction =  headingController.getValue(0, AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         //correction = 0;
+        opMode.telemetry.addData("error", AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
+        opMode.telemetry.addData("correction", correction);
+
         float power = path.getPower(position);
         float FFLeft=0;
         float FFRight=0;
@@ -198,8 +214,8 @@ public class ExampleDrivetrain extends Drivetrain {
         }
 
         runMotors(
-                power + FFRight/4f + correction * (3f/4f + power/(4f*path.getMaxPower())),
-                power + FFLeft/4f - correction * (3f/4f + power/(4f*path.getMaxPower()))
+                power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())),
+                power + /*FFLeft/4f*/ - correction * (3f/4f + power/(4f*path.getMaxPower()))
         );
 
         //opMode.telemetry.addData("Heading", currentHeading.firstAngle - initialHeading);
@@ -209,7 +225,6 @@ public class ExampleDrivetrain extends Drivetrain {
         else{
             return false;
         }
-
     }
 
     public void runMotors(float right,float left){

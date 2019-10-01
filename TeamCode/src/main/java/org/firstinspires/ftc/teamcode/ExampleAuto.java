@@ -16,10 +16,10 @@ public class ExampleAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         PathComponent[] pathComponents=
                 {
-                        new Line(24, Path.INCH),
+                        new Line(150, Path.INCH),
                         new Arc(24, 90, Path.INCH),
                 };
-        Path path = new Path(pathComponents, 1, 1, .35f, .1f);
+        Path path = new Path(pathComponents, .05f, .0006f, .35f, .05f);
         //creates continuous path
         ExampleBot.initialize(this);
         //inits all hardware
@@ -28,6 +28,9 @@ public class ExampleAuto extends LinearOpMode {
 
         //ExampleBot.horizontalSlides.move(500);
         //move horizontal slides
+        //while(true&&opModeIsActive()){
+          //  ExampleBot.drivetrain.moveLeftTest();
+        //}
 
         while (!ExampleBot.drivetrain.movePath(path)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
