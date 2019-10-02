@@ -313,7 +313,7 @@ public class VectorND {
      */
     public void rotate(double degrees, int plane) {
 
-        ArrayList baseThetas = new ArrayList();
+        ArrayList space3_Angles  = new ArrayList();
 
 
     }
