@@ -31,12 +31,12 @@ public class PIDTester extends LinearOpMode {
         waitForStart();
 
         ArrayList<Float> values = new ArrayList<Float>();
-        float smallIncrement = 0.001f;
+        float smallIncrement = 0.005f;
         float bigIncrement = 0.1f;
-
+        float currentValue = 0;
 
         while(opModeIsActive()){
-            float currentValue = 0;
+
             //dpad for small increments
             if(gamepad1.dpad_up){
                 currentValue+= smallIncrement;
@@ -70,6 +70,7 @@ public class PIDTester extends LinearOpMode {
             }
 
             telemetry.addData("current P value", currentValue);
+            telemetry.addData("all P values", values);
             telemetry.update();
         }
 
@@ -115,12 +116,11 @@ public class PIDTester extends LinearOpMode {
                 telemetry.update();
             }
             times.add(clock.seconds());
-            while(!gamepad1.a);
+            while(!gamepad1.x);
         }
 
         telemetry.addData("P Values", values);
         telemetry.addData("Times", times);
-
         telemetry.update();
     }
 }
