@@ -5,7 +5,7 @@ public class Pair<T1, T2> {
 	private T1 first;
 	private T2 second;
 	
-	Pair(T1 newFirst, T2 newSecond) {
+	public Pair(T1 newFirst, T2 newSecond) {
 		
 		first = newFirst;
 		second = newSecond;
