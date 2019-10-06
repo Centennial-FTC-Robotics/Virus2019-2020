@@ -6,6 +6,7 @@ public class PIDController {
     private float kP;
     private float kI;
     private float kD;
+    private float antiWind=-1;
     private ElapsedTime PIDClock;
     private float prevError = 0;
     private float i = 0;
@@ -15,6 +16,14 @@ public class PIDController {
         this.kI = kI;
         this.kD = kD;
     }
+
+    public PIDController(float kP, float kI, float kD, float antiWind){
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.antiWind = antiWind;
+    }
+
     public void start(){
         PIDClock = new ElapsedTime();
         prevError = 0;
@@ -31,7 +40,14 @@ public class PIDController {
         }
         float error = target - actual;
         float p = error;
-        i += (float)(error*PIDClock.seconds());
+        if(antiWind>=0){
+            if(Math.abs(error)<=antiWind){
+                i += (float)(error*PIDClock.seconds());
+            }
+        }
+        else{
+            i += (float)(error*PIDClock.seconds());
+        }
         float d = (float)((error-prevError)/ PIDClock.seconds());
         prevError=error;
         PIDClock.reset();
