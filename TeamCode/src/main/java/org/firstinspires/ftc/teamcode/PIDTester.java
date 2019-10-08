@@ -109,6 +109,7 @@ public class PIDTester extends LinearOpMode {
             telemetry.addData("Current P", value);
             telemetry.update();
             clock.reset();
+            ExampleBot.drivetrain.resetAllEncoders();
             PIDController testPID = new PIDController(value, 0, 0);
             testPID.start();
             while (!ExampleBot.drivetrain.movePath(path, testPID)){
