@@ -298,6 +298,7 @@ public class Function {
 //        System.out.println(Arrays.toString(components));
 //        System.out.println(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const));
         Function simpleFunction = new Function("(x * (x ^ 3) + 3 * x / (3 * 9) * (x / 4) ^ x)", variable, new HashMap<Character, Double>());
+        
 //        try {
 //            throw new UrBad((new Exception()).getCause());
 //        } catch (UrBad e) {
