@@ -40,6 +40,7 @@ public class Function {
         Pair<Integer, Integer> currentPair = null;
         int parenthesesDepth = 0;
 
+        // finds the basic subfunctions through the parentheses
         for (int c = 0; c < function.length(); c++) {
 
             if (function.substring(c, c + 1).equals("(")) {
@@ -181,11 +182,9 @@ public class Function {
         int subFuncPointer = 0;
 
         for (int node = 0; node < subFunctionLinks.size(); node++) {
-
             String subject = subFunctionLinks.get(node);
 
             if ("+-*/^".contains(String.valueOf(subject))) {
-
                 ArrayList<Pair<Integer, Boolean>> references = findLinkReferences(subFunctionTrees, node);
                 Node link = new Node(Node.paramType.Operation, subject);
 
@@ -199,38 +198,27 @@ public class Function {
                     }
                 } else {
 
+
                 }
-
-
             } else {
-
-                if (subject.equals(String.valueOf(subject))) {
+                if (subject.equals(String.valueOf(variable))) {
 
                 } else {
-
                     boolean isNumber = true;
 
                     try {
-
                         Double.valueOf(subject);
-
                     } catch (NumberFormatException e) {
-
                         isNumber = false;
                     }
 
-                    if (isNumber) {
+                    Node constant = new Node(Node.paramType.Const, subject);
 
-                        Node constant = new Node(Node.paramType.Const, subject);
-                    } else {
-
+                    if (!isNumber) {
                         if (constantList.containsKey(subject)) {
-
                             Double val = constantList.get(subject);
-
-
+                            constant = new Node(Node.paramType.Const, String.valueOf(val));
                         } else {
-
                             throw new UrBad(new Exception().getCause());
                         }
                     }

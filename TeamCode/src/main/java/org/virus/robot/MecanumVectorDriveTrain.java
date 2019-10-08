@@ -6,8 +6,6 @@ import org.virus.superclasses.Drivetrain;
 
 public class MecanumVectorDriveTrain extends Drivetrain {
 
-
-
     @Override
     public float encoderToInch(int encoder) {
         return 0;
