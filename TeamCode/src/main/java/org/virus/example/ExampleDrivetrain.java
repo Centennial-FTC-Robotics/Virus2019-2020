@@ -221,8 +221,7 @@ public class ExampleDrivetrain extends Drivetrain {
         //opMode.telemetry.addData("Heading", currentHeading.firstAngle - initialHeading);
         if(Math.abs(position-path.getDistance())<10 && Math.abs(AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading))<.5){
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -241,15 +240,9 @@ public class ExampleDrivetrain extends Drivetrain {
     }
 
     //turn around the center of the robot
-    public boolean pivot(float angle, float speed){
+    public boolean pivot(float angle, float speed) {
         //pretend there's implementation here
         return false;
         //once implemented should return true or false based on whether pivot is complete
     }
-
-
-
-
-
-
 }

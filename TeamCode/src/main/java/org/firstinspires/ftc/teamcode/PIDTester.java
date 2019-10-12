@@ -20,7 +20,7 @@ public class PIDTester extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         PathComponent[] pathComponents=
                 {
-                        new Line(150, Path.INCH),
+                        new Line(30, Path.INCH),
                         //new Arc(24, 90, Path.INCH),
                 };
         Path path = new Path(pathComponents, .05f, .0006f, .35f, .05f);
@@ -41,12 +41,12 @@ public class PIDTester extends LinearOpMode {
             if(gamepad1.dpad_up){
                 currentValue+= smallIncrement;
                 telemetry.update();
-                while (gamepad1.dpad_up);
+                while (gamepad1.dpad_up && opModeIsActive());
             }
             if(gamepad1.dpad_down){
                 currentValue-= smallIncrement;
                 telemetry.update();
-                while (gamepad1.dpad_down);
+                while (gamepad1.dpad_down && opModeIsActive());
             }
             //joystick for big jumps
             if(gamepad1.right_stick_y > 0){
@@ -62,6 +62,7 @@ public class PIDTester extends LinearOpMode {
                 values.add(currentValue);
                 currentValue = 0;
                 telemetry.update();
+                while(gamepad1.b && opModeIsActive());
             }
             //a to start or continue
             if(gamepad1.a){
