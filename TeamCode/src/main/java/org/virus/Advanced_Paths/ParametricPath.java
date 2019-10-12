@@ -2,6 +2,7 @@ package org.virus.Advanced_Paths;
 
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
+import org.virus.util.ParametricFunction2D;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ public abstract class ParametricPath {
 
     //stuff used to parametrize
     private Function[] functions;
+    private ParametricFunction2D[] rotatedFunctions;
     private Pair<Integer, Integer>[] tRanges;
     private double[] functionSpeeds;
     private double[] functionRotations;

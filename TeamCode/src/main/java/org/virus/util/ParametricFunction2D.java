@@ -10,14 +10,17 @@ public class ParametricFunction2D {
     private Function scale;
     private Function theta;
     private Function[] components;
+    private boolean isPolar;
 
     /**
      * @Description for cartesian: one is the x component and two is the y component; for polar: one is the function for theta and two is the function for the magnitude
      * @param one
      * @param two
-     * @param isPolar
+     * @param polarity
      */
-    ParametricFunction2D(Function one, Function two, boolean isPolar) {
+    ParametricFunction2D(Function one, Function two, boolean polarity) {
+
+        isPolar = polarity;
 
         if (isPolar) {
             theta = one;
@@ -87,6 +90,11 @@ public class ParametricFunction2D {
         return name;
     }
 
+    public boolean isPolar() {
+
+        return isPolar;
+    }
+
     //---------- Vector Operations ----------//
 
     public void add(ParametricFunction2D term_two) {
@@ -110,11 +118,6 @@ public class ParametricFunction2D {
         return iTwo;
     }
 
-    public void zero() {
-
-        this.scale(0);
-    }
-
     public void scale(double scalar) {
 
         Node constantRoot = new Node(Node.paramType.Const, String.valueOf(scalar));
@@ -123,29 +126,34 @@ public class ParametricFunction2D {
         components[1] = Function.operate(components[1], Function.makeFunction(constantRoot), "*");
     }
 
-    public double dot(ParametricFunction2D term_two) {
+    public double dot(ParametricFunction2D term_two, double tVal) {
 
-        double[] two_comp = term_two.getComponents();
+        Function[] two_comp = term_two.getComponents();
 
-        return ((components[0] * two_comp[0]) + (components[1] * two_comp[1]));
+        return ((components[0].output(tVal) * two_comp[0].output(tVal)) + (components[1].output(tVal) * two_comp[1].output(tVal)));
     }
 
-    public double angleBetween(ParametricFunction2D v2) {
+    public double angleBetween(ParametricFunction2D f2, double tVal) {
 
-        double dotProduct = this.dot(v2);
-        double magnitudeProducts = scale * v2.getMag();
+        double dotProduct = this.dot(f2, tVal);
+        double magnitudeProducts = scale.output(tVal) * f2.getMag().output(tVal);
 
         return Math.acos(dotProduct / magnitudeProducts);
     }
 
-    public static double standardPosAngle(ParametricFunction2D v) {
+    public static double standardPosAngle(ParametricFunction2D v, double tVal) {
 
-        ParametricFunction2D i = new ParametricFunction2D(1d, 0d);
-        ParametricFunction2D j = new ParametricFunction2D(0d, 1d);
+        Vector2D i = new Vector2D(1d, 0d);
+        Vector2D j = new Vector2D(0d, 1d);
 
-        double iAngle = v.angleBetween(i);
+        Function const1 = Function.makeFunction(new Node(Node.paramType.Const, "1"));
+        Function const0 = Function.makeFunction(new Node(Node.paramType.Const, "0"));
+        ParametricFunction2D iVector = new ParametricFunction2D(const1, const0, false);
+        ParametricFunction2D jVector = new ParametricFunction2D(const0, const1, false);
 
-        if (v.angleBetween(j) > (Math.PI / 2.0)) {
+        double iAngle = v.angleBetween(iVector, tVal);
+
+        if (v.angleBetween(jVector, tVal) > (Math.PI / 2.0)) {
 
             iAngle = (Math.PI * 2.0) - iAngle;
         }
@@ -168,9 +176,10 @@ public class ParametricFunction2D {
      */
     public void rotate(double radians) {
 
-        theta += radians % (2 * Math.PI);
-        theta = theta % (2 * Math.PI);
-        genComp();
+//        theta += radians % (2 * Math.PI);
+//        theta = theta % (2 * Math.PI);
+//        genComp();
+        // figure out how to properly rotate the different functions
     }
 
     public String toString() {
