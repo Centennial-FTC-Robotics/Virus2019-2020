@@ -46,26 +46,47 @@ public class Node {
         return child2;
     }
 
+    public Node loneClone() {
+
+        return new Node(type, parameter);
+    }
+
+    public Node linkedClone() {
+
+        Node clone = new Node(type, parameter);
+        clone.setChild1(child1);
+        clone.setChild2(child2);
+        clone.setParent(parent);
+
+        return clone;
+    }
+
     //---------- Set Methods ----------//
 
     protected void setParent(Node newParent) {
 
-        parent = newParent;
-        level = parent.getLevel() + 1;
+        if (newParent != null) {
+            parent = newParent;
+            level = parent.getLevel() + 1;
 
-        updateChildLevels();
+            updateChildLevels();
+        }
     }
 
     protected void setChild1(Node newChild) {
 
-        child1 = newChild;
-        child1.setParent(this);
+        if (newChild != null) {
+            child1 = newChild;
+            child1.setParent(this);
+        }
     }
 
     protected void setChild2(Node newChild) {
 
-        child2 = newChild;
-        child2.setParent(this);
+        if (newChild != null) {
+            child2 = newChild;
+            child2.setParent(this);
+        }
     }
 
     //---------- Tree severing ----------//

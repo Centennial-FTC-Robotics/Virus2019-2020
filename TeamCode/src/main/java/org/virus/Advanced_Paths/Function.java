@@ -25,8 +25,21 @@ public class Function {
     Function(String function, char variable, HashMap<Character, Double> newConstants) {
 
         constantList = newConstants;
-
         operationsTree = parse(function, variable);
+    }
+
+    Function(ArrayList<Node> oldFunctionTree) {
+
+        constantList = new HashMap<Character, Double>();
+        operationsTree = makeTreeCopy(getRoot(oldFunctionTree));
+    }
+
+    public ArrayList<Node> getOperationsTree() {
+        return makeTreeCopy(getRoot(operationsTree));
+    }
+
+    public Node getRoot() {
+        return getRoot(operationsTree).linkedClone();
     }
 
     private ArrayList<Node> parse(String function, char variable) {
@@ -230,7 +243,7 @@ public class Function {
         return linkedSubFunctions;
     }
 
-    private Pair<Integer, Integer> findLinkReferences(ArrayList<Pair<ArrayList<Node>, Pair<Integer, Integer>>> ObjLinkRef, int linkID) {
+    private static Pair<Integer, Integer> findLinkReferences(ArrayList<Pair<ArrayList<Node>, Pair<Integer, Integer>>> ObjLinkRef, int linkID) {
         Pair<Integer, Integer> refIndexes = new Pair<Integer, Integer>(null, null);
         // the subfunction doesnt always have an operator before or after
         for (int o = 0; o < ObjLinkRef.size(); o++) {
@@ -246,7 +259,7 @@ public class Function {
         return refIndexes;
     }
 
-    private Node getRoot(ArrayList<Node> tree) {
+    private static Node getRoot(ArrayList<Node> tree) {
         Node root = null;
 
         for (Node n: tree) {
@@ -258,12 +271,86 @@ public class Function {
         return root;
     }
 
-    public double output(int input) {
+    public double output(double input) {
         double output = 0;
 
 
 
         return output;
+    }
+
+    private Function derivative() {
+
+        Function f = makeFunction(getRoot(operationsTree));
+
+
+        return f;
+    }
+
+    //---------- Public Function Operations ----------//
+    public static Function makeFunction(Node root) {
+
+        return new Function(makeTreeCopy(root));
+    }
+
+    public static Function rebuildFunction(Node root) {
+
+        return new Function(rebuildTree(root));
+    }
+
+    public static ArrayList<Node> makeTreeCopy(Node root) {
+
+        ArrayList<Node> newTree = new ArrayList<Node>();
+        Node rootClone = root.loneClone();
+        newTree.add(rootClone);
+
+        if (root.getChild1() != null) {
+            ArrayList<Node> child1Tree = makeTreeCopy(root.getChild1());
+            Node child1Root = getRoot(child1Tree);
+            child1Root.setParent(rootClone);
+            rootClone.setChild1(child1Root);
+            newTree.addAll(child1Tree);
+        }
+        if (root.getChild2() != null) {
+            ArrayList<Node> child2Tree = makeTreeCopy(root.getChild2());
+            Node child2Root = getRoot(child2Tree);
+            child2Root.setParent(rootClone);
+            rootClone.setChild2(child2Root);
+            newTree.addAll(child2Tree);
+        }
+
+        return newTree;
+    }
+
+    public static ArrayList<Node> rebuildTree(Node root) {
+
+        ArrayList<Node> newTree = new ArrayList<Node>();
+        newTree.add(root);
+
+        if (root.getChild1() != null) {
+            newTree.addAll(rebuildTree(root.getChild1()));
+        }
+        if (root.getChild2() != null) {
+            newTree.addAll(rebuildTree(root.getChild2()));
+        }
+
+        return newTree;
+    }
+
+    public static Function operate(Function funcOne, Function funcTwo, String operation) {
+
+        if ("+-*/^".contains(operation)) {
+            Node plusRoot = new Node(Node.paramType.Operation, operation);
+            Node child1 = getRoot(makeTreeCopy(funcOne.getRoot()));
+            Node child2 = getRoot(makeTreeCopy(funcTwo.getRoot()));
+            child1.setParent(plusRoot);
+            child2.setParent(plusRoot);
+            plusRoot.setChild1(child1);
+            plusRoot.setChild2(child2);
+
+            return rebuildFunction(plusRoot);
+        }
+        return null;
     }
 
     public static void main(String[] args) {
