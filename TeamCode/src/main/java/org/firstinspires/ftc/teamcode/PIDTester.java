@@ -67,7 +67,26 @@ public class PIDTester extends LinearOpMode {
             //a to start or continue
             if(gamepad1.a){
                 //start testing
-                startTester(values, path);
+                ElapsedTime clock = new ElapsedTime();
+                ArrayList<Double> times = new ArrayList<Double>();
+                for(float value: values){
+                    telemetry.addData("Current P", value);
+                    telemetry.update();
+                    clock.reset();
+                    ExampleBot.drivetrain.resetAllEncoders();
+                    PIDController testPID = new PIDController(value, 0, 0);
+                    testPID.start();
+                    while (!ExampleBot.drivetrain.movePath(path, testPID) && opModeIsActive()){
+                        telemetry.addData("Current Time",clock.seconds());
+                        telemetry.update();
+                    }
+                    times.add(clock.seconds());
+                    while(!gamepad1.x && opModeIsActive());
+                }
+
+                telemetry.addData("P Values", values);
+                telemetry.addData("Times", times);
+                telemetry.update();
             }
 
             telemetry.addData("current P value", currentValue);
@@ -113,12 +132,12 @@ public class PIDTester extends LinearOpMode {
             ExampleBot.drivetrain.resetAllEncoders();
             PIDController testPID = new PIDController(value, 0, 0);
             testPID.start();
-            while (!ExampleBot.drivetrain.movePath(path, testPID)){
+            while (!ExampleBot.drivetrain.movePath(path, testPID) && opModeIsActive()){
                 telemetry.addData("Current Time",clock.seconds());
                 telemetry.update();
             }
             times.add(clock.seconds());
-            while(!gamepad1.x);
+            while(!gamepad1.x && opModeIsActive());
         }
 
         telemetry.addData("P Values", values);

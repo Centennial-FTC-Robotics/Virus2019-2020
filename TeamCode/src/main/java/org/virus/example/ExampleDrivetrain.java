@@ -113,6 +113,12 @@ public class ExampleDrivetrain extends Drivetrain {
         rFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        waitAllMotors();
+        lFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
     }
 
     public void waitAllMotors(){
@@ -170,7 +176,7 @@ public class ExampleDrivetrain extends Drivetrain {
         //correction = 0;
         opMode.telemetry.addData("error", AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         opMode.telemetry.addData("correction", correction);
-
+        opMode.telemetry.update();
         float power = path.getPower(position);
         float FFLeft=0;
         float FFRight=0;
@@ -212,7 +218,8 @@ public class ExampleDrivetrain extends Drivetrain {
             FFRight =0;
 
         }
-
+        opMode.telemetry.addData("Power", power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())));
+        opMode.telemetry.update();
         runMotors(
                 power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())),
                 power + /*FFLeft/4f*/ - correction * (3f/4f + power/(4f*path.getMaxPower()))
