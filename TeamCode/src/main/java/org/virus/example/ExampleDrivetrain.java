@@ -113,12 +113,6 @@ public class ExampleDrivetrain extends Drivetrain {
         rFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        waitAllMotors();
-        lFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
     }
 
     public void waitAllMotors(){
@@ -174,6 +168,9 @@ public class ExampleDrivetrain extends Drivetrain {
         float targetHeading = path.getHeading(position);
         float correction =  headingController.getValue(0, AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         //correction = 0;
+        opMode.telemetry.addData("heading", currentHeading.firstAngle - initialHeading);
+        opMode.telemetry.addData("leftEncoder", getLeftPos());
+        opMode.telemetry.addData("righttEncoder",getRightPos());
         opMode.telemetry.addData("error", AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         opMode.telemetry.addData("correction", correction);
         opMode.telemetry.update();
@@ -218,8 +215,6 @@ public class ExampleDrivetrain extends Drivetrain {
             FFRight =0;
 
         }
-        opMode.telemetry.addData("Power", power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())));
-        opMode.telemetry.update();
         runMotors(
                 power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())),
                 power + /*FFLeft/4f*/ - correction * (3f/4f + power/(4f*path.getMaxPower()))
@@ -227,6 +222,7 @@ public class ExampleDrivetrain extends Drivetrain {
 
         //opMode.telemetry.addData("Heading", currentHeading.firstAngle - initialHeading);
         if(Math.abs(position-path.getDistance())<10 && Math.abs(AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading))<.5){
+            runMotors(0,0);
             return true;
         } else {
             return false;
@@ -247,9 +243,12 @@ public class ExampleDrivetrain extends Drivetrain {
     }
 
     //turn around the center of the robot
-    public boolean pivot(float angle, float speed) {
-        //pretend there's implementation here
-        return false;
-        //once implemented should return true or false based on whether pivot is complete
-    }
+//    public boolean pivot(float angle, float speed, PIDController pid) {
+//        //pretend there's implementation here
+//        double distance = ((12.9) * 2 * Math.PI) * ((angle % 360) / 360);
+//
+//
+//        return false;
+//        //once implemented should return true or false based on whether pivot is complete
+//    }
 }

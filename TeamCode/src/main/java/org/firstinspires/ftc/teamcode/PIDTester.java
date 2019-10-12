@@ -20,8 +20,8 @@ public class PIDTester extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         PathComponent[] pathComponents=
                 {
-                        new Line(30, Path.INCH),
-                        //new Arc(24, 90, Path.INCH),
+//                        new Line(30, Path.INCH),
+                        new Arc(20, 180, Path.INCH),
                 };
         Path path = new Path(pathComponents, .05f, .0006f, .35f, .05f);
         //creates continuous path
@@ -31,66 +31,76 @@ public class PIDTester extends LinearOpMode {
         waitForStart();
 
         ArrayList<Float> values = new ArrayList<Float>();
-        float smallIncrement = 0.005f;
-        float bigIncrement = 0.1f;
+        float smallIncrement = 0.001f;
+        float bigIncrement = 0.005f;
         float currentValue = 0;
+        boolean showResults = false;
+        ArrayList<Double> times = new ArrayList<Double>();
 
         while(opModeIsActive()){
 
             //dpad for small increments
             if(gamepad1.dpad_up){
-                currentValue+= smallIncrement;
+                currentValue+= bigIncrement;
                 telemetry.update();
                 while (gamepad1.dpad_up && opModeIsActive());
             }
             if(gamepad1.dpad_down){
-                currentValue-= smallIncrement;
+                currentValue-= bigIncrement;
                 telemetry.update();
                 while (gamepad1.dpad_down && opModeIsActive());
             }
             //joystick for big jumps
-            if(gamepad1.right_stick_y > 0){
-                currentValue+= bigIncrement;
+            if(gamepad1.right_bumper){
+                currentValue+= smallIncrement;
                 telemetry.update();
+                while(gamepad1.right_bumper);
             }
-            if(gamepad1.right_stick_y < 0){
-                currentValue-= bigIncrement;
+            if(gamepad1.left_bumper){
+                currentValue-= smallIncrement;
                 telemetry.update();
+                while(gamepad1.left_bumper);
             }
             //b to save value
             if(gamepad1.b){
                 values.add(currentValue);
-                currentValue = 0;
                 telemetry.update();
                 while(gamepad1.b && opModeIsActive());
             }
             //a to start or continue
             if(gamepad1.a){
                 //start testing
+                showResults = true;
                 ElapsedTime clock = new ElapsedTime();
-                ArrayList<Double> times = new ArrayList<Double>();
                 for(float value: values){
                     telemetry.addData("Current P", value);
                     telemetry.update();
                     clock.reset();
+                    ExampleBot.drivetrain.resetOrientation();
                     ExampleBot.drivetrain.resetAllEncoders();
+                    ExampleBot.drivetrain.setAllRunUsingEncoders();
                     PIDController testPID = new PIDController(value, 0, 0);
                     testPID.start();
                     while (!ExampleBot.drivetrain.movePath(path, testPID) && opModeIsActive()){
                         telemetry.addData("Current Time",clock.seconds());
                         telemetry.update();
                     }
-                    times.add(clock.seconds());
+//                    ExampleBot.drivetrain
+                    Double timeToAdd = clock.seconds();
+                    telemetry.addData("Total Time", timeToAdd);
+                    telemetry.update();
+                    times.add(timeToAdd);
                     while(!gamepad1.x && opModeIsActive());
                 }
-
+            }
+            if(showResults){
                 telemetry.addData("P Values", values);
                 telemetry.addData("Times", times);
-                telemetry.update();
             }
-
-            telemetry.addData("current P value", currentValue);
-            telemetry.addData("all P values", values);
+            else {
+                telemetry.addData("current P value", currentValue);
+                telemetry.addData("all P values", values);
+            }
             telemetry.update();
         }
 
@@ -122,26 +132,27 @@ public class PIDTester extends LinearOpMode {
         return least;
     }
 
-    private void startTester(ArrayList<Float> values, Path path){
-        ElapsedTime clock = new ElapsedTime();
-        ArrayList<Double> times = new ArrayList<Double>();
-        for(float value: values){
-            telemetry.addData("Current P", value);
-            telemetry.update();
-            clock.reset();
-            ExampleBot.drivetrain.resetAllEncoders();
-            PIDController testPID = new PIDController(value, 0, 0);
-            testPID.start();
-            while (!ExampleBot.drivetrain.movePath(path, testPID) && opModeIsActive()){
-                telemetry.addData("Current Time",clock.seconds());
-                telemetry.update();
-            }
-            times.add(clock.seconds());
-            while(!gamepad1.x && opModeIsActive());
-        }
-
-        telemetry.addData("P Values", values);
-        telemetry.addData("Times", times);
-        telemetry.update();
-    }
+//    private void startTester(ArrayList<Float> values, Path path){
+//        ElapsedTime clock = new ElapsedTime();
+//        ArrayList<Double> times = new ArrayList<Double>();
+//        for(float value: values){
+//            telemetry.addData("Current P", value);
+//            telemetry.update();
+//            clock.reset();
+//            ExampleBot.drivetrain.resetAllEncoders();
+//            ExampleBot.drivetrain.setAllRunUsingEncoders();
+//            PIDController testPID = new PIDController(value, 0, 0);
+//            testPID.start();
+//            while (!ExampleBot.drivetrain.movePath(path, testPID) && opModeIsActive()){
+//                telemetry.addData("Current Time",clock.seconds());
+//                telemetry.update();
+//            }
+//            times.add(clock.seconds());
+//            while(!gamepad1.x && opModeIsActive());
+//        }
+//
+//        telemetry.addData("P Values", values);
+//        telemetry.addData("Times", times);
+//        telemetry.update();
+//    }
 }
