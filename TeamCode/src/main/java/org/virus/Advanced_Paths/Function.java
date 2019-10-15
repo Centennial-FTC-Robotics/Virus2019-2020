@@ -279,12 +279,21 @@ public class Function {
         return output;
     }
 
-    private Function derivative() {
+    public static Function derivative(Function originalFunc) {
 
-        Function f = makeFunction(getRoot(operationsTree));
+        ArrayList<Node> funcTree = makeTreeCopy(getRoot(originalFunc.getOperationsTree()));
 
 
-        return f;
+
+        return makeFunction(getRoot(funcTree));
+    }
+
+    public Function inverse() {
+
+        Function inverse = null;
+
+
+        return inverse;
     }
 
     //---------- Public Function Operations ----------//

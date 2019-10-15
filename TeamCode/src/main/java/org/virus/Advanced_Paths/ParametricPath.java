@@ -59,7 +59,10 @@ public abstract class ParametricPath {
     private Pair<Function[], Function[]> parametrize() {
         Pair<Function[], Function[]> components = new Pair<Function[], Function[]>(null, null);
 
+        for (Function p: functions) {
 
+            Function dervivative = Function.derivative(p);
+        }
 
         return components;
     }
