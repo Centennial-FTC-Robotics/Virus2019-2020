@@ -31,6 +31,11 @@ public class Node {
         return level;
     }
 
+    public String getVal() {
+
+        return parameter;
+    }
+
     public Node getParent() {
 
         return parent;
@@ -120,5 +125,11 @@ public class Node {
 
             child2.updateLevel();
         }
+    }
+
+    @Override
+    public String toString() {
+        String node = "{Type:" + type  + " Value: " + parameter + " Level: " + level + " {Child1: " + ((child1 == null)? "NULL":child1.getVal()) + "} {Child2: " + ((child2 == null)? "NULL":child2.getVal()) + "}" + "}";
+        return node;
     }
 }

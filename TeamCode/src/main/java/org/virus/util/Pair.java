@@ -30,4 +30,11 @@ public class Pair<T1, T2> {
 		
 		second = newSecond;
 	}
+
+	@Override
+	public String toString() {
+		String pair = "[" + first + ":" + second + "]";
+
+		return pair;
+	}
 }

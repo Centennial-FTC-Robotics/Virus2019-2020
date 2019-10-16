@@ -7,7 +7,7 @@ public class Three_Tuple<T1, T2, T3> {
     private T2 second;
     private T3 third;
 
-    Three_Tuple(T1 newFirst, T2 newSecond, T3 newThird) {
+    public Three_Tuple(T1 newFirst, T2 newSecond, T3 newThird) {
 
         first = newFirst;
         second = newSecond;
