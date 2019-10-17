@@ -242,6 +242,28 @@ public class ExampleDrivetrain extends Drivetrain {
         prevRight = right;
     }
 
+    public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
+        double maxPower=1;
+
+        if (Left0!=0&&Left1!=0&&Right0!=0&&Right1!=0) {
+            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
+        }
+
+        Left0=Left0+steerMagnitude;
+        Left1=Left1+steerMagnitude;
+        Right0=Right0-steerMagnitude;
+        Right1=Right1-steerMagnitude;
+        //make sure no exception thrown if power > 0
+        Left0 = Range.clip(Left0, -maxPower, maxPower);
+        Left1 = Range.clip(Left1, -maxPower, maxPower);
+        Right0 = Range.clip(Right0, -maxPower, maxPower);
+        Right1 = Range.clip(Right1, -maxPower, maxPower);
+        rBack.setPower(Right0);
+        rFront.setPower(Right1);
+        lBack.setPower(Left0);
+        lFront.setPower(Left1);
+    }
+
     //turn around the center of the robot
 //    public boolean pivot(float angle, float speed, PIDController pid) {
 //        //pretend there's implementation here
