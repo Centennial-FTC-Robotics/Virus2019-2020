@@ -395,7 +395,7 @@ public class Function {
         char variable = 'x';
 //        System.out.println(Arrays.toString(components));
 //        System.out.println(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const));
-        //Function simpleFunction = new Function("(3 * (x + 5))", variable, new HashMap<Character, Double>());
-        Function longFunction = new Function("(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))", variable, new HashMap<Character, Double>());
+        Function simpleFunction = new Function("(3 * (x + 5))", variable, new HashMap<Character, Double>());
+        //Function longFunction = new Function("(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))", variable, new HashMap<Character, Double>());
     }
 }
