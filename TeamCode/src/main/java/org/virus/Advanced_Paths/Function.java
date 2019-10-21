@@ -51,31 +51,7 @@ public class Function {
         System.out.println("New Function: " + function);
         function = function.substring(1, function.length() - 1); // remove garuanteed start and end parentheses
         System.out.println("Stripped function: " + function + "\n");
-        ArrayList<Pair<Integer, Integer>> subFunctions = new ArrayList<Pair<Integer, Integer>>();
-        Pair<Integer, Integer> currentPair = null;
-        int parenthesesDepth = 0;
-
-        // finds the basic subfunctions through the parentheses
-        for (int c = 0; c < function.length(); c++) {
-            if (function.substring(c, c + 1).equals("(")) {
-                if (parenthesesDepth == 0) {
-                    currentPair = new Pair<>(0, 0);
-                    currentPair.setT1(c);
-                }
-
-                parenthesesDepth++;
-            }
-
-            if (function.substring(c, c + 1).equals(")")) {
-                parenthesesDepth--;
-            }
-
-            if (parenthesesDepth == 0 && currentPair != null) {
-                currentPair.setT2(c + 1);
-                subFunctions.add(currentPair);
-                currentPair = null;
-            }
-        }
+        ArrayList<Pair<Integer, Integer>> subFunctions = getSubFuncIndex(function);
 
         System.out.print("Generated SubFunctions: ");
         for (Pair<Integer, Integer> a: subFunctions) {
@@ -88,17 +64,12 @@ public class Function {
 
         if (subFunctions.size() == 0) { // this is the base case of having a combination of a total of two variables and constants w/ one connecting operation
             String[] components = function.split(" ");
-            //System.out.println(Arrays.toString(components));
 
             Node child1 = new Node(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const), components[0]);
             Node child2 = new Node(((components[2].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const), components[2]);
-
             Node OpRelation = new Node(Node.paramType.Operation, components[1]);
             OpRelation.setChild1(child1);
             OpRelation.setChild2(child2);
-
-            child1.setParent(OpRelation);
-            child2.setParent(OpRelation);
 
             functionStructure.add(OpRelation);
             functionStructure.add(child1);
@@ -173,6 +144,37 @@ public class Function {
         return functionStructure;
     }
 
+    private ArrayList<Pair<Integer, Integer>> getSubFuncIndex(String function) {
+
+        ArrayList<Pair<Integer, Integer>> subFunctions = new ArrayList<Pair<Integer, Integer>>();
+        Pair<Integer, Integer> currentPair = null;
+        int parenthesesDepth = 0;
+
+        // finds the basic subfunctions through the parentheses
+        for (int c = 0; c < function.length(); c++) {
+            if (function.substring(c, c + 1).equals("(")) {
+                if (parenthesesDepth == 0) {
+                    currentPair = new Pair<>(0, 0);
+                    currentPair.setT1(c);
+                }
+
+                parenthesesDepth++;
+            }
+
+            if (function.substring(c, c + 1).equals(")")) {
+                parenthesesDepth--;
+            }
+
+            if (parenthesesDepth == 0 && currentPair != null) {
+                currentPair.setT2(c + 1);
+                subFunctions.add(currentPair);
+                currentPair = null;
+            }
+        }
+
+        return subFunctions;
+    }
+
     private ArrayList<Node> linker(char variable, ArrayList<String> subFunctionLinks, ArrayList<ArrayList<Node>> subFunctionTrees, ArrayList<Pair<Integer, Integer>> subFunctionIndexes) throws FunctionFormatException {
         ArrayList<Node> linkedSubFunctions = new ArrayList<Node>();
 
@@ -223,9 +225,9 @@ public class Function {
                 link.setChild2(funcAfter);
 
                 // add them to the linked subfunctions list
+                linkedSubFunctions.add(link);
                 linkedSubFunctions.add(funcBefore);
                 linkedSubFunctions.add(funcAfter);
-                linkedSubFunctions.add(link);
             }
         }
 
@@ -395,7 +397,7 @@ public class Function {
         char variable = 'x';
 //        System.out.println(Arrays.toString(components));
 //        System.out.println(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const));
-        Function simpleFunction = new Function("(3 * (x + 5))", variable, new HashMap<Character, Double>());
-        //Function longFunction = new Function("(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))", variable, new HashMap<Character, Double>());
+        //Function simpleFunction = new Function("(3 * (x + 5))", variable, new HashMap<Character, Double>());
+        Function longFunction = new Function("(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))", variable, new HashMap<Character, Double>());
     }
 }
