@@ -27,7 +27,7 @@ public class PIDModeTester extends LinearOpMode {
         PathComponent[] pathComponents=
                 {
 //                        new Line(30, Path.INCH),
-                        new Arc(25, 180, Path.INCH),
+                        new Arc(40, 180, Path.INCH),
                 };
         Path path = new Path(pathComponents, .05f, .0006f, .35f, .05f);
         //creates continuous path
@@ -112,8 +112,8 @@ public class PIDModeTester extends LinearOpMode {
                 while(opModeIsActive() && !gamepad1.x);
             }
             telemetry.addData("Current Mode: ", mode.name());
-            telemetry.addData("All trial times:", alltrials);
-            telemetry.addData("All trial overshoots:", trialOvershoots);
+            telemetry.addData("All trial times:", alltrials.toString());
+            telemetry.addData("All trial overshoots:", trialOvershoots.toString());
             telemetry.addData("overshoots", overshoots);
             telemetry.addData("Times", times);
             telemetry.update();
