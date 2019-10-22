@@ -79,8 +79,9 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         initialRoll = currentHeading.secondAngle;
         initialPitch = currentHeading.thirdAngle;
     }
-    public void updateOrientation() {
+    public Orientation updateOrientation() {
         currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentHeading;
     }
     public void initialize(OpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");

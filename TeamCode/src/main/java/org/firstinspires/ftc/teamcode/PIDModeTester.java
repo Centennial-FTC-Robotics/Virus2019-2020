@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.virus.agobot.Agobot;
+import org.virus.example.ExampleBot;
 import org.virus.paths.Arc;
 import org.virus.paths.Line;
 import org.virus.paths.Path;
 import org.virus.paths.PathComponent;
 import org.virus.util.PIDController;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @TeleOp(name="PID Mode Tester", group="TeleOp")
@@ -34,6 +36,7 @@ public class PIDModeTester extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         waitForStart();
 
+        int trials = 4;
         int modePointer = 0;
         double Ku = 0.04;
         double Tu = 0.664;
@@ -49,7 +52,7 @@ public class PIDModeTester extends LinearOpMode {
         };
 
         ArrayList<Double> times = new ArrayList<Double>();
-        boolean showResults = false;
+        ArrayList<Double> overshoots = new ArrayList<Double>();
 
         while(opModeIsActive()){
 
@@ -63,7 +66,9 @@ public class PIDModeTester extends LinearOpMode {
                 telemetry.update();
                 while (opModeIsActive() && gamepad1.dpad_down);
             }
-            double[] alltrials = new double[3];
+
+            double[] alltrials = new double[trials];
+            double[] trialOvershoots = new double[trials];
 
             modes mode = modes.values()[Math.abs(modePointer) % modes.values().length];
 
@@ -75,10 +80,10 @@ public class PIDModeTester extends LinearOpMode {
                 PIDVal[2] = porportions[modePointer % modes.values().length][2] * (Ku * Tu);
 
                 ElapsedTime clock = new ElapsedTime();
-                alltrials = new double[3];
-                int counter = 0;
-                showResults = true;
-                for(int i = 0; opModeIsActive() && i < 3; i++) {
+                alltrials = new double[trials];
+                trialOvershoots = new double[trials];
+
+                for(int i = 0; opModeIsActive() && i < 4; i++) {
                     resetRobot();
                     PIDController testPID = new PIDController((float) PIDVal[0],(float) PIDVal[1],(float) PIDVal[2]);
                     clock.reset();
@@ -98,13 +103,18 @@ public class PIDModeTester extends LinearOpMode {
                     telemetry.addData("Total Time", timeToAdd);
                     telemetry.update();
                     alltrials[i] = timeToAdd;
+                    PathComponent lastComponent = pathComponents[pathComponents.length - 1];
+                    trialOvershoots[i] = Math.abs(path.getHeading(path.getDistance()) - Agobot.drivetrain.updateOrientation().firstAngle);
                     while (opModeIsActive() && !gamepad1.x) ;
                 }
                 times.add(calculateAverage(alltrials));
+                overshoots.add(calculateAverage(trialOvershoots));
                 while(opModeIsActive() && !gamepad1.x);
             }
             telemetry.addData("Current Mode: ", mode.name());
-            telemetry.addData("All trials", alltrials);
+            telemetry.addData("All trial times:", alltrials);
+            telemetry.addData("All trial overshoots:", trialOvershoots);
+            telemetry.addData("overshoots", overshoots);
             telemetry.addData("Times", times);
             telemetry.update();
         }

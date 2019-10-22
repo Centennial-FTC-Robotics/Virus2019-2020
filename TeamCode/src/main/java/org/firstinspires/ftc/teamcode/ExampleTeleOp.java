@@ -42,9 +42,9 @@ public class ExampleTeleOp extends LinearOpMode {
 
     public void updateControllerValues(){
         lefty = -gamepad1.left_stick_y;
-        leftx = -gamepad1.left_stick_x;
+        leftx = gamepad1.left_stick_x;
         righty = -gamepad1.right_stick_y;
-        rightx = -gamepad1.right_stick_x;
+        rightx = gamepad1.right_stick_x;
         rtrigger = -gamepad1.right_trigger;
         ltrigger = -gamepad1.left_trigger;
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
