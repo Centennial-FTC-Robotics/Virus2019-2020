@@ -93,7 +93,7 @@ public class PIDTester extends LinearOpMode {
                         telemetry.update();
                         clock.reset();
                         resetRobot();
-                        PIDController testPID = new PIDController(value, allPIDCalcI[counter], allPIDCalcD[counter]);
+                        PIDController testPID = new PIDController(value, 0, 0);
                         testPID.start();
                         while (opModeIsActive() && !Agobot.drivetrain.movePath(path, testPID)) {
                             telemetry.addData("Current Time", clock.seconds());
