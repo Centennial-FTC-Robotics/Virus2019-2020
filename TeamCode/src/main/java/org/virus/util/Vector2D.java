@@ -63,7 +63,7 @@ public class Vector2D {
 
                 if (components[0] < 0) {
 
-                    if (components[1] > 0) {
+                    if (components[1] >= 0) {
 
                         theta += Math.PI;
                     } else if (components[1] < 0) {
