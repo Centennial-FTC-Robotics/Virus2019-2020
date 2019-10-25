@@ -8,20 +8,20 @@ public class Vector2D {
     private double theta;
     private double[] components;
 
-    Vector2D(double comp1, double comp2) {
+    public Vector2D(double comp1, double comp2) {
 
         components = new double[] {comp1, comp2};
         genAngles();
     }
 
-    Vector2D(float newTheta, float newMag) {
+    public Vector2D(float newTheta, float newMag) {
 
         R = newMag;
         theta = newTheta;
         genComp();
     }
 
-    Vector2D(Vector2D prevV) {
+    public Vector2D(Vector2D prevV) {
 
         components = prevV.getComponents();
         R = prevV.getMag();
@@ -45,16 +45,32 @@ public class Vector2D {
     public void genAngles() {
         genMag();
 
-        theta = Math.atan(components[1] / components[0]);
+        if (components[0] == 0 && components[1] == 0) {
 
-        if (components[0] < 0) {
+            theta = 0;
+        } else {
 
-            if (components[1] > 0) {
+            if (components[0] == 0) {
 
-                theta += Math.PI;
-            } else if (components[1] < 0) {
+                theta = Math.PI / 2;
 
-                theta -= Math.PI;
+                if (components[1] < 0) {
+                    theta *= -1;
+                }
+            } else {
+
+                theta = Math.atan(components[1] / components[0]);
+
+                if (components[0] < 0) {
+
+                    if (components[1] > 0) {
+
+                        theta += Math.PI;
+                    } else if (components[1] < 0) {
+
+                        theta -= Math.PI;
+                    }
+                }
             }
         }
     }
@@ -79,6 +95,16 @@ public class Vector2D {
     public double[] getComponents() {
 
         return Arrays.copyOf(components, components.length);
+    }
+
+    public Double getComponent(int component) {
+
+        if (component >= 0 && component < 2) {
+
+            return components[component];
+        }
+
+        return null;
     }
 
     public String getName() {
@@ -182,11 +208,17 @@ public class Vector2D {
 
     public static void main(String[] args) {
 
-        for (int angle = 0; angle < 360; angle++) {
+//        for (int angle = 0; angle < 360; angle++) {
+//
+//            float theta = (float) Math.toRadians(angle);
+//            Vector2D v = new Vector2D(theta, 1);
+//            System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
+//            v.rotate(Math.PI / 2);
+//            v.genAngles();
+//            System.out.println("Rotated Angle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)) + "\n");
+//        }
 
-            float theta = (float) Math.toRadians(angle);
-            Vector2D v = new Vector2D(theta, 1);
-            System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
-        }
+        Vector2D v = new Vector2D(0d, 0d);
+        System.out.println(v);
     }
 }

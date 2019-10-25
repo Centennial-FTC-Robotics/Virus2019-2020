@@ -11,12 +11,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.openftc.revextensions2.ExpansionHubMotor;
+import org.virus.agobot.Agobot;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
 import org.virus.superclasses.Drivetrain;
@@ -80,7 +82,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         initialPitch = currentHeading.thirdAngle;
     }
     public Orientation updateOrientation() {
-        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         return currentHeading;
     }
     public void initialize(OpMode opMode) {
@@ -226,6 +228,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
+
         double maxPower=1;
 
         if (Left0!=0&&Left1!=0&&Right0!=0&&Right1!=0) {
@@ -241,9 +244,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         Left1 = Range.clip(Left1, -maxPower, maxPower);
         Right0 = Range.clip(Right0, -maxPower, maxPower);
         Right1 = Range.clip(Right1, -maxPower, maxPower);
-        rBack.setPower(Right0);
-        rFront.setPower(Right1);
-        lBack.setPower(Left0);
-        lFront.setPower(Left1);
+
+        rBack.setPower(Right1);
+        rFront.setPower(Right0);
+        lBack.setPower(Left1);
+        lFront.setPower(Left0);
     }
 }
