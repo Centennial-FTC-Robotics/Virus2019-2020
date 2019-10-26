@@ -332,6 +332,24 @@ public class VectorND {
         return vector;
     }
 
+    public boolean equals(VectorND compare) {
+
+        if (compare.dimension() == this.dimension()) {
+
+            for (int c = 0; c < components.length; c++) {
+
+                if (compare.getComponent(c) != this.getComponent(c)) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     private static void VectorNDTester() {
 
         double[] components = {4, 5, 3, 7, 6, 6.54, 654.82667, 10};

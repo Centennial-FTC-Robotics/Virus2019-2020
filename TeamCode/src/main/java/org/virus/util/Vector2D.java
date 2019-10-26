@@ -69,6 +69,9 @@ public class Vector2D {
                     } else if (components[1] < 0) {
 
                         theta -= Math.PI;
+                    } else {
+
+                        theta = Math.PI;
                     }
                 }
             }
@@ -192,8 +195,7 @@ public class Vector2D {
      */
     public void rotate(double radians) {
 
-        theta += radians % (2 * Math.PI);
-        theta = theta % (2 * Math.PI);
+        theta = (theta + radians) % (2 * Math.PI);
         genComp();
     }
 
@@ -204,6 +206,19 @@ public class Vector2D {
         vector += components[1] + ">";
 
         return vector;
+    }
+
+    public boolean equals(Vector2D compare) {
+
+        for (int c = 0; c < components.length; c++) {
+
+            if (compare.getComponent(c) != this.getComponent(c)) {
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static void main(String[] args) {
