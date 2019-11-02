@@ -45,6 +45,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
+    Odometry odometry = new Odometry();
 
 
     @Override
@@ -108,6 +109,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         imu = new LynxEmbeddedIMU(idkWhatThisMeans);
         imu.initialize(new BNO055IMU.Parameters());
         currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        odometry.initialize(opMode);
     }
     public int getRightPos(){
         return (Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rFront)+ Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rBack))/2;
@@ -247,7 +250,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
-
         double maxPower = 1;
 
 //        if (Math.abs(Left0) > 0.01 && Math.abs(Left1) > 0.01 && Math.abs(Right0) > 0.01 && Math.abs(Right1) > 0.01) {
