@@ -92,6 +92,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         rBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rBack");
         rFront.setDirection(DcMotor.Direction.REVERSE);
         rBack.setDirection(DcMotor.Direction.REVERSE);
+
+        lFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         this.opMode=opMode;
         resetAllEncoders();
         waitAllMotors();
@@ -222,6 +228,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double magnitude = Math.sqrt(Math.pow(moveY, 2) + Math.pow(moveX, 2));
 
         Vector2D motorSpeeds = new Vector2D((moveY - moveX) * (magnitude / scalar), (moveY + moveX) * (magnitude / scalar));
+
+        
         return false;
     }
 
@@ -242,9 +250,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         double maxPower = 1;
 
-        if (Left0!=0&&Left1!=0&&Right0!=0&&Right1!=0) {
-            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
-        }
+//        if (Math.abs(Left0) > 0.01 && Math.abs(Left1) > 0.01 && Math.abs(Right0) > 0.01 && Math.abs(Right1) > 0.01) {
+//            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
+//        }
+
 
         Left0=Left0+steerMagnitude;
         Left1=Left1+steerMagnitude;

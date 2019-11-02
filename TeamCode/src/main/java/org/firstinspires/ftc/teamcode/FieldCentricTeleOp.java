@@ -24,6 +24,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         waitForStart();
 
+        leftStick = new Vector2D((double) gamepad1.left_stick_x, (double) -gamepad1.left_stick_y);
+        rightStick = new Vector2D((double) gamepad1.right_stick_x, (double) gamepad1.right_stick_y);
+
         while(opModeIsActive()) {
             updateControllerValues();
             double diagSpeed1 = motorSpeeds.getComponent(0);
@@ -45,10 +48,11 @@ public class FieldCentricTeleOp extends LinearOpMode {
     }
 
     public void updateControllerValues(){
-
+        leftStick.setComponents(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y});
+        rightStick.setComponents(new double[] {gamepad1.right_stick_x, gamepad1.right_stick_y});
         telemetry.addData("leftStick: ", leftStick.toString());
-        double heading = Math.toRadians(Agobot.drivetrain.updateOrientation().firstAngle);
-        leftStick.rotate(-heading);
+        double heading = Agobot.drivetrain.updateOrientation().firstAngle;
+        leftStick.rotate(-Math.toRadians(heading));
         telemetry.addData("Heading: ", heading);
         telemetry.addData("leftStick Rotated: ", leftStick.toString());
 

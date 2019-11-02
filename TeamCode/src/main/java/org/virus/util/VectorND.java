@@ -38,21 +38,35 @@ public class VectorND {
     //---------- Vector Refresh ----------//
 
     private void reCalcAngles() {
-
         angles = new double[components.length];
 
         for (int c = 0; c < components.length; c++) {
+            if (components[c] == 0 && components[c + 1] == 0) {
 
-            angles[c] = Math.atan2(components[(c + 1) % components.length], components[c]);
+                angles[c] = 0;
+            } else {
 
-            if (components[c] < 0) {
+                if (components[c] == 0) {
 
-                if (components[(c + 1) % components.length] > 0) {
+                    angles[c] = Math.PI / 2;
 
-                    angles[c] += Math.PI;
-                } else if (components[(c + 1) % components.length] < 0) {
+                    if (components[c + 1] < 0) {
+                        angles[c] *= -1;
+                    }
+                } else {
 
-                    angles[c] -= Math.PI;
+                    angles[c] = Math.atan2(components[(c + 1) % components.length], components[c]);
+
+                    if (components[c] < 0) {
+
+                        if (components[(c + 1) % components.length] > 0) {
+
+                            angles[c] += Math.PI;
+                        } else if (components[(c + 1) % components.length] < 0) {
+
+                            angles[c] -= Math.PI;
+                        }
+                    }
                 }
             }
         }

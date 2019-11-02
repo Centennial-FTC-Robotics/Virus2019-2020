@@ -1,4 +1,5 @@
 package org.virus.util;
+import java.sql.SQLOutput;
 import java.util.Arrays;
 
 public class Vector2D {
@@ -14,7 +15,11 @@ public class Vector2D {
         genAngles();
     }
 
-    public Vector2D(float newTheta, float newMag) {
+    public Vector2D(float newTheta, float newMag, boolean isRad) {
+
+        if (!isRad) {
+            theta = Math.toRadians(theta);
+        }
 
         R = newMag;
         theta = newTheta;
@@ -116,6 +121,15 @@ public class Vector2D {
     }
 
     //---------- Vector Operations ----------//
+
+    public void setComponents(double[] newComp) {
+
+        if (newComp.length == 2) {
+
+            components = Arrays.copyOf(newComp, newComp.length);
+            genAngles();
+        }
+    }
 
     public void add(Vector2D term_two) {
 
@@ -226,14 +240,25 @@ public class Vector2D {
 //        for (int angle = 0; angle < 360; angle++) {
 //
 //            float theta = (float) Math.toRadians(angle);
-//            Vector2D v = new Vector2D(theta, 1);
+//            Vector2D v = new Vector2D(theta, 1, true);
 //            System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
-//            v.rotate(Math.PI / 2);
+//            v.rotate(3 * Math.PI / 4);
 //            v.genAngles();
 //            System.out.println("Rotated Angle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)) + "\n");
+//
+//            if (Math.round(Math.toDegrees(standardPosAngle(v))) != ((angle + 135) % 360)) {
+//                System.out.println("BAD");
+//                break;
+//            }
 //        }
 
-        Vector2D v = new Vector2D(0d, 0d);
-        System.out.println(v);
+        Vector2D rightStick = new Vector2D(-1, 0);
+
+        for (double a = 130; a <= 140; a += 0.05) {
+
+            Vector2D leftStick = new Vector2D(0, 1);
+            leftStick.rotate(Math.toRadians(a));
+            System.out.println(leftStick);
+        }
     }
 }
