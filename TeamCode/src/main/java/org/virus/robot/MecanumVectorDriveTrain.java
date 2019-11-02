@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -25,6 +24,7 @@ import org.virus.superclasses.Drivetrain;
 import org.virus.superclasses.Robot;
 import org.virus.util.BetterI2cDeviceSynchImplOnSimple;
 import org.virus.util.PIDController;
+import org.virus.util.Vector2D;
 
 public class MecanumVectorDriveTrain extends Drivetrain {
     public static final float TRACKWIDTHIN =13.25f;
@@ -82,7 +82,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         initialPitch = currentHeading.thirdAngle;
     }
     public Orientation updateOrientation() {
-        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return currentHeading;
     }
     public void initialize(OpMode opMode) {
@@ -92,6 +92,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         rBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rBack");
         rFront.setDirection(DcMotor.Direction.REVERSE);
         rBack.setDirection(DcMotor.Direction.REVERSE);
+
+        lFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         this.opMode=opMode;
         resetAllEncoders();
         waitAllMotors();
@@ -214,6 +220,19 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
     }
 
+    public boolean move(Vector2D move) {
+
+        double moveX = move.getComponent(0);
+        double moveY = move.getComponent(1);
+        double scalar = Math.max(Math.abs(moveY - moveX), Math.abs(moveY + moveX)); //scalar and magnitude scale the motor powers based on distance from joystick origin
+        double magnitude = Math.sqrt(Math.pow(moveY, 2) + Math.pow(moveX, 2));
+
+        Vector2D motorSpeeds = new Vector2D((moveY - moveX) * (magnitude / scalar), (moveY + moveX) * (magnitude / scalar));
+
+        
+        return false;
+    }
+
     public void runMotors(float right,float left){
         if(prevLeft!=left){
             lFront.setPower(Range.clip(left,-1,1));
@@ -229,11 +248,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
     public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
 
-        double maxPower=1;
+        double maxPower = 1;
 
-        if (Left0!=0&&Left1!=0&&Right0!=0&&Right1!=0) {
-            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
-        }
+//        if (Math.abs(Left0) > 0.01 && Math.abs(Left1) > 0.01 && Math.abs(Right0) > 0.01 && Math.abs(Right1) > 0.01) {
+//            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
+//        }
+
 
         Left0=Left0+steerMagnitude;
         Left1=Left1+steerMagnitude;
