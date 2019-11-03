@@ -1,38 +1,38 @@
 package org.virus.Advanced_Paths;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Function {
 
     /*
-    * RULES:
-    *  - no single constants or variables will have parentheses around them
-    *  - there will be parentheses around every single operation ((ex. (2 * x) / (10.2)))
-    *  - between operations and constants there will always be spaces (ex. 1 + x, not 1+x)
-    *  - don't put in any constants that don't correspond to a constant in the hashmap, a format exception will be thrown
-    * */
+     * RULES:
+     *  - no single constants or variables will have parentheses around them
+     *  - there will be parentheses around every single operation ((ex. (2 * x) / (10.2)))
+     *  - between operations and constants there will always be spaces (ex. 1 + x, not 1+x)
+     *  - don't put in any constants that don't correspond to a constant in the hashmap, a format exception will be thrown
+     * */
 
     public enum operation {addition, subtraction, multiplication, division, exponent};
-    private char funcVariable;
-    private HashMap<Character, Double> constantList;
+    private String funcVariable;
+    private HashMap<String, Double> constantList;
     private ArrayList<Node> operationsTree; // ArrayList<Pair<Bounds<Start, End>, Relatives<Parent, Children<Positions>>>>
 
-    Function(String function, char variable, HashMap<Character, Double> newConstants) {
+    Function(String function, String variable, HashMap<String, Double> newConstants) {
 
         funcVariable = variable;
         constantList = newConstants;
         operationsTree = parse(function, funcVariable);
-        System.out.println("Tree: " + operationsTree);
     }
 
     Function(ArrayList<Node> oldFunctionTree) {
 
-        constantList = new HashMap<Character, Double>();
+        constantList = new HashMap<String, Double>();
         operationsTree = makeTreeCopy(getRoot(oldFunctionTree));
     }
 
@@ -44,11 +44,11 @@ public class Function {
         return getRoot(operationsTree).linkedClone();
     }
 
-    private ArrayList<Node> parse(String function, char variable) {
+    private ArrayList<Node> parse(String function, String variable) {
         ArrayList<Node> functionStructure = new ArrayList<Node>();
 
         // checking for smaller functions inside
-        System.out.println("New Function: " + function);
+        System.out.println("\n+ New Function: " + function);
         function = function.substring(1, function.length() - 1); // remove garuanteed start and end parentheses
         System.out.println("Stripped function: " + function + "\n");
         ArrayList<Pair<Integer, Integer>> subFunctions = getSubFuncIndex(function);
@@ -65,15 +65,40 @@ public class Function {
         if (subFunctions.size() == 0) { // this is the base case of having a combination of a total of two variables and constants w/ one connecting operation
             String[] components = function.split(" ");
 
-            Node child1 = new Node(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const), components[0]);
-            Node child2 = new Node(((components[2].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const), components[2]);
-            Node OpRelation = new Node(Node.paramType.Operation, components[1]);
-            OpRelation.setChild1(child1);
-            OpRelation.setChild2(child2);
+            if (components.length == 1) {
 
-            functionStructure.add(OpRelation);
-            functionStructure.add(child1);
-            functionStructure.add(child2);
+                Node lone = null;
+
+                try {
+                    lone = genNode(components[0]);
+
+                    if (lone.getType() == Node.paramType.Operation) {
+
+                        throw new FunctionFormatException("Syntax error, function/subfunction found to literally just be an operator", (new Exception()).getCause());
+                    }
+                } catch (FunctionFormatException e) {
+                    e.printStackTrace();
+                }
+
+                functionStructure.add(lone);
+            } else {
+                Node child1 = null;
+                Node child2 = null;
+
+                try {
+                    child1 = genNode(components[0]);
+                    child2 = genNode(components[2]);
+                } catch (FunctionFormatException e) {
+                    e.printStackTrace();
+                }
+                Node OpRelation = new Node(Node.paramType.Operation, components[1]);
+                OpRelation.setChild1(child1);
+                OpRelation.setChild2(child2);
+
+                functionStructure.add(OpRelation);
+                functionStructure.add(child1);
+                functionStructure.add(child2);
+            }
         } else { // unfortunately you've some smaller functions to break down
             ArrayList<ArrayList<Node>> subFunctionTrees = new ArrayList<ArrayList<Node>>();
             ArrayList<Pair<Integer, Integer>> subFunctionIndexes = new ArrayList<Pair<Integer, Integer>>();
@@ -141,6 +166,8 @@ public class Function {
             }
         }
 
+        System.out.println("Tree: " + functionStructure);
+
         return functionStructure;
     }
 
@@ -175,48 +202,57 @@ public class Function {
         return subFunctions;
     }
 
-    private ArrayList<Node> linker(char variable, ArrayList<String> subFunctionLinks, ArrayList<ArrayList<Node>> subFunctionTrees, ArrayList<Pair<Integer, Integer>> subFunctionIndexes) throws FunctionFormatException {
+    private ArrayList<Node> linker(String variable, ArrayList<String> subFunctionLinks, ArrayList<ArrayList<Node>> subFunctionTrees, ArrayList<Pair<Integer, Integer>> subFunctionIndexes) throws FunctionFormatException {
         ArrayList<Node> linkedSubFunctions = new ArrayList<Node>();
+        for (int subFunc = 0; subFunc < subFunctionTrees.size(); subFunc++) {
+            ArrayList<Node> subFunction = subFunctionTrees.get(subFunc);
+            System.out.println(subFunc + ": " + subFunction);
+        }
+        System.out.println("Links: " + subFunctionLinks);
+        System.out.println("Indexes: " + subFunctionIndexes);
 
         for (int node = 0; node < subFunctionLinks.size(); node++) {
             String subject = subFunctionLinks.get(node);
 
             if ("+-*/^".contains(String.valueOf(subject))) {
                 Pair<Integer, Integer> references = findLinkReferences(subFunctionIndexes, node);
-                Node link = new Node(Node.paramType.Operation, subject);
+                System.out.println("Link References: " + references);
+                Node link = genNode(subject);
                 Node funcBefore = null;
                 Node funcAfter = null;
 
-                if (node < subFunctionLinks.size() - 1) {
+                if (node < subFunctionLinks.size()) {
                     if (node == 0) {
-                        funcBefore = getRoot(subFunctionTrees.get(references.get1()));
+                        ArrayList<Node> refSubFunc = subFunctionTrees.get(references.get1());
+                        funcBefore = changeNode(getRoot(refSubFunc), getRoot(refSubFunc).getVal());
                     }
 
                     if (references.get2() == null) {
                         if (subFunctionLinks.size() > (node + 1) && !"+-*/^".contains(subFunctionLinks.get(node + 1))) {
-                            funcAfter = new Node(Node.paramType.Const, subFunctionLinks.get(node + 1));
+                            funcAfter = genNode(subFunctionLinks.get(node + 1));
                         } else {
                             throw new FunctionFormatException("No constant connected after " + subject + " operator at " + node , (new Exception()).getCause());
                         }
                     } else {
-                        funcAfter = getRoot(subFunctionTrees.get(references.get2()));
+                        funcAfter = changeNode(getRoot(subFunctionTrees.get(references.get2())), getRoot(subFunctionTrees.get(references.get2())).getVal());
                     }
                 }
 
                 if (node > 0) {
                     if (node == subFunctionLinks.size() - 1) {
-                        funcAfter = getRoot(subFunctionTrees.get(references.get2()));
+                        ArrayList<Node> refSubFunc = subFunctionTrees.get(references.get2());
+                        funcAfter = changeNode(getRoot(refSubFunc), getRoot(refSubFunc).getVal());
                     }
 
                     if (references.get1() == null) {
-                        if ( (node - 1) >= 0 && !"+-*/^".contains(subFunctionLinks.get(node - 1))) {
+                        if (!"+-*/^".contains(subFunctionLinks.get(node - 1))) {
                             // add in the case in which the constant is not explicitly defined
-                            funcBefore = new Node(Node.paramType.Const, subFunctionLinks.get(node - 1));
+                            funcBefore = genNode(subFunctionLinks.get(node - 1));
                         } else {
                             throw new FunctionFormatException("No constant connected before " + subject + " operator at " + node , (new Exception()).getCause());
                         }
                     } else {
-                        funcBefore = getRoot(subFunctionTrees.get(references.get1()));
+                        funcBefore = changeNode(getRoot(subFunctionTrees.get(references.get1())), getRoot(subFunctionTrees.get(references.get1())).getVal());
                     }
                 }
 
@@ -225,6 +261,10 @@ public class Function {
                 link.setChild2(funcAfter);
 
                 // add them to the linked subfunctions list
+                System.out.println("\nFunction Before: " + funcBefore);
+                System.out.println("Link: " + link);
+                System.out.println("Function After: " + funcAfter + "\n");
+
                 linkedSubFunctions.add(link);
                 linkedSubFunctions.add(funcBefore);
                 linkedSubFunctions.add(funcAfter);
@@ -262,15 +302,113 @@ public class Function {
             }
         }
 
+        if (root == null) {
+            System.out.println("Bad tree: " + tree);
+        }
         return root;
     }
 
     public double output(double input) {
+
+        return output(this, input);
+    }
+
+    public static double output(Function inputFunction, double input) {
+
+        return output(inputFunction.getOperationsTree(), input);
+    }
+
+    public static double output(ArrayList<Node> operationTree, double input) {
+
         double output = 0;
+        Node root = getRoot(operationTree);
 
+        //child 1
+        double child1Val = 0;
+        if (root.getChild1() != null) {
+            switch (root.getChild1().getType()) {
+                case Const:
+                    child1Val = Double.parseDouble(root.getChild1().getVal());
+                    break;
+                case Variable:
+                    child1Val = input;
+                    break;
+                case Operation:
+                    ArrayList<Node> subTree = makeTreeCopy(root.getChild1());
+                    child1Val = output(subTree, input);
+                    break;
+            }
+        }
 
+        //child2
+        double child2Val = 0;
+        if (root.getChild1() != null) {
+            switch (root.getChild2().getType()) {
+                case Const:
+                    child2Val = Double.parseDouble(root.getChild2().getVal());
+                    break;
+                case Variable:
+                    child2Val = input;
+                    break;
+                case Operation:
+                    ArrayList<Node> subTree = makeTreeCopy(root.getChild2());
+                    child2Val = output(subTree, input);
+                    break;
+            }
+        }
+
+        switch(root.getType()) {
+            case Const:
+
+                output = Double.parseDouble(root.getVal());
+                break;
+            case Variable:
+
+                output = input;
+                break;
+            case Operation:
+                switch (root.getVal()) {
+                    case "+":
+                        output = child1Val + child2Val;
+                        break;
+                    case "-":
+                        output = child1Val - child2Val;
+                        break;
+                    case "*":
+                        output = child1Val * child2Val;
+                        break;
+                    case "/":
+                        output = child1Val / child2Val;
+                        break;
+                    case "^":
+                        output = Math.pow(child1Val, child2Val);
+                        break;
+                }
+                break;
+        }
 
         return output;
+    }
+
+    public Node changeNode(Node root, String newVal) throws FunctionFormatException{
+
+        Node newRoot = genNode(newVal);
+
+        if (root.getChild1() != null) {
+
+            Node child1 = root.getChild1();
+            root.getChild1().severParent(root);
+            newRoot.setChild1(child1);
+        }
+
+        if (root.getChild2() != null) {
+
+            Node child2 = root.getChild2();
+            root.getChild2().severParent(root);
+            newRoot.setChild2(child2);
+        }
+
+        return newRoot;
     }
 
     public Node genNode(String nodeVal) throws FunctionFormatException{
@@ -293,9 +431,11 @@ public class Function {
             if (isNumber) {
                 newNode = new Node(Node.paramType.Const, nodeVal);
             } else {
+                System.out.println("List of Constants: " + constantList);
                 if (constantList.containsKey(nodeVal)) {
                     Double val = constantList.get(nodeVal);
                     newNode = new Node(Node.paramType.Const, String.valueOf(val));
+                    System.out.println(nodeVal + " = " + newNode.getVal());
                 } else {
                     throw new FunctionFormatException("Constant " + nodeVal + " does not exist in constant hashmap",(new Exception()).getCause());
                 }
@@ -364,16 +504,58 @@ public class Function {
 
             return rebuildFunction(plusRoot);
         }
+
         return null;
     }
 
     public static Function derivative(Function originalFunc) {
 
-        ArrayList<Node> funcTree = makeTreeCopy(getRoot(originalFunc.getOperationsTree()));
+        return makeFunction(getRoot(derivative(originalFunc.getOperationsTree())));
+    }
 
+    public static ArrayList<Node> derivative(ArrayList<Node> originalFunc) {
 
+        ArrayList<Node> funcTree = makeTreeCopy(getRoot(originalFunc));
+        Node dRoot = getRoot(funcTree);
 
-        return makeFunction(getRoot(funcTree));
+        Node subRoot1 = null;
+        if (dRoot.getChild1() != null) {
+            switch(dRoot.getChild1().getType()) {
+                case Const:
+                    break;
+                case Variable:
+                    break;
+                case Operation:
+                    ArrayList<Node> subDerivative = derivative(makeTreeCopy(dRoot.getChild1()));
+                    subRoot1 = getRoot(subDerivative);
+                    break;
+            }
+        }
+
+        Node subRoot2 = null;
+        if (dRoot.getChild2() != null) {
+            switch(dRoot.getChild2().getType()) {
+                case Const:
+                    break;
+                case Variable:
+                    break;
+                case Operation:
+                    ArrayList<Node> subDerivative = derivative(makeTreeCopy(dRoot.getChild2()));
+                    subRoot2 = getRoot(subDerivative);
+                    break;
+            }
+        }
+
+        switch(dRoot.getType()) {
+            case Const:
+                break;
+            case Variable:
+                break;
+            case Operation:
+                break;
+        }
+
+        return funcTree;
     }
 
     public static Function inverse(Function originalFunc) {
@@ -384,20 +566,78 @@ public class Function {
         return inverse;
     }
 
-    public static void main(String[] args) {
-//        String polynomial = "(x ^ 3)";
-//        String multipleInputPoint = "((ln(x)) / (4)) + (12.34 * (x + p))";
-//
-//        HashMap<Character, Double> MIPconsts = new HashMap<Character, Double>();
-//        MIPconsts.put('p', 500.2);
-//
-//        Function MIP = new Function(multipleInputPoint, 'x', MIPconsts);
+    public static boolean FunctionTypeTester(double input) {
 
-        String[] components = "x ^ 2".split(" ");
-        char variable = 'x';
-//        System.out.println(Arrays.toString(components));
-//        System.out.println(((components[0].equals(String.valueOf(variable))) ? Node.paramType.Variable : Node.paramType.Const));
-        //Function simpleFunction = new Function("(3 * (x + 5))", variable, new HashMap<Character, Double>());
-        Function longFunction = new Function("(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))", variable, new HashMap<Character, Double>());
+        boolean passed = true;
+
+        String variable = "x";
+
+        String polynomial = "(x ^ 3)";
+        Function polynomialFunction = new Function(polynomial, variable, new HashMap<String, Double>());
+        passed = (polynomialFunction.output(input) == Math.pow(input, 3));
+        if (!passed) {
+            return false;
+        }
+
+        String multipleInputPoint = "((x / 4) + (12.34 * (x + p)))";
+        HashMap<String, Double> MIPconsts = new HashMap<String, Double>();
+        MIPconsts.put("p", 500.2);
+        Function MIPFunction = new Function(multipleInputPoint, variable, MIPconsts);
+        passed = (MIPFunction.output(input) == ((input / 4.0) + (12.34 * (input + 500.2))));
+        if (!passed) {
+            return false;
+        }
+
+        String moreComplex = "(C * ((x * 4) / (((x ^ x) + 8) - C)))";
+        HashMap<String, Double> mCVariables = new HashMap<String, Double>();
+        mCVariables.put("C", 340.2);
+        Function moreComplexFunction = new Function(moreComplex, variable, mCVariables);
+        passed = (moreComplexFunction.output(input) == (340.2 * ((input * 4) / (((Math.pow(input, input)) + 8) - 340.2))));
+        if (!passed) {
+            return false;
+        }
+
+        String simple = "(3 * (x + 5))";
+        Function simpleFunction = new Function(simple, variable, new HashMap<String, Double>());
+        passed = (simpleFunction.output(input) == (3 * (input + 5)));
+        if (!passed) {
+            return false;
+        }
+
+        String wayMoreComplex = "((((x ^ 2) - ((3 * x) ^ 5)) + (((3 * x) ^ 0) + 2)) + ((3 ^ x) ^ 0)))";
+        HashMap<String, Double> WMCVariables = new HashMap<String, Double>();
+        WMCVariables.put("z", 123d);
+        Function wayMoreComplexFunction = new Function(wayMoreComplex, variable, WMCVariables);
+        passed = (wayMoreComplexFunction.output(input) == ((((Math.pow(input, 2)) - (Math.pow((3 * input), 5))) + ((Math.pow((3 * input), 0)) + 2)) + (Math.pow((Math.pow(3, input)), 0))));
+        if (!passed) {
+            return false;
+        }
+
+        String constant = "(8)";
+        Function constantFunction = new Function(constant, variable, new HashMap<String, Double>());
+        passed = (constantFunction.output(input) == 8);
+        if (!passed) {
+            return false;
+        }
+
+        String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
+        Function longestFunction = new Function(longest, variable, new HashMap<String, Double>());
+        passed = (longestFunction.output(input) == (((((3 * 5) * 45) + (input * (Math.pow(input, 3)))) + (3 * (input / (3.0 * 9.0)))) * (Math.pow((input / 4), input))));
+
+        return passed;
+    }
+
+    public static void main(String[] args) {
+
+        boolean passed = true;
+        for (double x = 0.0; x <= 100; x+=0.5) {
+
+            if (!FunctionTypeTester(x)) {
+                passed = false;
+                break;
+            }
+        }
+
+        System.out.println(passed);
     }
 }
