@@ -5,17 +5,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.virus.robot.MecanumVectorDriveTrain;
+import org.virus.robot.Odometry;
 import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 
 public class Agobot extends Robot {
     public static MecanumVectorDriveTrain drivetrain = new MecanumVectorDriveTrain();
+    public static Odometry odometry = new Odometry();
     //public static ExampleSlides verticalSlides = new ExampleSlides();
     //public static ExampleSlides horizontalSlides = new ExampleSlides();
 
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain/*, verticalSlides, horizontalSlides*/};
+    static Subsystem[] subsystems = {drivetrain, odometry};
 
     public static void initialize(OpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));

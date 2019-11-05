@@ -13,12 +13,12 @@ public class Odometry extends Subsystem {
     ExpansionHubMotor lEncoder;
     ExpansionHubMotor rEncoder;
     ExpansionHubMotor bEncoder;
-    Vector2D position;
+    Vector2D position; // this has to be in inches
     double heading = 0;
     int lEncoderPrevious = 0;
     int rEncoderPrevious = 0;
     int bEncoderPrevious = 0;
-    final static double ENCODER_COUNTS_PER_INCH = 1024/(2.0*Math.PI);
+    final static double ENCODER_COUNTS_PER_INCH = 4096/(2*1*Math.PI);
     final static double RADIUS = 6.5;
     @Override
     public void initialize(OpMode opMode) {
@@ -34,6 +34,11 @@ public class Odometry extends Subsystem {
 
         position = new Vector2D(0,0);
     }
+    public void setStartLocation(Vector2D startPosition, double startHeading){ //inches, and degrees
+        position = new Vector2D(startPosition);
+        heading = Math.toRadians(startHeading);
+    }
+
     public void resetAllEncoders(){
         lEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -68,9 +73,9 @@ public class Odometry extends Subsystem {
             deltay = moveRad * Math.sin(deltaHeading) - strafeRad * (Math.cos(deltaHeading) - 1);
         }
 
-        Vector2D deltaDisp = new Vector2D(deltax, deltay);
+        Vector2D deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
         heading += deltaHeading;
-        deltaDisp.rotate(Math.toRadians(heading));
+        deltaDisp.rotate(heading);
         position.add(deltaDisp);
 
         lEncoderPrevious = lEncoder.getCurrentPosition();
@@ -80,7 +85,7 @@ public class Odometry extends Subsystem {
         return position;
     }
 
-    public float encoderToInch(int encoder) {
+    public float encoderToInch(double encoder) {
         return (float)(encoder/ENCODER_COUNTS_PER_INCH);
     }
 
