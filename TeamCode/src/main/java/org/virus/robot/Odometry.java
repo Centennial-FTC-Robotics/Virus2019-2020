@@ -48,20 +48,35 @@ public class Odometry extends Subsystem {
         rEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public double updateOrientation(){
-        heading = 180*(rEncoder.getCurrentPosition() - lEncoder.getCurrentPosition())/(2*Math.PI*RADIUS);
-        return heading;
-    }
+
     public Vector2D updatePosition(){
         int deltalEncoder = lEncoder.getCurrentPosition() - lEncoderPrevious;
         int deltarEncoder = rEncoder.getCurrentPosition() - rEncoderPrevious;
         int deltabEncoder = bEncoder.getCurrentPosition() - bEncoderPrevious;
-        Vector2D deltaDisp = new Vector2D(deltabEncoder, (deltalEncoder + deltarEncoder)/2);
+
+        double deltaHeading = (deltarEncoder - deltalEncoder)/(2*RADIUS); //it's in radians
+        double deltax;
+        double deltay;
+
+        if (Math.abs(deltaHeading) < 0.0001){ //don't really trust java to not floating point everything up
+            deltax = deltabEncoder;
+            deltay = (deltalEncoder + deltarEncoder)/2;
+        } else {
+            double moveRad = (deltalEncoder + deltarEncoder)/(2 * deltaHeading);
+            double strafeRad = deltabEncoder/deltaHeading;
+            deltax = moveRad * (Math.cos(deltaHeading) - 1) + strafeRad * Math.sin(deltaHeading);
+            deltay = moveRad * Math.sin(deltaHeading) - strafeRad * (Math.cos(deltaHeading) - 1);
+        }
+
+        Vector2D deltaDisp = new Vector2D(deltax, deltay);
+        heading += deltaHeading;
         deltaDisp.rotate(Math.toRadians(heading));
         position.add(deltaDisp);
+
         lEncoderPrevious = lEncoder.getCurrentPosition();
         rEncoderPrevious = rEncoder.getCurrentPosition();
         bEncoderPrevious = bEncoder.getCurrentPosition();
+        
         return position;
     }
 
