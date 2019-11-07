@@ -20,13 +20,17 @@ public class Odometry extends Subsystem {
     int bEncoderPrevious = 0;
     final static double ENCODER_COUNTS_PER_INCH = 4096/(2*1*Math.PI);
     final static double RADIUS = 6.5;
+    Vector2D fieldCentricDelta;
+    Vector2D robotCentricDelta;
+
+    Odometry(ExpansionHubMotor lEncoder, ExpansionHubMotor rEncoder, ExpansionHubMotor bEncoder){
+        this.lEncoder=lEncoder;
+        this.rEncoder=rEncoder;
+        this.bEncoder=bEncoder;
+
+    }
     @Override
     public void initialize(OpMode opMode) {
-        lEncoder = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lEncoder");
-        rEncoder = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rEncoder");
-        bEncoder = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "bEncoder");
-
-        rEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         resetAllEncoders();
         waitAllEncoders();
@@ -54,7 +58,7 @@ public class Odometry extends Subsystem {
         bEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public Vector2D updatePosition(){
+    public void updatePosition(){
         int deltalEncoder = lEncoder.getCurrentPosition() - lEncoderPrevious;
         int deltarEncoder = rEncoder.getCurrentPosition() - rEncoderPrevious;
         int deltabEncoder = bEncoder.getCurrentPosition() - bEncoderPrevious;
@@ -74,14 +78,27 @@ public class Odometry extends Subsystem {
         }
 
         Vector2D deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
+        robotCentricDelta=deltaDisp;
         heading += deltaHeading;
         deltaDisp.rotate(heading);
+        fieldCentricDelta=deltaDisp;
+
         position.add(deltaDisp);
 
         lEncoderPrevious = lEncoder.getCurrentPosition();
         rEncoderPrevious = rEncoder.getCurrentPosition();
         bEncoderPrevious = bEncoder.getCurrentPosition();
         
+        //return deltaDisp;
+    }
+
+    public Vector2D getRobotCentricDelta(){
+        return robotCentricDelta;
+    }
+    public Vector2D getFieldCentricDelta(){
+        return fieldCentricDelta;
+    }
+    public Vector2D currentPosition(){
         return position;
     }
 

@@ -45,6 +45,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
+    public static Odometry odometry;
+
 //    Odometry odometry = new Odometry();
 
 
@@ -94,15 +96,22 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         rFront.setDirection(DcMotor.Direction.REVERSE);
         rBack.setDirection(DcMotor.Direction.REVERSE);
 
+        odometry = new Odometry(lFront, rFront, lBack);
+        odometry.initialize(opMode);
+
         lFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.opMode=opMode;
+        //should be handled by odometry
+        /*
         resetAllEncoders();
         waitAllMotors();
         setAllRunUsingEncoders();
+
+         */
         LynxModule module = opMode.hardwareMap.get(LynxModule.class, "Expansion Hub 1");
         I2cDeviceSynch idkWhatThisMeans = new BetterI2cDeviceSynchImplOnSimple(
                 new LynxI2cDeviceSynchV1(AppUtil.getDefContext(), module, 0), true);
