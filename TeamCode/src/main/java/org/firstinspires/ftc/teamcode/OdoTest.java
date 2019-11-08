@@ -33,7 +33,7 @@ public class OdoTest extends LinearOpMode {
             } else {
                 Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
             }
-            Agobot.drivetrain.odometry.updateEncoders();
+            Agobot.drivetrain.odometry.updatePosition();
             telemetry.addData("Position:", Agobot.drivetrain.odometry.currentPosition());
             telemetry.addData("Heading:", Agobot.drivetrain.odometry.currentHeading());
             telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
