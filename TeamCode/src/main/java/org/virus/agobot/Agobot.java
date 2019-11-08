@@ -21,7 +21,7 @@ public class Agobot extends Robot {
     public static void initialize(OpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
         //setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
-        readHub1Data();
+        updateHub1Data();
         //readHub2Data();
         for(int i=0; i<subsystems.length; i++){
             subsystems[i].initialize(opMode);

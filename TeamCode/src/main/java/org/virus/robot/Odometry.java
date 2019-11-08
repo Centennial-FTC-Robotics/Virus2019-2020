@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.openftc.revextensions2.ExpansionHubMotor;
+import org.virus.agobot.Agobot;
+import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 import org.virus.util.Vector2D;
 
@@ -18,7 +20,12 @@ public class Odometry extends Subsystem {
     int lEncoderPrevious = 0;
     int rEncoderPrevious = 0;
     int bEncoderPrevious = 0;
-    final static double ENCODER_COUNTS_PER_INCH = 4096/(2*1*Math.PI);
+    int lEncoderCounts=0;
+    int rEncoderCounts=0;
+    int bEncoderCounts=0;
+
+
+    final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
     final static double RADIUS = 6.5;
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
@@ -58,10 +65,36 @@ public class Odometry extends Subsystem {
         bEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    //lrb
+    public void updateEncoders(){
+        Agobot.updateHub1Data();
+        lEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(lEncoder);
+        rEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(rEncoder);
+        bEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(bEncoder);
+    }
+
+    public int getlEncoderCounts() {
+        return lEncoderCounts;
+    }
+
+    public int getrEncoderCounts() {
+        return rEncoderCounts;
+    }
+
+    public int getbEncoderCounts() {
+        return bEncoderCounts;
+    }
+
     public void updatePosition(){
-        int deltalEncoder = lEncoder.getCurrentPosition() - lEncoderPrevious;
-        int deltarEncoder = rEncoder.getCurrentPosition() - rEncoderPrevious;
-        int deltabEncoder = bEncoder.getCurrentPosition() - bEncoderPrevious;
+        updateEncoders();
+
+        int deltalEncoder =  getlEncoderCounts() - lEncoderPrevious;
+        int deltarEncoder = getrEncoderCounts() - rEncoderPrevious;
+        int deltabEncoder = getbEncoderCounts() - bEncoderPrevious;
+
+        lEncoderPrevious = getlEncoderCounts();
+        rEncoderPrevious = getrEncoderCounts();
+        bEncoderPrevious = getbEncoderCounts();
 
         double deltaHeading = (deltarEncoder - deltalEncoder)/(2*RADIUS); //it's in radians
         double deltax;
@@ -82,13 +115,7 @@ public class Odometry extends Subsystem {
         heading += deltaHeading;
         deltaDisp.rotate(heading);
         fieldCentricDelta=deltaDisp;
-
         position.add(deltaDisp);
-
-        lEncoderPrevious = lEncoder.getCurrentPosition();
-        rEncoderPrevious = rEncoder.getCurrentPosition();
-        bEncoderPrevious = bEncoder.getCurrentPosition();
-        
         //return deltaDisp;
     }
 
@@ -101,6 +128,10 @@ public class Odometry extends Subsystem {
     public Vector2D currentPosition(){
         return position;
     }
+    public double currentHeading(){
+        return heading;
+    }
+
 
     public float encoderToInch(double encoder) {
         return (float)(encoder/ENCODER_COUNTS_PER_INCH);
