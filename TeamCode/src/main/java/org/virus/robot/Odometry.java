@@ -41,7 +41,7 @@ public class Odometry extends Subsystem {
 
         resetAllEncoders();
         waitAllEncoders();
-        setAllRunUsingEncoders();
+        setAllRunWithoutEncoders();
 
         position = new Vector2D(0,0);
     }
@@ -59,10 +59,10 @@ public class Odometry extends Subsystem {
         while(lEncoder.isBusy() || rEncoder.isBusy() || bEncoder.isBusy()){
         }
     }
-    public void setAllRunUsingEncoders(){
-        lEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    public void setAllRunWithoutEncoders(){
+        lEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     //lrb
