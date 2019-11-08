@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOP", name = "MechDrive")
+@TeleOp(group = "TeleOP", name = "OdometryTest")
 public class OdoTest extends LinearOpMode {
 
     Vector2D leftStick;
@@ -19,7 +19,7 @@ public class OdoTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         Agobot.initialize(this);
-        Agobot.drivetrain.setAllRunUsingEncoders();
+//        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
         waitForStart();
@@ -35,10 +35,24 @@ public class OdoTest extends LinearOpMode {
             }
             Agobot.drivetrain.odometry.updatePosition();
             telemetry.addData("Position:", Agobot.drivetrain.odometry.currentPosition());
-            telemetry.addData("Heading:", Agobot.drivetrain.odometry.currentHeading());
+            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.odometry.currentHeading()));
             telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
             telemetry.addData("rEncoder:", Agobot.drivetrain.odometry.getrEncoderCounts());
             telemetry.addData("bEncoder:", Agobot.drivetrain.odometry.getbEncoderCounts());
+            telemetry.addData("lEncoderPrevious",Agobot.drivetrain.odometry.lEncoderPrevious);
+            telemetry.addData("rEncoderPrevious",Agobot.drivetrain.odometry.rEncoderPrevious);
+            telemetry.addData("bEncoderPrevious",Agobot.drivetrain.odometry.bEncoderPrevious);
+            telemetry.addData("diagSpeed1", diagSpeed1);
+            telemetry.addData("diagSpeed2", diagSpeed2);
+            telemetry.addData("deltalEncoder",Agobot.drivetrain.odometry.deltalEncoder);
+            telemetry.addData("deltarEncoder",Agobot.drivetrain.odometry.deltarEncoder);
+            telemetry.addData("deltabEncoder",Agobot.drivetrain.odometry.deltabEncoder);
+            telemetry.addData("deltaHeading",Agobot.drivetrain.odometry.deltaHeading);
+            telemetry.addData("deltax",Agobot.drivetrain.odometry.deltax);
+            telemetry.addData("deltay",Agobot.drivetrain.odometry.deltay);
+            telemetry.addData("lEncoder Run Mode",Agobot.drivetrain.odometry.lEncoder.getMode().toString());
+            telemetry.addData("deltaDisp",Agobot.drivetrain.odometry.deltaDisp);
+            telemetry.addData("Position = deltaDisp?", Agobot.drivetrain.odometry.currentPosition().equals(Agobot.drivetrain.odometry.deltaDisp));
 
             telemetry.update();
 

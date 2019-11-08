@@ -119,6 +119,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         imu.initialize(new BNO055IMU.Parameters());
         currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+        lFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
     public int getRightPos(){
         return (Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rFront)+ Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rBack))/2;

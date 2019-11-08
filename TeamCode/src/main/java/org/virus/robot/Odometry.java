@@ -12,21 +12,29 @@ import org.virus.superclasses.Subsystem;
 import org.virus.util.Vector2D;
 
 public class Odometry extends Subsystem {
-    ExpansionHubMotor lEncoder;
-    ExpansionHubMotor rEncoder;
-    ExpansionHubMotor bEncoder;
-    Vector2D position; // this has to be in inches
-    double heading = 0;
-    int lEncoderPrevious = 0;
-    int rEncoderPrevious = 0;
-    int bEncoderPrevious = 0;
-    int lEncoderCounts=0;
-    int rEncoderCounts=0;
-    int bEncoderCounts=0;
+    public ExpansionHubMotor lEncoder;
+    public ExpansionHubMotor rEncoder;
+    public ExpansionHubMotor bEncoder;
+    public Vector2D position; // this has to be in inches
+    public double heading = 0;
+    public int lEncoderPrevious = 0;
+    public int rEncoderPrevious = 0;
+    public int bEncoderPrevious = 0;
+    public int lEncoderCounts=0;
+    public int rEncoderCounts=0;
+    public int bEncoderCounts=0;
+
+    public int deltalEncoder;
+    public int deltarEncoder;
+    public int deltabEncoder;
+    public double deltaHeading;
+    public double deltax;
+    public double deltay;
+    public Vector2D deltaDisp;
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
-    final static double RADIUS = 6.5;
+    final static double RADIUS = 6.258445555555; //6.5 * (1733.108/1800) ~5 circles
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
 
@@ -88,17 +96,17 @@ public class Odometry extends Subsystem {
     public void updatePosition(){
         updateEncoders();
 
-        int deltalEncoder =  getlEncoderCounts() - lEncoderPrevious;
-        int deltarEncoder = getrEncoderCounts() - rEncoderPrevious;
-        int deltabEncoder = getbEncoderCounts() - bEncoderPrevious;
+        deltalEncoder =  getlEncoderCounts() - lEncoderPrevious;
+        deltarEncoder = getrEncoderCounts() - rEncoderPrevious;
+        deltabEncoder = getbEncoderCounts() - bEncoderPrevious;
 
         lEncoderPrevious = getlEncoderCounts();
         rEncoderPrevious = getrEncoderCounts();
         bEncoderPrevious = getbEncoderCounts();
 
-        double deltaHeading = (deltarEncoder - deltalEncoder)/(2*RADIUS); //it's in radians
-        double deltax;
-        double deltay;
+        deltaHeading = ((double)(encoderToInch(deltarEncoder - deltalEncoder)))/(2.0*RADIUS); //it's in radians
+//        double deltax;
+//        double deltay;
 
         if (Math.abs(deltaHeading) < 0.0001){ //don't really trust java to not floating point everything up
             deltax = deltabEncoder;
@@ -110,7 +118,7 @@ public class Odometry extends Subsystem {
             deltay = moveRad * Math.sin(deltaHeading) - strafeRad * (Math.cos(deltaHeading) - 1);
         }
 
-        Vector2D deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
+        deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
         robotCentricDelta=deltaDisp;
         heading += deltaHeading;
         deltaDisp.rotate(heading);
