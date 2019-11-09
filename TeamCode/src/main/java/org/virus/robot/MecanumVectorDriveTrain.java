@@ -1,5 +1,7 @@
 package org.virus.robot;
 
+import android.media.AudioRecord;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
@@ -26,9 +28,13 @@ import org.virus.util.BetterI2cDeviceSynchImplOnSimple;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
 
+import java.util.Vector;
+
 public class MecanumVectorDriveTrain extends Drivetrain {
     public static final float TRACKWIDTHIN =13.25f;
     //standard 4 motor drivetrain
+    private int IMUUPDATERATE=100;
+    private int odoLoopCounter=0;
     private ExpansionHubMotor lFront;
     private ExpansionHubMotor rFront;
     private ExpansionHubMotor lBack;
@@ -38,6 +44,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     float initialPitch;
     float initialRoll;
     private Orientation currentHeading;
+    private Vector2D currentPosition;
     PIDController headingController;
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
@@ -45,7 +52,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
-    public static Odometry odometry;
+    private static Odometry odometry;
 
 //    Odometry odometry = new Odometry();
 
@@ -85,8 +92,26 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         initialPitch = currentHeading.thirdAngle;
     }
     public Orientation updateOrientation() {
-        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return currentHeading;
+    }
+    public Vector2D updatePosition(){
+        if(odoLoopCounter%IMUUPDATERATE==0){
+            currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            currentHeading.firstAngle = AngleUnit.normalizeDegrees(currentHeading.firstAngle-initialHeading);
+            odometry.setHeading(Math.toRadians(getHeading()));
+            odometry.updatePosition();
+        }
+        else{
+            odometry.updatePosition();
+        }
+        currentHeading.firstAngle = (float) odometry.currentHeading();
+        odoLoopCounter++;
+        return odometry.currentPosition();
+    }
+    public double getHeading(){
+        return currentHeading.firstAngle;
+        //return AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading);
     }
     public void initialize(OpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");

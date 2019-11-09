@@ -19,7 +19,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         Agobot.initialize(this);
-        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
         waitForStart();
@@ -51,9 +50,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
         leftStick.setComponents(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y});
         rightStick.setComponents(new double[] {gamepad1.right_stick_x, gamepad1.right_stick_y});
         telemetry.addData("leftStick: ", leftStick.toString());
-        double heading = Agobot.drivetrain.updateOrientation().firstAngle;
-        leftStick.rotate(-Math.toRadians(heading));
-        telemetry.addData("Heading: ", heading);
+        Agobot.drivetrain.updatePosition();
+        leftStick.rotate(-Agobot.drivetrain.getHeading());
+        telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
         telemetry.addData("leftStick Rotated: ", leftStick.toString());
 
         double leftx = -leftStick.getComponent(0);

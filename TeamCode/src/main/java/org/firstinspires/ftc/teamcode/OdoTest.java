@@ -33,9 +33,9 @@ public class OdoTest extends LinearOpMode {
             } else {
                 Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
             }
-            Agobot.drivetrain.odometry.updatePosition();
-            telemetry.addData("Position:", Agobot.drivetrain.odometry.currentPosition());
-            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.odometry.currentHeading()));
+            telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
+            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+            /*
             telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
             telemetry.addData("rEncoder:", Agobot.drivetrain.odometry.getrEncoderCounts());
             telemetry.addData("bEncoder:", Agobot.drivetrain.odometry.getbEncoderCounts());
@@ -52,7 +52,7 @@ public class OdoTest extends LinearOpMode {
             telemetry.addData("deltay",Agobot.drivetrain.odometry.deltay);
             telemetry.addData("lEncoder Run Mode",Agobot.drivetrain.odometry.lEncoder.getMode().toString());
             telemetry.addData("deltaDisp",Agobot.drivetrain.odometry.deltaDisp);
-            telemetry.addData("Position = deltaDisp?", Agobot.drivetrain.odometry.currentPosition().equals(Agobot.drivetrain.odometry.deltaDisp));
+            telemetry.addData("Position = deltaDisp?", Agobot.drivetrain.odometry.currentPosition().equals(Agobot.drivetrain.odometry.deltaDisp));*/
 
             telemetry.update();
 

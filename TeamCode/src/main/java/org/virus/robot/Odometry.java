@@ -1,5 +1,6 @@
 package org.virus.robot;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,8 +21,8 @@ public class Odometry extends Subsystem {
 
     //make any of these directions -1 to reverse the encoder without affecting the corresponding drive motor
     public int lEncoderDirection = 1;
-    public int rEncoderDirection = -1;
-    public int bEncoderDirection = 1;
+    public int rEncoderDirection = 1;
+    public int bEncoderDirection = -1;
 
     public int lEncoderPrevious = 0;
     public int rEncoderPrevious = 0;
@@ -41,7 +42,7 @@ public class Odometry extends Subsystem {
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
-    final static double RADIUS = 14.553420608108109/2;
+    final static double RADIUS = 14.553420608108109/2.0   * 928.0/1080.0;
     final static double BENCODER_OFFSET = 5079.53754590155;
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
@@ -140,6 +141,9 @@ public class Odometry extends Subsystem {
     }
     public double currentHeading(){
         return heading;
+    }
+    public void setHeading(double heading){
+        this.heading=heading;
     }
 
 

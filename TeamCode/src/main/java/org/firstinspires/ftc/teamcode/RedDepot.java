@@ -14,7 +14,7 @@ public class RedDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Agobot.initialize(this);
-        Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        //Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
 
         //go to (63, -60)
