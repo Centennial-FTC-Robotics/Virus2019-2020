@@ -2,14 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
-
-import java.util.Vector;
 
 @Autonomous(group = "Autonomous", name = "Odometry Demo")
 
@@ -18,6 +15,7 @@ public class OdoDemo extends LinearOpMode {
     Vector2D rightStick;
     double lefty;
     double leftx;
+    double steerMag;
     Vector2D motorSpeeds;
     PIDController headingController = new PIDController(-.03f, 0 ,0);
     PIDController xController = new PIDController(.08f,0 ,0);
@@ -33,7 +31,7 @@ public class OdoDemo extends LinearOpMode {
 
         waitForStart();
 
-        while(!gamepad1.a){
+        while(!gamepad1.a && opModeIsActive()){
             telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
             telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
             telemetry.update();
@@ -42,20 +40,23 @@ public class OdoDemo extends LinearOpMode {
         headingController.start();
         xController.start();
         yController.start();
-        while(true){
-            currentPosition = Agobot.drivetrain.updatePosition();
-            telemetry.addData("Position:", currentPosition);
-            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
-            updateControllerValues();
-            double diagSpeed1 = motorSpeeds.getComponent(0);
-            double diagSpeed2 = motorSpeeds.getComponent(1);
-            if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
-                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
-            } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
-            }
-            telemetry.update();
-        }
+        Vector2D newPosition = new Vector2D(0,0);
+        double newHeading = 0;
+        goToPosition(newPosition, newHeading);
+//        while(opModeIsActive()){
+//            currentPosition = Agobot.drivetrain.updatePosition();
+//            telemetry.addData("Position:", currentPosition);
+//            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+//            updateControllerValues();
+//            double diagSpeed1 = motorSpeeds.getComponent(0);
+//            double diagSpeed2 = motorSpeeds.getComponent(1);
+//            if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
+//                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
+//            } else {
+//                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
+//            }
+//            telemetry.update();
+//        }
 
 
     }
@@ -73,4 +74,40 @@ public class OdoDemo extends LinearOpMode {
 
         motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
     }
+
+    public void goToPosition(Vector2D newPosition, double newHeading){
+        while(opModeIsActive()){
+            currentPosition = Agobot.drivetrain.updatePosition();
+            telemetry.addData("Position:", currentPosition);
+            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+            updateMotorPowers(newPosition, newHeading);
+            double diagSpeed1 = motorSpeeds.getComponent(0);
+            double diagSpeed2 = motorSpeeds.getComponent(1);
+            if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
+                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
+            } else {
+                Agobot.drivetrain.runMotors(0, 0, 0, 0, steerMag);
+            }
+            if (Math.abs(diagSpeed1) < 0.001 && Math.abs(diagSpeed2) < 0.001 && Math.abs(steerMag) < 0.001) {
+                break;
+            }
+            telemetry.update();
+        }
+    }
+
+    public void updateMotorPowers(Vector2D newPosition, double newHeading){
+        double x = currentPosition.getComponent(0);
+        double y = currentPosition.getComponent(1);
+        leftStick = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double)  yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
+        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float)Math.toDegrees(Agobot.drivetrain.getHeading())));
+        leftStick.rotate(-Agobot.drivetrain.getHeading());
+        leftx = -leftStick.getComponent(0);
+        lefty = -leftStick.getComponent(1);
+        double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
+        double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
+
+        motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
+
+    }
+
 }
