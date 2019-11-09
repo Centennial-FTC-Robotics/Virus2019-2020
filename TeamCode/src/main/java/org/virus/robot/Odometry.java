@@ -17,6 +17,12 @@ public class Odometry extends Subsystem {
     public ExpansionHubMotor bEncoder;
     public Vector2D position; // this has to be in inches
     public double heading = 0;
+
+    //make any of these directions -1 to reverse the encoder without affecting the corresponding drive motor
+    public int lEncoderDirection = 1;
+    public int rEncoderDirection = 1;
+    public int bEncoderDirection = 1;
+
     public int lEncoderPrevious = 0;
     public int rEncoderPrevious = 0;
     public int bEncoderPrevious = 0;
@@ -82,15 +88,15 @@ public class Odometry extends Subsystem {
     }
 
     public int getlEncoderCounts() {
-        return lEncoderCounts;
+        return lEncoderCounts*lEncoderDirection;
     }
 
     public int getrEncoderCounts() {
-        return rEncoderCounts;
+        return rEncoderCounts*rEncoderDirection;
     }
 
     public int getbEncoderCounts() {
-        return bEncoderCounts;
+        return bEncoderCounts*bEncoderDirection;
     }
 
     public void updatePosition(){
@@ -105,8 +111,7 @@ public class Odometry extends Subsystem {
         bEncoderPrevious = getbEncoderCounts();
 
         deltaHeading = ((double)(encoderToInch(deltarEncoder - deltalEncoder)))/(2.0*RADIUS); //it's in radians
-//        double deltax;
-//        double deltay;
+        heading += deltaHeading;
 
         if (Math.abs(deltaHeading) < 0.0001){ //don't really trust java to not floating point everything up
             deltax = deltabEncoder;
@@ -120,7 +125,7 @@ public class Odometry extends Subsystem {
 
         deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
         robotCentricDelta=deltaDisp;
-        heading += deltaHeading;
+
         deltaDisp.rotate(heading);
         fieldCentricDelta=deltaDisp;
         position.add(deltaDisp);
