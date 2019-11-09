@@ -20,7 +20,7 @@ public class Odometry extends Subsystem {
 
     //make any of these directions -1 to reverse the encoder without affecting the corresponding drive motor
     public int lEncoderDirection = 1;
-    public int rEncoderDirection = 1;
+    public int rEncoderDirection = -1;
     public int bEncoderDirection = 1;
 
     public int lEncoderPrevious = 0;
@@ -33,6 +33,7 @@ public class Odometry extends Subsystem {
     public int deltalEncoder;
     public int deltarEncoder;
     public int deltabEncoder;
+    public double deltaHorizontal;
     public double deltaHeading;
     public double deltax;
     public double deltay;
@@ -40,7 +41,8 @@ public class Odometry extends Subsystem {
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
-    final static double RADIUS = 6.258445555555; //6.5 * (1733.108/1800) ~5 circles
+    final static double RADIUS = 14.553420608108109/2;
+    final static double BENCODER_OFFSET = 5079.53754590155;
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
 
@@ -110,24 +112,19 @@ public class Odometry extends Subsystem {
         rEncoderPrevious = getrEncoderCounts();
         bEncoderPrevious = getbEncoderCounts();
 
-        deltaHeading = ((double)(encoderToInch(deltarEncoder - deltalEncoder)))/(2.0*RADIUS); //it's in radians
+        deltaHeading = (deltarEncoder - deltalEncoder)/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH); //it's in radians
         heading += deltaHeading;
 
-        if (Math.abs(deltaHeading) < 0.0001){ //don't really trust java to not floating point everything up
-            deltax = deltabEncoder;
-            deltay = (deltalEncoder + deltarEncoder)/2;
-        } else {
-            double moveRad = (deltalEncoder + deltarEncoder)/(2 * deltaHeading);
-            double strafeRad = deltabEncoder/deltaHeading;
-            deltax = moveRad * (Math.cos(deltaHeading) - 1) + strafeRad * Math.sin(deltaHeading);
-            deltay = moveRad * Math.sin(deltaHeading) - strafeRad * (Math.cos(deltaHeading) - 1);
-        }
+        deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
+
+        deltay = (deltarEncoder + deltalEncoder)/2;
+        deltax = deltaHorizontal;
 
         deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
-        robotCentricDelta=deltaDisp;
+        robotCentricDelta = new Vector2D(deltaDisp);
 
         deltaDisp.rotate(heading);
-        fieldCentricDelta=deltaDisp;
+        fieldCentricDelta = new Vector2D(deltaDisp);
         position.add(deltaDisp);
         //return deltaDisp;
     }
