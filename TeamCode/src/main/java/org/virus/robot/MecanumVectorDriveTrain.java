@@ -1,7 +1,5 @@
 package org.virus.robot;
 
-import android.media.AudioRecord;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
@@ -28,8 +26,6 @@ import org.virus.util.BetterI2cDeviceSynchImplOnSimple;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
 
-import java.util.Vector;
-
 public class MecanumVectorDriveTrain extends Drivetrain {
     public static final float TRACKWIDTHIN =13.25f;
     //standard 4 motor drivetrain
@@ -45,14 +41,19 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     float initialRoll;
     private Orientation currentHeading;
     private Vector2D currentPosition;
-    PIDController headingController;
+    PIDController headingController = new PIDController(-.03f, 0 ,0);
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
+    PIDController xController = new PIDController(.08f,0 ,0);
+    PIDController yController = new PIDController(-.08f,0 ,0);
     private OpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
     private static Odometry odometry;
+    double steerMag;
+    Vector2D motorSpeeds;
+    Vector2D translationalMvmt;
 
 //    Odometry odometry = new Odometry();
 
@@ -315,5 +316,40 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("Back Odometry Encoder", odometry.bEncoder.getCurrentPosition());
 //        opMode.telemetry.addData("Odometry Position",odometry.position);
 //        opMode.telemetry.addData("Odometry Heading",odometry.heading);
+    }
+
+    public void goToPosition(Vector2D newPosition, double newHeading){
+        while(((LinearOpMode)opMode).opModeIsActive()){
+            currentPosition = Agobot.drivetrain.updatePosition();
+            opMode.telemetry.addData("Position:", currentPosition);
+            opMode.telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+            updateMotorPowers(newPosition, newHeading);
+            double diagSpeed1 = motorSpeeds.getComponent(0);
+            double diagSpeed2 = motorSpeeds.getComponent(1);
+            if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
+                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
+            } else {
+                Agobot.drivetrain.runMotors(0, 0, 0, 0, steerMag);
+            }
+            if (Math.abs(diagSpeed1) < 0.001 && Math.abs(diagSpeed2) < 0.001 && Math.abs(steerMag) < 0.001) {
+                break;
+            }
+            opMode.telemetry.update();
+        }
+    }
+
+    public void updateMotorPowers(Vector2D newPosition, double newHeading){
+        double x = currentPosition.getComponent(0);
+        double y = currentPosition.getComponent(1);
+        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double)  yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
+        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float)Math.toDegrees(Agobot.drivetrain.getHeading())));
+        translationalMvmt.rotate(-Agobot.drivetrain.getHeading());
+        double leftx = -translationalMvmt.getComponent(0);
+        double lefty = -translationalMvmt.getComponent(1);
+        double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
+        double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
+
+        motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
+
     }
 }
