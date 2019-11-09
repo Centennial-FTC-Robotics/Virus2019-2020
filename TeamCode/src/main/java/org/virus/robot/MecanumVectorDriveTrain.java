@@ -318,24 +318,27 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("Odometry Heading",odometry.heading);
     }
 
-    public void goToPosition(Vector2D newPosition, double newHeading){
-        while(((LinearOpMode)opMode).opModeIsActive()){
-            currentPosition = Agobot.drivetrain.updatePosition();
-            opMode.telemetry.addData("Position:", currentPosition);
-            opMode.telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
-            updateMotorPowers(newPosition, newHeading);
-            double diagSpeed1 = motorSpeeds.getComponent(0);
-            double diagSpeed2 = motorSpeeds.getComponent(1);
-            if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
-                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
-            } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, steerMag);
-            }
-            if (Math.abs(diagSpeed1) < 0.001 && Math.abs(diagSpeed2) < 0.001 && Math.abs(steerMag) < 0.001) {
-                break;
-            }
-            opMode.telemetry.update();
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
+        currentPosition = Agobot.drivetrain.updatePosition();
+        opMode.telemetry.addData("Position:", currentPosition);
+        opMode.telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+        updateMotorPowers(newPosition, newHeading);
+        double diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, maxSpeed);
+        double diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, maxSpeed);
+        if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
+            Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
+        } else {
+            Agobot.drivetrain.runMotors(0, 0, 0, 0, steerMag);
         }
+        opMode.telemetry.update();
+        double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
+        double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
+        double headingDiff = Math.toDegrees(Agobot.drivetrain.getHeading()) - newHeading;
+        if (Math.abs(xDiff) < 0.1 && Math.abs(yDiff) < 0.1 && Math.abs(headingDiff) < 0.5) {
+            Agobot.drivetrain.runMotors(0,0,0,0,0);
+            return false;
+        }
+        return true;
     }
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){

@@ -16,6 +16,7 @@ public class OdoDemo extends LinearOpMode {
     double lefty;
     double leftx;
     double steerMag;
+    double maxSpeed = 1;
     Vector2D motorSpeeds;
     PIDController headingController = new PIDController(-.03f, 0 ,0);
     PIDController xController = new PIDController(.08f,0 ,0);
@@ -42,7 +43,8 @@ public class OdoDemo extends LinearOpMode {
         yController.start();
         Vector2D newPosition = new Vector2D(0,0);
         double newHeading = 0;
-        Agobot.drivetrain.goToPosition(newPosition, newHeading);
+        while(Agobot.drivetrain.goToPosition(newPosition, newHeading, maxSpeed));
+
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();
 //            telemetry.addData("Position:", currentPosition);
