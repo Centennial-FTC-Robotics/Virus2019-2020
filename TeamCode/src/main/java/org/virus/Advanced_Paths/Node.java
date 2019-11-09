@@ -2,8 +2,10 @@ package org.virus.Advanced_Paths;
 
 public class Node {
 
-    public enum paramType {Const, Variable, Operation}
+    public enum paramType {Const, Variable, Operation, T_FUNC}
+    public enum T_FUNC_TYPES {sin, cos, tan, csc, sec, cot, asin, acos, atan, sinh, cosh, tanh, csch, sech, coth, ln, log10, sgn};
     private paramType type;
+    private T_FUNC_TYPES T_FUNC_TYPE;
 
     private Node parent = null;
     private Node child1 = null;
@@ -17,6 +19,10 @@ public class Node {
         type = numType;
         parameter = val;
         level = 0;
+
+        if (numType.equals(paramType.T_FUNC)) {
+            T_FUNC_TYPE = T_FUNC_TYPES.valueOf(val.toLowerCase());
+        }
     }
 
     //---------- Get Methods ----------//
@@ -88,7 +94,7 @@ public class Node {
 
     protected void setChild2(Node newChild) {
 
-        if (newChild != null) {
+        if (newChild != null && type != paramType.T_FUNC) {
             child2 = newChild;
             child2.setParent(this);
         }
@@ -124,6 +130,19 @@ public class Node {
         if (child2 != null) {
 
             child2.updateLevel();
+        }
+    }
+
+    //---------- Info Methods ----------//
+
+    public boolean subTreeContains(String value) {
+
+        if (parameter.equals(value)) {
+
+            return true;
+        } else {
+
+            return (((child1 != null) && child1.subTreeContains(value)) || ((child2 != null) && child2.subTreeContains(value)));
         }
     }
 

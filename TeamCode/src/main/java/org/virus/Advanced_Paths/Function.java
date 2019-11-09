@@ -7,6 +7,7 @@ import org.virus.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 public class Function {
 
@@ -23,26 +24,49 @@ public class Function {
     private HashMap<String, Double> constantList;
     private ArrayList<Node> operationsTree; // ArrayList<Pair<Bounds<Start, End>, Relatives<Parent, Children<Positions>>>>
 
-    Function(String function, String variable, HashMap<String, Double> newConstants) {
+    public Function(String function, String variable, HashMap<String, Double> newConstants) {
 
         funcVariable = variable;
         constantList = newConstants;
         operationsTree = parse(function, funcVariable);
     }
 
-    Function(ArrayList<Node> oldFunctionTree) {
+    public Function(Node oldFunctionTree, String variable, boolean directly) {
 
-        constantList = new HashMap<String, Double>();
-        operationsTree = makeTreeCopy(getRoot(oldFunctionTree));
+        this(oldFunctionTree, variable, new HashMap<String, Double>(), directly);
+    }
+
+    public Function(Node oldFunctionTree, String variable, HashMap<String, Double> newConstants, boolean directly) {
+
+        funcVariable = variable;
+        constantList = newConstants;
+
+        if (directly) {
+            operationsTree = rebuildTree(oldFunctionTree);
+        } else {
+            operationsTree = rebuildTree(makeTreeCopy(oldFunctionTree));
+        }
     }
 
     public ArrayList<Node> getOperationsTree() {
-        return makeTreeCopy(getRoot(operationsTree));
+        return rebuildTree(makeTreeCopy(getRoot(operationsTree)));
+    }
+
+    public HashMap<String, Double> getConstantList() {
+
+        return constantList;
     }
 
     public Node getRoot() {
-        return getRoot(operationsTree).linkedClone();
+        return getRoot(operationsTree);
     }
+
+    public String getVariable() {
+
+        return funcVariable;
+    }
+
+    //---------- Parser and linker ----------//
 
     private ArrayList<Node> parse(String function, String variable) {
         ArrayList<Node> functionStructure = new ArrayList<Node>();
@@ -308,6 +332,8 @@ public class Function {
         return root;
     }
 
+    //---------- Function Evaluation ----------//
+
     public double output(double input) {
 
         return output(this, input);
@@ -315,13 +341,13 @@ public class Function {
 
     public static double output(Function inputFunction, double input) {
 
-        return output(inputFunction.getOperationsTree(), input);
+        return output(inputFunction.getRoot(), input);
     }
 
-    public static double output(ArrayList<Node> operationTree, double input) {
+    public static double output(Node operationTree, double input) {
 
         double output = 0;
-        Node root = getRoot(operationTree);
+        Node root = operationTree;
 
         //child 1
         double child1Val = 0;
@@ -334,15 +360,14 @@ public class Function {
                     child1Val = input;
                     break;
                 case Operation:
-                    ArrayList<Node> subTree = makeTreeCopy(root.getChild1());
-                    child1Val = output(subTree, input);
+                    child1Val = output(makeTreeCopy(root.getChild1()), input);
                     break;
             }
         }
 
         //child2
         double child2Val = 0;
-        if (root.getChild1() != null) {
+        if (root.getChild2() != null) {
             switch (root.getChild2().getType()) {
                 case Const:
                     child2Val = Double.parseDouble(root.getChild2().getVal());
@@ -351,8 +376,7 @@ public class Function {
                     child2Val = input;
                     break;
                 case Operation:
-                    ArrayList<Node> subTree = makeTreeCopy(root.getChild2());
-                    child2Val = output(subTree, input);
+                    child2Val = output(makeTreeCopy(root.getChild2()), input);
                     break;
             }
         }
@@ -384,15 +408,125 @@ public class Function {
                         output = Math.pow(child1Val, child2Val);
                         break;
                 }
+            case T_FUNC:
+                switch (root.getVal()) {
+                    case "sin":
+                        output = Math.sin(child1Val);
+                        break;
+                    case "cos":
+                        output = Math.cos(child1Val);
+                        break;
+                    case "tan":
+                        output = Math.tan(child1Val);
+                        break;
+                    case "csc":
+                        output = 1 / Math.sin(child1Val);
+                        break;
+                    case "sec":
+                        output = 1 / Math.cos(child1Val);
+                        break;
+                    case "cot":
+                        output = 1 / Math.tan(child1Val);
+                        break;
+                    case "asin":
+                        output = Math.asin(child1Val);
+                        break;
+                    case "acos":
+                        output = Math.acos(child1Val);
+                        break;
+                    case "atan":
+                        output = Math.atan(child1Val);
+                        break;
+                    case "sinh":
+                        output = Math.sinh(child1Val);
+                        break;
+                    case "cosh":
+                        output = Math.cosh(child1Val);
+                        break;
+                    case "tanh":
+                        output = Math.tanh(child1Val);
+                        break;
+                    case "csch":
+                        output = 1 / Math.sinh(child1Val);
+                        break;
+                    case "sech":
+                        output = 1 / Math.cosh(child1Val);
+                        break;
+                    case "coth":
+                        output = 1 / Math.tanh(child1Val);
+                        break;
+                    case "ln":
+                        output = Math.log(child1Val);
+                        break;
+                    case "log10":
+                        output = Math.log10(child1Val);
+                        break;
+                    case "sgn":
+                        output = Math.signum(child1Val);
+                        break;
+                }
                 break;
         }
 
         return output;
     }
 
+    //---------- Tree Reworking ----------//
+
+    public static Node replaceVariable(Node originalTree, String replacement, String variable, HashMap<String, Double> implicitConsts) {
+
+        Node newTree = originalTree.loneClone();
+
+        Node subTree1 = null;
+        if (newTree.getChild1() != null) {
+            switch (newTree.getChild1().getType()) {
+                case Variable:
+
+                    subTree1 = changeNode(newTree.getChild1(), replacement, variable, implicitConsts);
+                    break;
+                case Operation:
+                case T_FUNC:
+
+                    subTree1 = replaceVariable(originalTree.getChild1(), replacement, variable, implicitConsts);
+                    break;
+            }
+        }
+
+        Node subTree2 = null;
+        if (newTree.getChild2() != null) {
+            switch (newTree.getChild2().getType()) {
+                case Variable:
+
+                    subTree2 = changeNode(newTree.getChild2(), replacement, variable, implicitConsts);
+                    break;
+                case Operation:
+                case T_FUNC:
+
+                    subTree2 = replaceVariable(originalTree.getChild2(), replacement, variable, implicitConsts);
+                    break;
+            }
+        }
+
+        newTree.setChild1(subTree1);
+        newTree.setChild2(subTree2);
+
+        return newTree;
+    }
+
     public Node changeNode(Node root, String newVal) throws FunctionFormatException{
 
-        Node newRoot = genNode(newVal);
+        return changeNode(root, newVal, funcVariable, constantList);
+    }
+
+    public static Node changeNode(Node root, String newVal, String variable, HashMap<String, Double> implicitConsts) {
+
+        Node newRoot = null;
+
+        try {
+            newRoot = genNode(newVal, variable, implicitConsts);
+        } catch (FunctionFormatException e) {
+            e.printStackTrace();
+        }
 
         if (root.getChild1() != null) {
 
@@ -413,11 +547,45 @@ public class Function {
 
     public Node genNode(String nodeVal) throws FunctionFormatException{
 
+        return genNode(nodeVal, funcVariable, constantList);
+    }
+
+    public static Node genNodeNoConst(String nodeVal, String variable) {
+
         Node newNode = null;
 
         if ("+-*/^".contains(nodeVal)) {
             newNode = new Node(Node.paramType.Operation, nodeVal);
-        }else if (nodeVal.equals(String.valueOf(funcVariable))) {
+        } else if (Arrays.toString(Node.T_FUNC_TYPES.values()).contains(nodeVal)) {
+            newNode = new Node(Node.paramType.T_FUNC, nodeVal);
+        } else if (nodeVal.equals(String.valueOf(variable))) {
+            newNode = new Node(Node.paramType.Variable, nodeVal);
+        } else {
+            boolean isNumber = true;
+
+            try {
+                Double.valueOf(nodeVal);
+            } catch (NumberFormatException e) {
+                isNumber = false;
+            }
+
+            if (isNumber) {
+                newNode = new Node(Node.paramType.Const, nodeVal);
+            }
+        }
+
+        return newNode;
+    }
+
+    public static Node genNode(String nodeVal, String variable, HashMap<String, Double> implicitConsts) throws FunctionFormatException {
+
+        Node newNode = null;
+
+        if ("+-*/^".contains(nodeVal)) {
+            newNode = new Node(Node.paramType.Operation, nodeVal);
+        } else if (isTFUNC(nodeVal)) {
+            newNode = new Node(Node.paramType.T_FUNC, nodeVal);
+        } else if (nodeVal.equals(String.valueOf(variable))) {
             newNode = new Node(Node.paramType.Variable, nodeVal);
         } else {
             boolean isNumber = true;
@@ -431,9 +599,9 @@ public class Function {
             if (isNumber) {
                 newNode = new Node(Node.paramType.Const, nodeVal);
             } else {
-                System.out.println("List of Constants: " + constantList);
-                if (constantList.containsKey(nodeVal)) {
-                    Double val = constantList.get(nodeVal);
+                System.out.println("List of Constants: " + implicitConsts);
+                if (implicitConsts.containsKey(nodeVal)) {
+                    Double val = implicitConsts.get(nodeVal);
                     newNode = new Node(Node.paramType.Const, String.valueOf(val));
                     System.out.println(nodeVal + " = " + newNode.getVal());
                 } else {
@@ -445,37 +613,39 @@ public class Function {
         return newNode;
     }
 
+    public static boolean isTFUNC(String funcName) {
+        Node.T_FUNC_TYPES[] funcs = Node.T_FUNC_TYPES.values();
+
+        for (int t = 0; t < funcs.length; t++) {
+            if (funcName.toLowerCase().equals(funcs[t].name())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //---------- Public Function Operations ----------//
-    public static Function makeFunction(Node root) {
 
-        return new Function(makeTreeCopy(root));
+    public static Function makeFunction(Node tree, String variable) {
+
+        return (new Function(tree, variable, new HashMap<String, Double>(), true));
     }
 
-    public static Function rebuildFunction(Node root) {
+    public static Node makeTreeCopy(Node root) {
 
-        return new Function(rebuildTree(root));
-    }
-
-    public static ArrayList<Node> makeTreeCopy(Node root) {
-
-        ArrayList<Node> newTree = new ArrayList<Node>();
         Node rootClone = root.loneClone();
-        newTree.add(rootClone);
 
         if (root.getChild1() != null) {
-            ArrayList<Node> child1Tree = makeTreeCopy(root.getChild1());
-            Node child1Root = getRoot(child1Tree);
+            Node child1Root = makeTreeCopy(root.getChild1());
             rootClone.setChild1(child1Root);
-            newTree.addAll(child1Tree);
         }
         if (root.getChild2() != null) {
-            ArrayList<Node> child2Tree = makeTreeCopy(root.getChild2());
-            Node child2Root = getRoot(child2Tree);
+            Node child2Root = makeTreeCopy(root.getChild2());
             rootClone.setChild2(child2Root);
-            newTree.addAll(child2Tree);
         }
 
-        return newTree;
+        return rootClone;
     }
 
     public static ArrayList<Node> rebuildTree(Node root) {
@@ -493,16 +663,111 @@ public class Function {
         return newTree;
     }
 
-    public static Function operate(Function funcOne, Function funcTwo, String operation) {
+//    public static Function compose(Function funcOne, Function funcTwo) {
+//
+//        HashMap<String, Double> newConstantList = new HashMap<String, Double>(funcOne.constantList);
+//
+//
+//        return (new Function(compose(funcOne.getRoot(), funcOne.getVariable(), funcTwo.getRoot(), funcTwo.getVariable()), funcOne.getVariable(), true));
+//    }
+//
+//    public static Node compose(Node treeOne, String varOne, Node treeTwo, String varTwo) {
+//
+//
+//    }
 
-        if ("+-*/^".contains(operation)) {
-            Node plusRoot = new Node(Node.paramType.Operation, operation);
-            Node child1 = getRoot(makeTreeCopy(funcOne.getRoot()));
-            Node child2 = getRoot(makeTreeCopy(funcTwo.getRoot()));
-            plusRoot.setChild1(child1);
-            plusRoot.setChild2(child2);
 
-            return rebuildFunction(plusRoot);
+    public static Node composeTFUNC(Node function, String variable, Node.T_FUNC_TYPES T_function) {
+
+        Node TFUNC = new Node(Node.paramType.T_FUNC, T_function.name());
+        TFUNC.setChild1(new Node(Node.paramType.Variable, variable));
+
+        return compose(TFUNC, function);
+    }
+
+    public static Node compose(Function funcOne, Function funcTwo) {
+
+        return compose(funcOne.getRoot(), funcTwo.getRoot());
+    }
+
+    public static Node compose(Node funcOne, Node funcTwo) {
+
+        Node composed1 = null;
+        if (funcOne.getChild1() != null) {
+            switch (funcOne.getChild1().getType()) {
+                case Variable:
+
+                    composed1 = makeTreeCopy(funcTwo);
+                    System.out.println("Composed 1: " + composed1);
+                    break;
+                case Operation:
+                case T_FUNC:
+
+                    compose(funcOne.getChild1(), funcTwo);
+                    break;
+            }
+        }
+
+        Node composed2 = null;
+        if (funcOne.getChild2() != null) {
+            switch (funcOne.getChild2().getType()) {
+                case Variable:
+
+                    composed2 = makeTreeCopy(funcTwo);
+                    System.out.println("Composed 2: " + composed2);
+                    break;
+                case Operation:
+                case T_FUNC:
+
+                    compose(funcOne.getChild2(), funcTwo);
+                    break;
+            }
+        }
+
+        if (composed1 != null ) {
+            funcOne.setChild1(composed1);
+        }
+
+        if (composed2 != null) {
+            funcOne.setChild2(composed2);
+        }
+
+        return funcOne;
+    }
+
+    public static Function operate(Function funcOne, Function funcTwo, operation operator) {
+
+        return (new Function(operate(funcOne.getRoot(), funcTwo.getRoot(), operator), funcOne.getVariable(), true));
+    }
+
+    public static Node operate(Node treeOne, Node treeTwo, String operator) {
+
+        switch (operator) {
+            case "+":
+                return operate(treeOne, treeTwo, operation.addition);
+            case "-":
+                return operate(treeOne, treeTwo, operation.subtraction);
+            case "*":
+                return operate(treeOne, treeTwo, operation.multiplication);
+            case "/":
+                return operate(treeOne, treeTwo, operation.division);
+            case "^":
+                return operate(treeOne, treeTwo, operation.exponent);
+        }
+
+        return null;
+    }
+
+    public static Node operate(Node treeOne, Node treeTwo, operation operator) {
+
+        if (operator != null) {
+            Node opRoot = new Node(Node.paramType.Operation, operator.name());
+            Node child1 = makeTreeCopy(treeOne);
+            Node child2 = makeTreeCopy(treeTwo);
+            opRoot.setChild1(child1);
+            opRoot.setChild2(child2);
+
+            return opRoot;
         }
 
         return null;
@@ -510,52 +775,109 @@ public class Function {
 
     public static Function derivative(Function originalFunc) {
 
-        return makeFunction(getRoot(derivative(originalFunc.getOperationsTree())));
+        return (new Function(derivative(originalFunc.getRoot(), originalFunc.getVariable()), originalFunc.getVariable(), originalFunc.constantList, true));
     }
 
-    public static ArrayList<Node> derivative(ArrayList<Node> originalFunc) {
+    public static Node derivative(Node originalFunc, String variable) {
 
-        ArrayList<Node> funcTree = makeTreeCopy(getRoot(originalFunc));
-        Node dRoot = getRoot(funcTree);
+        Node root = makeTreeCopy(originalFunc);
 
-        Node subRoot1 = null;
-        if (dRoot.getChild1() != null) {
-            switch(dRoot.getChild1().getType()) {
+        Node subDerivative1 = null;
+        if (root.getChild1() != null) {
+            switch(root.getChild1().getType()) {
                 case Const:
+
+                    subDerivative1 = new Node(Node.paramType.Const, "0");
                     break;
                 case Variable:
+                    subDerivative1 = new Node(Node.paramType.Const, "1");
                     break;
                 case Operation:
-                    ArrayList<Node> subDerivative = derivative(makeTreeCopy(dRoot.getChild1()));
-                    subRoot1 = getRoot(subDerivative);
+                    subDerivative1 = derivative(makeTreeCopy(root.getChild1()), variable);
                     break;
             }
         }
 
-        Node subRoot2 = null;
-        if (dRoot.getChild2() != null) {
-            switch(dRoot.getChild2().getType()) {
+        Node subDerivative2 = null;
+        if (root.getChild2() != null) {
+            switch(root.getChild2().getType()) {
                 case Const:
+                    subDerivative1 = new Node(Node.paramType.Const, "0");
                     break;
                 case Variable:
+                    subDerivative1 = new Node(Node.paramType.Const, "1");
                     break;
                 case Operation:
-                    ArrayList<Node> subDerivative = derivative(makeTreeCopy(dRoot.getChild2()));
-                    subRoot2 = getRoot(subDerivative);
+                    subDerivative2 = derivative(makeTreeCopy(root.getChild2()), variable);
                     break;
             }
         }
 
-        switch(dRoot.getType()) {
+        Node dRoot = null;
+        switch(root.getType()) {
             case Const:
+                dRoot = new Node(Node.paramType.Const, "0");
                 break;
             case Variable:
+                dRoot = new Node(Node.paramType.Const, "1");
                 break;
             case Operation:
+                switch (root.getVal()) {
+                    case "+":
+                    case "-":
+
+                        dRoot = operate(subDerivative1, subDerivative2, root.getVal());
+                        break;
+                    case "*":
+
+                        Node product1 = operate(root.getChild1(), subDerivative2, "*");
+                        Node product2 = operate(root.getChild2(), subDerivative1, "*");
+
+                        dRoot = operate(product1, product2, operation.addition);
+                        break;
+                    case "/":
+
+                        product1 = operate(root.getChild2(), subDerivative1,"*");
+                        product2 = operate(root.getChild1(), subDerivative2, "*");
+                        Node topDiff = operate(product1, product2, "-");
+                        Node squareBottom = operate(root.getChild2(), new Node(Node.paramType.Const, "2"), "^");
+
+                        dRoot = operate(topDiff, squareBottom, "/");
+                        break;
+                    case "^":
+
+                        if (root.getChild1().subTreeContains(variable)) {
+
+                            if (root.getChild2().subTreeContains(variable)) {
+                                // not fun times
+
+                                // term 1
+                                Node term1Exp1 = operate(root.getChild1(), root.getChild1(), "^");
+                                Node term1Product1 = operate(root.getChild2(), term1Exp1, "*");
+                                Node term1Division1 = operate(term1Product1, root.getChild1(), "/");
+                                Node term1 = operate(term1Division1, subDerivative1, "*");
+
+                                //term 2
+                                //Node term2Product1 = operate(term1Exp1, ) // (f(x)^g(x)) * ln(f(x))
+                            } else {
+                                // power rule
+
+                            }
+                        } else {
+                            if (root.getChild2().subTreeContains(variable)) {
+                                // exponent rule
+
+                            } else {
+                                // constant
+
+                            }
+                        }
+                        break;
+                }
                 break;
         }
 
-        return funcTree;
+        return dRoot;
     }
 
     public static Function inverse(Function originalFunc) {
@@ -639,5 +961,9 @@ public class Function {
         }
 
         System.out.println(passed);
+
+        Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
+        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
+        System.out.println(Function.rebuildTree(newFunc));
     }
 }

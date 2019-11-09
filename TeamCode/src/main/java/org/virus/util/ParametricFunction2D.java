@@ -3,6 +3,7 @@ import org.virus.Advanced_Paths.Function;
 import org.virus.Advanced_Paths.Node;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ParametricFunction2D {
 
@@ -12,12 +13,34 @@ public class ParametricFunction2D {
     private Function[] components;
     private boolean isPolar;
 
+    ParametricFunction2D(Function combined, boolean polarity) {
+
+        isPolar = polarity;
+
+        Pair<Function, Function> newComponents = parametrize(combined);
+
+        if (isPolar) {
+            theta = newComponents.get1();
+            scale = newComponents.get2();
+
+            Pair<Function, Function> newRectangular = rectangularize(scale, theta);
+            components = new Function[] {newRectangular.get1(), newRectangular.get2()};
+        } else {
+
+            components = new Function[] {newComponents.get1(), newComponents.get2()};
+            Pair<Function, Function> newPolar = polarize(newComponents.get1(), newComponents.get2());
+            scale = newPolar.get1();
+            theta = newPolar.get2();
+        }
+    }
+
     /**
      * @Description for cartesian: one is the x component and two is the y component; for polar: one is the function for theta and two is the function for the magnitude
      * @param one
      * @param two
      * @param polarity
      */
+
     ParametricFunction2D(Function one, Function two, boolean polarity) {
 
         isPolar = polarity;
@@ -37,10 +60,7 @@ public class ParametricFunction2D {
         theta = prevV.getTheta();
     }
 
-    //---------- Vector Refresh ----------//
-    // add in functions for adding parameterized functions
-
-    //---------- Vector Properties ----------//
+    //---------- Function Properties ----------//
 
     public Function getMag() {
 
@@ -95,14 +115,48 @@ public class ParametricFunction2D {
         return isPolar;
     }
 
-    //---------- Vector Operations ----------//
+    //---------- Function Operations ----------//
+
+    public static Pair<Function, Function> parametrize(Function pathComponent) {
+
+        Node dependent = Function.replaceVariable(pathComponent.getRoot(), pathComponent.getVariable(), "t", pathComponent.getConstantList());
+        Node independent = new Node(Node.paramType.Variable, "t");
+
+        return new Pair<Function, Function>(Function.makeFunction(independent, "t"), Function.makeFunction(dependent, "t"));
+    }
+
+    private static Pair<Function, Function> polarize(Function x, Function y) {
+
+        Node square1 = Function.operate(x.getRoot(), new Node(Node.paramType.Const, "2"), "^"); // x^2
+        Node square2 = Function.operate(y.getRoot(), new Node(Node.paramType.Const, "2"), "^"); // y^2
+        Node sum = Function.operate(square1, square2, "+"); // (x^2) + (y^2)
+        Node r = Function.operate(sum, new Node(Node.paramType.Const, "0.5"), "^"); // sqrt((x^2) + (y^2))
+
+        Node diff = Function.operate(x.getRoot(), y.getRoot(), "/"); // x/y
+        Node theta = Function.compose(new Node(Node.paramType.T_FUNC, Node.T_FUNC_TYPES.atan.toString()), diff); // arctan(x/y)
+
+        return (new Pair<Function, Function>(Function.makeFunction(r, "t"), Function.makeFunction(theta, "t")));
+    }
+
+    private static Pair<Function, Function> rectangularize(Function r, Function theta) {
+
+        Node sin = Function.compose(new Node(Node.paramType.T_FUNC, Node.T_FUNC_TYPES.sin.toString()), theta.getRoot()); // sin(theta)
+        Node cos = Function.compose(new Node(Node.paramType.T_FUNC, Node.T_FUNC_TYPES.cos.toString()), theta.getRoot()); // cos(theta)
+
+        Node x = Function.operate(r.getRoot(), cos, "*");
+        Node y = Function.operate(r.getRoot(), sin, "*");
+
+        return (new Pair<Function, Function>(Function.makeFunction(x, "t"), Function.makeFunction(y, "t")));
+    }
+
+    //---------- Parametric Operations ----------//
 
     public void add(ParametricFunction2D term_two) {
 
         Function[] two_comp = term_two.getComponents();
 
-        components[0] = two_comp[0];
-        components[1] = two_comp[1];
+        components[0] = Function.operate(components[0], two_comp[0], Function.operation.addition);
+        components[1] = Function.operate(components[1], two_comp[1], Function.operation.addition);
     }
 
     public void sub(ParametricFunction2D term_two) {
@@ -122,8 +176,8 @@ public class ParametricFunction2D {
 
         Node constantRoot = new Node(Node.paramType.Const, String.valueOf(scalar));
 
-        components[0] = Function.operate(components[0], Function.makeFunction(constantRoot), "*");
-        components[1] = Function.operate(components[1], Function.makeFunction(constantRoot), "*");
+        components[0] = Function.operate(components[0], Function.makeFunction(constantRoot, components[0].getVariable()), Function.operation.multiplication);
+        components[1] = Function.operate(components[1], Function.makeFunction(constantRoot, components[1].getVariable()), Function.operation.multiplication);
     }
 
     public double dot(ParametricFunction2D term_two, double tVal) {
@@ -146,8 +200,8 @@ public class ParametricFunction2D {
         Vector2D i = new Vector2D(1d, 0d);
         Vector2D j = new Vector2D(0d, 1d);
 
-        Function const1 = Function.makeFunction(new Node(Node.paramType.Const, "1"));
-        Function const0 = Function.makeFunction(new Node(Node.paramType.Const, "0"));
+        Function const1 = Function.makeFunction(new Node(Node.paramType.Const, "1"), v.getComponents()[0].getVariable());
+        Function const0 = Function.makeFunction(new Node(Node.paramType.Const, "0"), v.getComponents()[1].getVariable());
         ParametricFunction2D iVector = new ParametricFunction2D(const1, const0, false);
         ParametricFunction2D jVector = new ParametricFunction2D(const0, const1, false);
 
@@ -167,19 +221,17 @@ public class ParametricFunction2D {
      */
     public void flipDimension(int dimension) {
 
-        components[dimension] = Function.operate(components[dimension], Function.makeFunction(new Node(Node.paramType.Const, "-1")), "*");
+        components[dimension] = Function.operate(components[dimension], Function.makeFunction(new Node(Node.paramType.Const, "-1"), components[dimension].getVariable()), Function.operation.multiplication);
     }
 
     /**
-     * This function rotates the vector x radians counterclockwise
+     * This function rotates the function x radians counterclockwise
      * @param radians
      */
     public void rotate(double radians) {
 
-//        theta += radians % (2 * Math.PI);
-//        theta = theta % (2 * Math.PI);
-//        genComp();
         // figure out how to properly rotate the different functions
+
     }
 
     public String toString() {
