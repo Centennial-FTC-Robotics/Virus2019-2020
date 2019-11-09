@@ -41,11 +41,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     float initialRoll;
     private Orientation currentHeading;
     private Vector2D currentPosition;
-    PIDController headingController = new PIDController(-.03f, 0 ,0);
+    PIDController headingController = new PIDController(-.04f, 0 ,0);
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    PIDController xController = new PIDController(.08f,0 ,0);
-    PIDController yController = new PIDController(-.08f,0 ,0);
+    PIDController xController = new PIDController(.12f,0 ,0);
+    PIDController yController = new PIDController(-.12f,0 ,0);
     private OpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
@@ -334,7 +334,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
         double headingDiff = Math.toDegrees(Agobot.drivetrain.getHeading()) - newHeading;
-        if (Math.abs(xDiff) < 0.1 && Math.abs(yDiff) < 0.1 && Math.abs(headingDiff) < 0.5) {
+        if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
             Agobot.drivetrain.runMotors(0,0,0,0,0);
             return false;
         }
