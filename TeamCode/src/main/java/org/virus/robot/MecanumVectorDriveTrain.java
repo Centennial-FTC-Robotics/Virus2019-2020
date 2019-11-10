@@ -44,8 +44,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     PIDController headingController = new PIDController(-.04f, 0 ,0);
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    PIDController xController = new PIDController(.12f,0 ,0);
-    PIDController yController = new PIDController(-.12f,0 ,0);
+    PIDController xController = new PIDController(.06f,.05f ,0, 0.1f);
+    PIDController yController = new PIDController(-.06f,-.05f ,0,0.1f);
     private OpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
@@ -336,6 +336,9 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double headingDiff = Math.toDegrees(Agobot.drivetrain.getHeading()) - newHeading;
         if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
             Agobot.drivetrain.runMotors(0,0,0,0,0);
+            xController.clear();
+            yController.clear();
+            headingController.clear();
             return false;
         }
         return true;
