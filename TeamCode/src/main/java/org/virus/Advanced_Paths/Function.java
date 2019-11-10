@@ -1,13 +1,10 @@
 package org.virus.Advanced_Paths;
-
-
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 public class Function {
 
@@ -292,6 +289,31 @@ public class Function {
                 linkedSubFunctions.add(link);
                 linkedSubFunctions.add(funcBefore);
                 linkedSubFunctions.add(funcAfter);
+            } else if (isTFUNC(subject)) {
+
+                Pair<Integer, Integer> references = findLinkReferences(subFunctionIndexes, node);
+                System.out.println("Link References: " + references);
+                Node link = genNode(subject);
+                Node funcAfter = null;
+
+                if (references.get2() != null) {
+
+                    ArrayList<Node> refSubFunc = subFunctionTrees.get(references.get2());
+                    funcAfter = changeNode(getRoot(refSubFunc), getRoot(refSubFunc).getVal());
+                } else {
+                    throw new FunctionFormatException("No subfunction connected to " + subject + " function at " + node , (new Exception()).getCause());
+                }
+
+                link.setChild1(funcAfter);
+
+                linkedSubFunctions.add(link);
+                linkedSubFunctions.add(funcAfter);
+            } else {
+
+                if (subFunctionLinks.size() == 1 && !"+-*/^".contains(String.valueOf(subject))) {
+
+                    throw new FunctionFormatException("Trancendental Function misspelled: " + subject + " at: " + node , (new Exception()).getCause());
+                }
             }
         }
 
@@ -360,6 +382,7 @@ public class Function {
                     child1Val = input;
                     break;
                 case Operation:
+                case T_FUNC:
                     child1Val = output(makeTreeCopy(root.getChild1()), input);
                     break;
             }
@@ -376,6 +399,7 @@ public class Function {
                     child2Val = input;
                     break;
                 case Operation:
+                case T_FUNC:
                     child2Val = output(makeTreeCopy(root.getChild2()), input);
                     break;
             }
@@ -478,11 +502,15 @@ public class Function {
         Node newTree = originalTree.loneClone();
 
         Node subTree1 = null;
-        if (newTree.getChild1() != null) {
-            switch (newTree.getChild1().getType()) {
+        if (originalTree.getChild1() != null) {
+            switch (originalTree.getChild1().getType()) {
                 case Variable:
 
-                    subTree1 = changeNode(newTree.getChild1(), replacement, variable, implicitConsts);
+                    subTree1 = new Node(Node.paramType.Variable, replacement);
+                    break;
+                case Const:
+
+                    subTree1 = originalTree.getChild1().loneClone();
                     break;
                 case Operation:
                 case T_FUNC:
@@ -493,11 +521,15 @@ public class Function {
         }
 
         Node subTree2 = null;
-        if (newTree.getChild2() != null) {
-            switch (newTree.getChild2().getType()) {
+        if (originalTree.getChild2() != null) {
+            switch (originalTree.getChild2().getType()) {
                 case Variable:
 
-                    subTree2 = changeNode(newTree.getChild2(), replacement, variable, implicitConsts);
+                    subTree2 = new Node(Node.paramType.Variable, replacement);
+                    break;
+                case Const:
+
+                    subTree2 = originalTree.getChild2().loneClone();
                     break;
                 case Operation:
                 case T_FUNC:
@@ -613,6 +645,18 @@ public class Function {
         return newNode;
     }
 
+    public static Node.T_FUNC_TYPES getTFUNC(String funcName) {
+        Node.T_FUNC_TYPES[] funcs = Node.T_FUNC_TYPES.values();
+
+        for (int t = 0; t < funcs.length; t++) {
+            if (funcName.toLowerCase().equals(funcs[t].name())) {
+                return funcs[t];
+            }
+        }
+
+        return null;
+    }
+
     public static boolean isTFUNC(String funcName) {
         Node.T_FUNC_TYPES[] funcs = Node.T_FUNC_TYPES.values();
 
@@ -630,6 +674,11 @@ public class Function {
     public static Function makeFunction(Node tree, String variable) {
 
         return (new Function(tree, variable, new HashMap<String, Double>(), true));
+    }
+
+    public static Function makeFunctionCopy(Function originalFunction) {
+
+        return (makeFunction(makeTreeCopy(originalFunction.getRoot()), originalFunction.getVariable()));
     }
 
     public static Node makeTreeCopy(Node root) {
@@ -945,14 +994,21 @@ public class Function {
         String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
         Function longestFunction = new Function(longest, variable, new HashMap<String, Double>());
         passed = (longestFunction.output(input) == (((((3 * 5) * 45) + (input * (Math.pow(input, 3)))) + (3 * (input / (3.0 * 9.0)))) * (Math.pow((input / 4), input))));
+        if (!passed) {
+            return false;
+        }
+
+        String cardoid = "(1 + (sin(x)))";
+        Function cardoidFunction = new Function(cardoid, "x", new HashMap<String, Double>());
+        passed = (cardoidFunction.output(input) == (1 + Math.sin(input)));
 
         return passed;
     }
 
-    public static void main(String[] args) {
+    public static void testFunctions(double init, double end) {
 
         boolean passed = true;
-        for (double x = 0.0; x <= 100; x+=0.5) {
+        for (double x = init; x <= end; x+=0.5) {
 
             if (!FunctionTypeTester(x)) {
                 passed = false;
@@ -961,9 +1017,23 @@ public class Function {
         }
 
         System.out.println(passed);
+    }
+
+    public static void main(String[] args) {
+        //testFunctions(0,100);
 
         Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
-        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
-        System.out.println(Function.rebuildTree(newFunc));
+//        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
+//        System.out.println(Function.rebuildTree(newFunc));
+//
+//        Function sine = new Function("(sin(x))", "x", new HashMap<String, Double>());
+//        Function complexSinusoid =  new Function("(x + ((sin(3 * x)) ^ x))", "x", new HashMap<String, Double>());
+//        Function cardoid = new Function("(1 + (sin(x)))", "x", new HashMap<String, Double>());
+
+        Node quadT = replaceVariable(quadratic.getRoot(), "t", quadratic.getVariable(), quadratic.getConstantList());
+        System.out.println(rebuildTree(quadT));
+        Function quadTFunc = Function.makeFunction(quadT, "t");
+        System.out.println(quadTFunc.output(2));
+
     }
 }

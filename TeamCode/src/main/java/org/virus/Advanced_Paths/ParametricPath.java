@@ -11,29 +11,25 @@ public abstract class ParametricPath {
 
     //stuff used to parametrize
     private Function[] functions;
-    private ParametricFunction2D[] rotatedFunctions;
     private Pair<Integer, Integer>[] tRanges;
-    private double[] functionSpeeds;
     private double[] functionRotations;
 
-    // parametrized stuff
-    private Pair<Function[], Function[]> functionComponents;
-    // note: make function vectors for this
+    private ParametricFunction2D[] rotatedFunctions;
 
-    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, double[] newSpeeds, double[] newAngles) throws FunctionFormatException {
+    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, double[] newAngles) throws FunctionFormatException {
 
         // tRange error checking, making sure ranges are consistent and continuous
         if (!checkTRanges(newRanges)) {
             throw new FunctionFormatException("tRanges in new Path incorrectly defined!", (new Exception()).getCause());
         }
 
-        // parametrize the paths
+        // information to parametrize
         functions = Arrays.copyOf(orderedFunctions, orderedFunctions.length);
         tRanges = Arrays.copyOf(newRanges, newRanges.length);
-        functionSpeeds = Arrays.copyOf(newSpeeds, newSpeeds.length);
         functionRotations = Arrays.copyOf(newAngles, newAngles.length);
 
-        functionComponents = parametrize();
+        // parametrize the paths
+        rotatedFunctions = parametrize();
     }
 
     private boolean checkTRanges(Pair<Integer, Integer>[] tRanges) {
@@ -56,14 +52,16 @@ public abstract class ParametricPath {
         return true;
     }
 
-    private Pair<Function[], Function[]> parametrize() {
-        Pair<Function[], Function[]> components = new Pair<Function[], Function[]>(null, null);
+    private ParametricFunction2D[] parametrize() {
 
-        for (Function p: functions) {
+        ParametricFunction2D[] pathComponents = new ParametricFunction2D[functions.length];
 
-            Function dervivative = Function.derivative(p);
+        for (int f = 0; f < functions.length; f++) {
+            ParametricFunction2D function = new ParametricFunction2D(functions[f], false);
+            function = ParametricFunction2D.rotate(function, functionRotations[f]);
+            pathComponents[f] = function;
         }
 
-        return components;
+        return pathComponents;
     }
 }

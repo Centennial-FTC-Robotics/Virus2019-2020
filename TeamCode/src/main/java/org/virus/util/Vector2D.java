@@ -92,8 +92,8 @@ public class Vector2D {
 
         double[] two_comp = term_two.getComponents();
 
-        components[0] = two_comp[0];
-        components[1] = two_comp[1];
+        components[0] += two_comp[0];
+        components[1] += two_comp[1];
     }
 
     public void sub(Vector2D term_two) {

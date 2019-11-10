@@ -13,7 +13,9 @@ public class ParametricFunction2D {
     private Function[] components;
     private boolean isPolar;
 
-    ParametricFunction2D(Function combined, boolean polarity) {
+
+
+    public ParametricFunction2D(Function combined, boolean polarity) {
 
         isPolar = polarity;
 
@@ -41,7 +43,7 @@ public class ParametricFunction2D {
      * @param polarity
      */
 
-    ParametricFunction2D(Function one, Function two, boolean polarity) {
+    public ParametricFunction2D(Function one, Function two, boolean polarity) {
 
         isPolar = polarity;
 
@@ -53,7 +55,7 @@ public class ParametricFunction2D {
         }
     }
 
-    ParametricFunction2D(ParametricFunction2D prevV) {
+    public ParametricFunction2D(ParametricFunction2D prevV) {
 
         components = prevV.getComponents();
         scale = prevV.getMag();
@@ -228,10 +230,24 @@ public class ParametricFunction2D {
      * This function rotates the function x radians counterclockwise
      * @param radians
      */
-    public void rotate(double radians) {
+    public static ParametricFunction2D rotate(ParametricFunction2D originalFunc, double radians) {
 
-        // figure out how to properly rotate the different functions
+        Function newTheta = null;
+        Function newScale = null;
 
+        Function thetaOffset = new Function( "t + " + radians, "t", new HashMap<String, Double>());
+
+        newTheta = Function.makeFunction(Function.compose(Function.makeFunctionCopy(originalFunc.getTheta()), thetaOffset), "t");
+        newScale = Function.makeFunctionCopy(originalFunc.getMag());
+
+        if (originalFunc.isPolar()) {
+
+            return (new ParametricFunction2D(newTheta, newScale, true));
+        } else {
+
+            Pair<Function, Function> rectangularComponents = ParametricFunction2D.rectangularize(newScale, newTheta);
+            return (new ParametricFunction2D(rectangularComponents.get1(), rectangularComponents.get2(), false));
+        }
     }
 
     public String toString() {
@@ -245,11 +261,7 @@ public class ParametricFunction2D {
 
     public static void main(String[] args) {
 
-        for (int angle = 0; angle < 360; angle++) {
-
-            float theta = (float) Math.toRadians(angle);
-            //ParametricFunction2D v = new ParametricFunction2D(null, null, false);
-            //System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
-        }
+        Function parabola = new Function("(x ^ 2)", "x", new HashMap<String, Double>());
+        ParametricFunction2D parabolaParametric = new ParametricFunction2D(parabola, false);
     }
 }
