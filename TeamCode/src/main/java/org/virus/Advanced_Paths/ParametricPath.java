@@ -14,6 +14,7 @@ public abstract class ParametricPath {
     private Pair<Integer, Integer>[] tRanges;
     private double[] functionRotations;
 
+    // path definition
     private ParametricFunction2D[] rotatedFunctions;
 
     public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, double[] newAngles) throws FunctionFormatException {
@@ -29,10 +30,10 @@ public abstract class ParametricPath {
         functionRotations = Arrays.copyOf(newAngles, newAngles.length);
 
         // parametrize the paths
-        rotatedFunctions = parametrize();
+        rotatedFunctions = parametrize(functions, functionRotations);
     }
 
-    private boolean checkTRanges(Pair<Integer, Integer>[] tRanges) {
+    private static boolean checkTRanges(Pair<Integer, Integer>[] tRanges) {
         for (int i = 0; i < tRanges.length; i++) {
             // check individual tRanges don't go backwards
             if (tRanges[i].get1() < tRanges[i].get2()) {
@@ -52,7 +53,7 @@ public abstract class ParametricPath {
         return true;
     }
 
-    private ParametricFunction2D[] parametrize() {
+    private static ParametricFunction2D[] parametrize(Function[] functions, double[] functionRotations) {
 
         ParametricFunction2D[] pathComponents = new ParametricFunction2D[functions.length];
 
