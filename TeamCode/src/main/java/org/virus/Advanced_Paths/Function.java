@@ -112,6 +112,7 @@ public class Function {
                 } catch (FunctionFormatException e) {
                     e.printStackTrace();
                 }
+
                 Node OpRelation = new Node(Node.paramType.Operation, components[1]);
                 OpRelation.setChild1(child1);
                 OpRelation.setChild2(child2);
@@ -308,6 +309,7 @@ public class Function {
 
                 linkedSubFunctions.add(link);
                 linkedSubFunctions.add(funcAfter);
+
             } else {
 
                 if (subFunctionLinks.size() == 1 && !"+-*/^".contains(String.valueOf(subject))) {
@@ -501,46 +503,56 @@ public class Function {
 
         Node newTree = originalTree.loneClone();
 
-        Node subTree1 = null;
-        if (originalTree.getChild1() != null) {
-            switch (originalTree.getChild1().getType()) {
-                case Variable:
+        switch (originalTree.getType()) {
+            case Variable:
 
-                    subTree1 = new Node(Node.paramType.Variable, replacement);
-                    break;
-                case Const:
+                newTree = new Node(Node.paramType.Variable, replacement);
+                break;
+            case Operation:
+            case T_FUNC:
 
-                    subTree1 = originalTree.getChild1().loneClone();
-                    break;
-                case Operation:
-                case T_FUNC:
+                Node subTree1 = null;
+                if (originalTree.getChild1() != null) {
+                    switch (originalTree.getChild1().getType()) {
+                        case Variable:
 
-                    subTree1 = replaceVariable(originalTree.getChild1(), replacement, variable, implicitConsts);
-                    break;
-            }
+                            subTree1 = new Node(Node.paramType.Variable, replacement);
+                            break;
+                        case Const:
+
+                            subTree1 = originalTree.getChild1().loneClone();
+                            break;
+                        case Operation:
+                        case T_FUNC:
+
+                            subTree1 = replaceVariable(originalTree.getChild1(), replacement, variable, implicitConsts);
+                            break;
+                    }
+                }
+
+                Node subTree2 = null;
+                if (originalTree.getChild2() != null) {
+                    switch (originalTree.getChild2().getType()) {
+                        case Variable:
+
+                            subTree2 = new Node(Node.paramType.Variable, replacement);
+                            break;
+                        case Const:
+
+                            subTree2 = originalTree.getChild2().loneClone();
+                            break;
+                        case Operation:
+                        case T_FUNC:
+
+                            subTree2 = replaceVariable(originalTree.getChild2(), replacement, variable, implicitConsts);
+                            break;
+                    }
+                }
+
+                newTree.setChild1(subTree1);
+                newTree.setChild2(subTree2);
+                break;
         }
-
-        Node subTree2 = null;
-        if (originalTree.getChild2() != null) {
-            switch (originalTree.getChild2().getType()) {
-                case Variable:
-
-                    subTree2 = new Node(Node.paramType.Variable, replacement);
-                    break;
-                case Const:
-
-                    subTree2 = originalTree.getChild2().loneClone();
-                    break;
-                case Operation:
-                case T_FUNC:
-
-                    subTree2 = replaceVariable(originalTree.getChild2(), replacement, variable, implicitConsts);
-                    break;
-            }
-        }
-
-        newTree.setChild1(subTree1);
-        newTree.setChild2(subTree2);
 
         return newTree;
     }
@@ -747,7 +759,7 @@ public class Function {
                 case Variable:
 
                     composed1 = makeTreeCopy(funcTwo);
-                    System.out.println("Composed 1: " + composed1);
+                    //System.out.println("Composed 1: " + composed1);
                     break;
                 case Operation:
                 case T_FUNC:
@@ -763,7 +775,7 @@ public class Function {
                 case Variable:
 
                     composed2 = makeTreeCopy(funcTwo);
-                    System.out.println("Composed 2: " + composed2);
+                    //System.out.println("Composed 2: " + composed2);
                     break;
                 case Operation:
                 case T_FUNC:
@@ -781,6 +793,11 @@ public class Function {
             funcOne.setChild2(composed2);
         }
 
+        if (composed1 == null && composed2 == null && funcOne.getType() == Node.paramType.Variable) {
+
+            funcOne = makeTreeCopy(funcTwo);
+        }
+
         return funcOne;
     }
 
@@ -789,28 +806,35 @@ public class Function {
         return (new Function(operate(funcOne.getRoot(), funcTwo.getRoot(), operator), funcOne.getVariable(), true));
     }
 
-    public static Node operate(Node treeOne, Node treeTwo, String operator) {
+    public static Node operate(Node treeOne, Node treeTwo, operation operator) {
 
         switch (operator) {
-            case "+":
-                return operate(treeOne, treeTwo, operation.addition);
-            case "-":
-                return operate(treeOne, treeTwo, operation.subtraction);
-            case "*":
-                return operate(treeOne, treeTwo, operation.multiplication);
-            case "/":
-                return operate(treeOne, treeTwo, operation.division);
-            case "^":
-                return operate(treeOne, treeTwo, operation.exponent);
+            case addition:
+                operate(treeOne, treeTwo, "+");
+                break;
+            case subtraction:
+                operate(treeOne, treeTwo, "-");
+                break;
+            case multiplication:
+                operate(treeOne, treeTwo, "*");
+                break;
+            case division:
+                operate(treeOne, treeTwo, "/");
+                break;
+            case exponent:
+                operate(treeOne, treeTwo, "^");
+                break;
+            default:
+                break;
         }
 
         return null;
     }
 
-    public static Node operate(Node treeOne, Node treeTwo, operation operator) {
+    public static Node operate(Node treeOne, Node treeTwo, String operator) {
 
         if (operator != null) {
-            Node opRoot = new Node(Node.paramType.Operation, operator.name());
+            Node opRoot = new Node(Node.paramType.Operation, operator);
             Node child1 = makeTreeCopy(treeOne);
             Node child2 = makeTreeCopy(treeTwo);
             opRoot.setChild1(child1);
@@ -1020,20 +1044,15 @@ public class Function {
     }
 
     public static void main(String[] args) {
-        //testFunctions(0,100);
+        testFunctions(0,100);
 
-        Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
+//        Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
 //        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
 //        System.out.println(Function.rebuildTree(newFunc));
 //
 //        Function sine = new Function("(sin(x))", "x", new HashMap<String, Double>());
 //        Function complexSinusoid =  new Function("(x + ((sin(3 * x)) ^ x))", "x", new HashMap<String, Double>());
 //        Function cardoid = new Function("(1 + (sin(x)))", "x", new HashMap<String, Double>());
-
-        Node quadT = replaceVariable(quadratic.getRoot(), "t", quadratic.getVariable(), quadratic.getConstantList());
-        System.out.println(rebuildTree(quadT));
-        Function quadTFunc = Function.makeFunction(quadT, "t");
-        System.out.println(quadTFunc.output(2));
-
+        //Function atan2 = new Function("(atan2((x ^ 2) / (x + 4)))", "x", new HashMap<String, Double>());
     }
 }

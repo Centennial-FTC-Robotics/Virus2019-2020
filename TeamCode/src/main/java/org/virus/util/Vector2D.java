@@ -45,16 +45,35 @@ public class Vector2D {
     public void genAngles() {
         genMag();
 
-        theta = Math.atan(components[1] / components[0]);
+        if (components[0] == 0 && components[1] == 0) {
 
-        if (components[0] < 0) {
+            theta = 0;
+        } else {
 
-            if (components[1] > 0) {
+            if (components[0] == 0) {
 
-                theta += Math.PI;
-            } else if (components[1] < 0) {
+                theta = Math.PI / 2;
 
-                theta -= Math.PI;
+                if (components[1] < 0) {
+                    theta *= -1;
+                }
+            } else {
+
+                theta = Math.atan(components[1] / components[0]);
+
+                if (components[0] < 0) {
+
+                    if (components[1] >= 0) {
+
+                        theta += Math.PI;
+                    } else if (components[1] < 0) {
+
+                        theta -= Math.PI;
+                    } else {
+
+                        theta = Math.PI;
+                    }
+                }
             }
         }
     }
