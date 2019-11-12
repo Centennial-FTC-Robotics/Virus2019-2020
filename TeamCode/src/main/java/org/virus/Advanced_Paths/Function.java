@@ -865,6 +865,7 @@ public class Function {
                 case Variable:
                     subDerivative1 = new Node(Node.paramType.Const, "1");
                     break;
+                case T_FUNC:
                 case Operation:
                     subDerivative1 = derivative(makeTreeCopy(root.getChild1()), variable);
                     break;
@@ -875,11 +876,12 @@ public class Function {
         if (root.getChild2() != null) {
             switch(root.getChild2().getType()) {
                 case Const:
-                    subDerivative1 = new Node(Node.paramType.Const, "0");
+                    subDerivative2 = new Node(Node.paramType.Const, "0");
                     break;
                 case Variable:
-                    subDerivative1 = new Node(Node.paramType.Const, "1");
+                    subDerivative2 = new Node(Node.paramType.Const, "1");
                     break;
+                case T_FUNC:
                 case Operation:
                     subDerivative2 = derivative(makeTreeCopy(root.getChild2()), variable);
                     break;
@@ -898,7 +900,10 @@ public class Function {
                 switch (root.getVal()) {
                     case "+":
                     case "-":
-
+                        System.out.println(root.getChild1());
+                        System.out.println(root.getChild2());
+                        System.out.println("subderivative 1: " + subDerivative1);
+                        System.out.println("subderivative 2: " + subDerivative2);
                         dRoot = operate(subDerivative1, subDerivative2, root.getVal());
                         break;
                     case "*":
@@ -906,7 +911,7 @@ public class Function {
                         Node product1 = operate(root.getChild1(), subDerivative2, "*");
                         Node product2 = operate(root.getChild2(), subDerivative1, "*");
 
-                        dRoot = operate(product1, product2, operation.addition);
+                        dRoot = operate(product1, product2, "+");
                         break;
                     case "/":
 
@@ -919,44 +924,145 @@ public class Function {
                         break;
                     case "^":
 
-                        if (root.getChild1().subTreeContains(variable)) {
+                        Node term1Exp1 = operate(root.getChild1(), root.getChild2(), "^"); //
+                        Node term1Product1 = operate(root.getChild2(), term1Exp1, "*");
+                        Node term1Division1 = operate(term1Product1, root.getChild1(), "/");
+                        Node term1 = operate(term1Division1, subDerivative1, "*");
 
-                            if (root.getChild2().subTreeContains(variable)) {
-                                // not fun times
+                        //term 2
+                        Node term2Product1 = operate(term1Exp1, Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.ln), "*"); // (f(x)^g(x)) * ln(f(x))
+                        Node term2 = operate(term2Product1, subDerivative2, "*"); // (f(x)^g(x)) * ln(f(x)) * g'(x)
 
-                                // term 1
-                                Node term1Exp1 = operate(root.getChild1(), root.getChild1(), "^");
-                                Node term1Product1 = operate(root.getChild2(), term1Exp1, "*");
-                                Node term1Division1 = operate(term1Product1, root.getChild1(), "/");
-                                Node term1 = operate(term1Division1, subDerivative1, "*");
-
-                                //term 2
-                                //Node term2Product1 = operate(term1Exp1, ) // (f(x)^g(x)) * ln(f(x))
-                            } else {
-                                // power rule
-
-                            }
-                        } else {
-                            if (root.getChild2().subTreeContains(variable)) {
-                                // exponent rule
-
-                            } else {
-                                // constant
-
-                            }
-                        }
+                        //sum
+                        dRoot = operate(term1, term2, "+");
                         break;
                 }
+                break;
+            case T_FUNC:
+
+                Node functionDerivative = null;
+
+                switch (root.getVal()) {
+                    case "sin":
+                        functionDerivative = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.cos);
+                        break;
+                    case "cos":
+                        Node innerFunc = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sin);
+                        functionDerivative = Function.operate(innerFunc, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "tan":
+                        innerFunc = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sec);
+                        functionDerivative = Function.operate(innerFunc, new Node(Node.paramType.Const, "2"), "^");
+                        break;
+                    case "csc":
+                        Node term1 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.csc);
+                        Node term2 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.cot);
+                        Node product = Function.operate(term1, term2, "*");
+                        functionDerivative = Function.operate(product, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "sec":
+                        term1 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sec);
+                        term2 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.tan);
+                        functionDerivative = Function.operate(term1, term2, "*");
+                        break;
+                    case "cot":
+                        innerFunc = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.csc);
+                        term1 = Function.operate(innerFunc, new Node(Node.paramType.Const, "2"), "^");
+                        functionDerivative = Function.operate(term1, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "asin":
+                        Node square = Function.operate(root.getChild1(), new Node(Node.paramType.Const, "2"), "^");
+                        Node diff = Function.operate(new Node(Node.paramType.Const, "1"), square, "-");
+                        Node sqRoot = Function.operate(diff, new Node(Node.paramType.Const, "0.5"), "^");
+                        functionDerivative = Function.operate(sqRoot, new Node(Node.paramType.Const, "-1"), "^");
+                        break;
+                    case "acos":
+                        square = Function.operate(root.getChild1(), new Node(Node.paramType.Const, "2"), "^");
+                        diff = Function.operate(new Node(Node.paramType.Const, "1"), square, "-");
+                        sqRoot = Function.operate(diff, new Node(Node.paramType.Const, "0.5"), "^");
+                        Node arcsin = Function.operate(sqRoot, new Node(Node.paramType.Const, "-1"), "^");
+                        functionDerivative = Function.operate(arcsin, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "atan":
+                        square = Function.operate(root.getChild1(), new Node(Node.paramType.Const, "2"), "^");
+                        Node sum = Function.operate(new Node(Node.paramType.Const, "1"), square, "+");
+                        functionDerivative = Function.operate(sum, new Node(Node.paramType.Const, "-1"), "^");
+                        break;
+                    case "sinh":
+                        functionDerivative = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.cosh);
+                        break;
+                    case "cosh":
+                        functionDerivative = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sinh);
+                        break;
+                    case "tanh":
+                        innerFunc = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sech);
+                        functionDerivative = Function.operate(innerFunc, new Node(Node.paramType.Const, "2"), "^");
+                        break;
+                    case "csch":
+                        term1 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.csch);
+                        term2 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.coth);
+                        product = Function.operate(term1, term2, "*");
+                        functionDerivative = Function.operate(product, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "sech":
+                        term1 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.sech);
+                        term2 = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.tanh);
+                        product = Function.operate(term1, term2, "*");
+                        functionDerivative = Function.operate(product, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "coth":
+                        innerFunc = Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.csch);
+                        term1 = Function.operate(innerFunc, new Node(Node.paramType.Const, "2"), "^");
+                        functionDerivative = Function.operate(term1, new Node(Node.paramType.Const, "-1"), "*");
+                        break;
+                    case "ln":
+                        functionDerivative = Function.operate(root.getChild1(), new Node(Node.paramType.Const, "-1"), "^");
+                        break;
+                    case "log10":
+                        product = Function.operate(Function.composeTFUNC(new Node(Node.paramType.Const, "10"), variable, Node.T_FUNC_TYPES.ln), root.getChild1(), "*");
+                        functionDerivative = Function.operate(product, new Node(Node.paramType.Const, "-1"), "^");
+                        break;
+                    case "sgn":
+                        functionDerivative = new Node(Node.paramType.Const, "0");
+                        break;
+                }
+
+                dRoot = Function.operate(functionDerivative, subDerivative1, "*");
                 break;
         }
 
         return dRoot;
     }
 
+    public static Function simplify(Function originalFunc) {
+
+        return Function.makeFunction(simplify(originalFunc.getRoot(), originalFunc.getVariable()), originalFunc.getVariable());
+    }
+
+    public static Node simplify(Node originalFunc, String variable) {
+
+        Node simplified = makeTreeCopy(originalFunc);
+
+        // write good code inside here
+        // start with the easiest case, when a term in a product is 0
+        // anything multiplied by one is the same thing
+        // then go to simplifying constants that are operated on, ex. 7 instead of 3 + 4
+        // get to the point where you can divide polynomials to get rid of those pesky asymptotes
+
+        return simplified;
+    }
+
     public static Function inverse(Function originalFunc) {
 
-        Function inverse = null;
+        return Function.makeFunction(simplify(originalFunc.getRoot(), originalFunc.getVariable()), originalFunc.getVariable());
+    }
 
+    public static Node inverse(Node originalFunc, String variable) {
+
+        Node inverse = makeTreeCopy(originalFunc);
+
+        // try to write a method that just reverses the operations, one at a time
+        // do it recursively!
 
         return inverse;
     }
@@ -1015,7 +1121,7 @@ public class Function {
             return false;
         }
 
-        String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
+        String longest = "(((((3 * 5) * 45) + (x * (x  ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
         Function longestFunction = new Function(longest, variable, new HashMap<String, Double>());
         passed = (longestFunction.output(input) == (((((3 * 5) * 45) + (input * (Math.pow(input, 3)))) + (3 * (input / (3.0 * 9.0)))) * (Math.pow((input / 4), input))));
         if (!passed) {
@@ -1054,5 +1160,18 @@ public class Function {
 //        Function complexSinusoid =  new Function("(x + ((sin(3 * x)) ^ x))", "x", new HashMap<String, Double>());
 //        Function cardoid = new Function("(1 + (sin(x)))", "x", new HashMap<String, Double>());
         //Function atan2 = new Function("(atan2((x ^ 2) / (x + 4)))", "x", new HashMap<String, Double>());
+
+        Function parabola = new Function("(x ^ 2)", "x", new HashMap<String, Double>());
+        Function derivative1 = Function.derivative(parabola);
+        Function two_X = new Function("(2 * x)", "x", new HashMap<String, Double>());
+        System.out.println(derivative1.output(-10));
+        System.out.println(two_X.output(-10));
+
+//        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
+//        Function derivative2 = Function.derivative(polynomial);
+//        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
+//
+//        System.out.println(derivative2.output(10));
+//        System.out.println(polyDeriv.output(10));
     }
 }

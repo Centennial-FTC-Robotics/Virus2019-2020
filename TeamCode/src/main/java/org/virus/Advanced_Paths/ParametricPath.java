@@ -7,7 +7,7 @@ import org.virus.util.ParametricFunction2D;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public abstract class ParametricPath {
+public class ParametricPath {
 
     //stuff used to parametrize
     private Function[] functions;
