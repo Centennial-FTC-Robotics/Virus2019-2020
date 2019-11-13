@@ -1,5 +1,6 @@
 package org.virus.example;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,7 +19,7 @@ public class ExampleBot extends Robot {
     public static ElapsedTime clock = new ElapsedTime();
     static Subsystem[] subsystems = {drivetrain/*, verticalSlides, horizontalSlides*/};
 
-    public static void initialize(OpMode opMode){
+    public static void initialize(LinearOpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
         //setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
         updateHub1Data();

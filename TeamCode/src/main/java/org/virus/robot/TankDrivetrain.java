@@ -39,7 +39,7 @@ public class TankDrivetrain extends Drivetrain {
     private Orientation currentHeading;
     private Position currentPosition = new Position();
     private Position targetPosition = new Position();
-    private OpMode opMode;
+    private LinearOpMode opMode;
     private ExpansionHubMotor lFront;
     private ExpansionHubMotor rFront;
     private ExpansionHubMotor lBack;
@@ -284,7 +284,7 @@ public class TankDrivetrain extends Drivetrain {
     }
 
     @Override
-    public void initialize(OpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         this.opMode = opMode;
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");

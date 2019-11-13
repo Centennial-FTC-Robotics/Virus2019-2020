@@ -46,11 +46,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
     PIDController xController = new PIDController(.06f,.05f ,0, 0.1f);
     PIDController yController = new PIDController(-.06f,-.05f ,0,0.1f);
-    private OpMode opMode;
+    private LinearOpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
-    private static Odometry odometry;
+    public Odometry odometry;
     double steerMag;
     Vector2D motorSpeeds;
     Vector2D translationalMvmt;
@@ -114,7 +114,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         return currentHeading.firstAngle;
         //return AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading);
     }
-    public void initialize(OpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");

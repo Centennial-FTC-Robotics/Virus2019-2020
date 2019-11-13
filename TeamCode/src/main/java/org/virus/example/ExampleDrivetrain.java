@@ -42,7 +42,7 @@ public class ExampleDrivetrain extends Drivetrain {
     PIDController headingController;
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    private OpMode opMode;
+    private LinearOpMode opMode;
 
     float prevLeft;
     float prevRight;
@@ -82,7 +82,7 @@ public class ExampleDrivetrain extends Drivetrain {
         initialPitch = currentHeading.thirdAngle;
     }
     @Override
-    public void initialize(OpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");

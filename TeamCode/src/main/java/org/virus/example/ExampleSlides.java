@@ -1,5 +1,6 @@
 package org.virus.example;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -11,7 +12,7 @@ public class ExampleSlides extends Subsystem {
     //Defenition for some type of slides with only 1 motor, only controlled by passing it a height to be at.
     private ExpansionHubMotor slideMotor;
     @Override
-    public void initialize(OpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         slideMotor = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
