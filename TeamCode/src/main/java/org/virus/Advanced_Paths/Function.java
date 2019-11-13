@@ -84,7 +84,7 @@ public class Function {
         System.out.println();
 
         if (subFunctions.size() == 0) { // this is the base case of having a combination of a total of two variables and constants w/ one connecting operation
-            String[] components = function.split(" ");
+            String[] components = removeSpaces(function.split(" "));
 
             if (components.length == 1) {
 
@@ -114,6 +114,7 @@ public class Function {
                 }
 
                 Node OpRelation = new Node(Node.paramType.Operation, components[1]);
+                System.out.println("Base Components: " + Arrays.toString(components));
                 OpRelation.setChild1(child1);
                 OpRelation.setChild2(child2);
 
@@ -191,6 +192,19 @@ public class Function {
         System.out.println("Tree: " + functionStructure);
 
         return functionStructure;
+    }
+
+    public static String[] removeSpaces(String[] components) {
+
+        String list = "";
+
+        for (int c = 0; c < components.length; c++) {
+            list += components[c];
+        }
+
+        list.replaceAll(" ","");
+
+        return list.split("");
     }
 
     private ArrayList<Pair<Integer, Integer>> getSubFuncIndex(String function) {
@@ -1119,7 +1133,37 @@ public class Function {
                                  } else {
                                      simplified = new Node(Node.paramType.Const, String.valueOf(val1 - val2));
                                  }
-                            }
+                            } else if (originalFunc.getVal().equals("+")) {
+                                 if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getVal().equals("+") && (newChild2.getChild1().getType().equals(Node.paramType.Const) || newChild2.getChild2().getType().equals(Node.paramType.Const))) {
+                                     if (!newChild2.getChild1().getType().equals(Node.paramType.Const)) {
+                                         simplified.setChild2(newChild2.getChild1());
+
+                                         double val1 = Double.valueOf(newChild1.getVal());
+                                         double val2 = Double.valueOf(newChild2.getChild2().getVal());
+                                         simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 + val2)));
+                                     } else if (!newChild2.getChild2().getType().equals(Node.paramType.Const)) {
+                                         simplified.setChild2(newChild2.getChild2());
+
+                                         double val1 = Double.valueOf(newChild1.getVal());
+                                         double val2 = Double.valueOf(newChild2.getChild1().getVal());
+                                         simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 + val2)));
+                                     }
+                                 } else if (newChild2.getType().equals(Node.paramType.Const) && newChild1.getVal().equals("+") && (newChild1.getChild1().getType().equals(Node.paramType.Const) || newChild1.getChild2().getType().equals(Node.paramType.Const))) {
+                                     if (!newChild1.getChild1().getType().equals(Node.paramType.Const)) {
+                                         simplified.setChild2(newChild1.getChild1());
+
+                                         double val1 = Double.valueOf(newChild2.getVal());
+                                         double val2 = Double.valueOf(newChild1.getChild2().getVal());
+                                         simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 + val2)));
+                                     } else if (!newChild1.getChild2().getType().equals(Node.paramType.Const)) {
+                                         simplified.setChild2(newChild1.getChild2());
+
+                                         double val1 = Double.valueOf(newChild2.getVal());
+                                         double val2 = Double.valueOf(newChild1.getChild1().getVal());
+                                         simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 + val2)));
+                                     }
+                                 }
+                             }
                         }
 
                         break;
@@ -1196,6 +1240,48 @@ public class Function {
                                 double val2 = Double.valueOf(newChild2.getVal());
 
                                 simplified = new Node(Node.paramType.Const, String.valueOf(val1 * val2));
+                            } else if (newChild2.getVal().equals("*") || newChild2.getVal().equals("/")) {
+                                if (newChild1.getType().equals(Node.paramType.Const) && (newChild2.getChild1().getType().equals(Node.paramType.Const) || newChild2.getChild2().getType().equals(Node.paramType.Const))) {
+                                    if (!newChild2.getChild1().getType().equals(Node.paramType.Const)) {
+                                        simplified.setChild2(newChild2.getChild1());
+
+                                        double val1 = Double.valueOf(newChild1.getVal());
+                                        double val2 = Double.valueOf(newChild2.getChild2().getVal());
+
+                                        if (newChild2.getVal().equals("*")) {
+                                            simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * val2)));
+                                        } else {
+                                            simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * (1.0 / val2))));
+                                        }
+                                    } else if (!newChild2.getChild2().getType().equals(Node.paramType.Const) && newChild1.getVal().equals("*") ) {
+                                        simplified.setChild2(newChild2.getChild2());
+
+                                        double val1 = Double.valueOf(newChild1.getVal());
+                                        double val2 = Double.valueOf(newChild2.getChild1().getVal());
+                                        simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * val2)));
+                                    }
+                                }
+                            } else if (newChild1.getVal().equals("*") || newChild1.getVal().equals("/")) {
+                                if (newChild2.getType().equals(Node.paramType.Const) && (newChild1.getChild1().getType().equals(Node.paramType.Const) || newChild1.getChild2().getType().equals(Node.paramType.Const))) {
+                                    if (!newChild1.getChild1().getType().equals(Node.paramType.Const)) {
+                                        simplified.setChild2(newChild1.getChild1());
+
+                                        double val1 = Double.valueOf(newChild2.getVal());
+                                        double val2 = Double.valueOf(newChild1.getChild2().getVal());
+
+                                        if (newChild1.getVal().equals("*")) {
+                                            simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * val2)));
+                                        } else {
+                                            simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * (1.0 / val2))));
+                                        }
+                                    } else if (!newChild1.getChild2().getType().equals(Node.paramType.Const) && newChild1.getVal().equals("*")) {
+                                        simplified.setChild2(newChild1.getChild2());
+
+                                        double val1 = Double.valueOf(newChild2.getVal());
+                                        double val2 = Double.valueOf(newChild1.getChild1().getVal());
+                                        simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * val2)));
+                                    }
+                                }
                             }
                         } else if (newChild1 == null && newChild2 != null) {
                             newChild2.severParent(simplified);
@@ -1486,9 +1572,10 @@ public class Function {
             return false;
         }
 
-        String longest = "(((((3 * 5) * 45) + (x * (x  ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
+        String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
         Function longestFunction = new Function(longest, variable, new HashMap<String, Double>());
         passed = (longestFunction.output(input) == (((((3 * 5) * 45) + (input * (Math.pow(input, 3)))) + (3 * (input / (3.0 * 9.0)))) * (Math.pow((input / 4), input))));
+        System.out.println(true);
         if (!passed) {
             return false;
         }
@@ -1515,7 +1602,7 @@ public class Function {
     }
 
     public static void main(String[] args) {
-//        testFunctions(0,100);
+        testFunctions(0,100);
 
 //        Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
 //        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
@@ -1533,17 +1620,28 @@ public class Function {
 //        System.out.println(two_X.output(-10));
 //        System.out.println(derivative1);
 
-        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
-        Function derivative2 = Function.simplify(Function.derivative(polynomial));
-        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
+//        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
+//        Function derivative2 = Function.simplify(Function.derivative(polynomial));
+//        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
+//
+//        System.out.println(derivative2);
+//        System.out.println(polyDeriv);
 
-        System.out.println(derivative2);
-        System.out.println(polyDeriv);
+//        Function additionSimplified = Function.simplify(new Function("((6.0 + x) + 3.0)", "x", new HashMap<String, Double>()));
+//        System.out.println(additionSimplified);
+//
+//        Function multiplicationSimplified = Function.simplify(new Function("((3 * x) * 6)", "x", new HashMap<String, Double>()));
+//        System.out.println(multiplicationSimplified);
 
 //        Function inefficient = new Function("((x ^ (2 * 8)) + (3 * (x * 1)))", "x", new HashMap<String, Double>());
 //        System.out.println(inefficient);
 //        Function efficient = Function.simplify(inefficient);
 //        System.out.println(efficient.getOperationsTree());
 //        System.out.println(efficient);
+
+        String longest = "(((((3 * 5) * 45) + (x * (x  ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
+        Function longestFunction = new Function(longest, "x", new HashMap<String, Double>());
+        System.out.println(longestFunction);
+        System.out.println(Function.simplify(longestFunction));
     }
 }
