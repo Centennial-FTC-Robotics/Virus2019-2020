@@ -22,6 +22,13 @@ public class Node {
 
         if (numType.equals(paramType.T_FUNC)) {
             T_FUNC_TYPE = T_FUNC_TYPES.valueOf(val.toLowerCase());
+        } else {
+            T_FUNC_TYPE = null;
+        }
+
+        if (numType.equals(paramType.Const)) {
+
+            parameter = String.valueOf(Double.valueOf(val));
         }
     }
 
@@ -30,6 +37,11 @@ public class Node {
     public paramType getType() {
 
         return type;
+    }
+
+    public T_FUNC_TYPES getT_FUNC_TYPE() {
+
+        return T_FUNC_TYPE;
     }
 
     public int getLevel() {
@@ -115,7 +127,11 @@ public class Node {
 
     public void updateLevel() {
 
-        level = parent.getLevel() + 1;
+        if (parent != null) {
+            level = parent.getLevel() + 1;
+        } else {
+            level = 0;
+        }
 
         updateChildLevels();
     }

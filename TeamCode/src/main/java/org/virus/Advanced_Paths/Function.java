@@ -924,10 +924,10 @@ public class Function {
                         break;
                     case "^":
 
-                        Node term1Exp1 = operate(root.getChild1(), root.getChild2(), "^"); //
-                        Node term1Product1 = operate(root.getChild2(), term1Exp1, "*");
-                        Node term1Division1 = operate(term1Product1, root.getChild1(), "/");
-                        Node term1 = operate(term1Division1, subDerivative1, "*");
+                        Node expDiff = operate(root.getChild2(), new Node(Node.paramType.Const, "1"), "-"); // g(x) - 1
+                        Node term1Exp1 = operate(root.getChild1(), expDiff, "^"); // f(x) ^ (g(x) - 1)
+                        Node term1Product1 = operate(root.getChild2(), term1Exp1, "*"); // (f(x)^(g(x) - 1)) * g(x)
+                        Node term1 = operate(term1Product1, subDerivative1, "*"); // ((f(x)^g(x)) * g(x)) / f(x)) * f'(x)
 
                         //term 2
                         Node term2Product1 = operate(term1Exp1, Function.composeTFUNC(root.getChild1(), variable, Node.T_FUNC_TYPES.ln), "*"); // (f(x)^g(x)) * ln(f(x))
@@ -1041,14 +1041,349 @@ public class Function {
 
     public static Node simplify(Node originalFunc, String variable) {
 
-        Node simplified = makeTreeCopy(originalFunc);
+        Node simplified = originalFunc.loneClone();
+
+        switch (originalFunc.getType()) {
+            case Const:
+
+                // cannot simplify a constant??
+                break;
+            case Variable:
+
+                // similarly cannot simplify a variable
+                break;
+            case Operation:
+                switch (originalFunc.getVal()) {
+                    case "+":
+                    case "-":
+
+                        Node newChild1 = null;
+                        if (originalFunc.getChild1() != null) {
+                            switch (originalFunc.getChild1().getType()) {
+                                case Const:
+                                case Variable:
+
+                                    newChild1 = originalFunc.getChild1().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild1 = simplify(originalFunc.getChild1(), variable);
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild1().getChild1(), variable);
+                                    newChild1 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild1().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        Node newChild2 = null;
+                        if (originalFunc.getChild2() != null) {
+                            switch (originalFunc.getChild2().getType()) {
+                                case Const:
+                                case Variable:
+
+                                    newChild2 = originalFunc.getChild2().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild2 = simplify(originalFunc.getChild2(), variable);
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild2().getChild1(), variable);
+                                    newChild2 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild2().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        simplified.setChild1(newChild1);
+                        simplified.setChild2(newChild2);
+
+                        if (newChild1 != null && newChild2 != null) {
+
+                            // with addition you can add any two numbers and nothing bad happens!!
+                             if (newChild1.getVal().equals("0.0")) {
+                                 newChild2.severParent(simplified);
+                                 simplified = newChild2.loneClone();
+                             } else if (newChild2.getVal().equals("0.0")) {
+                                 newChild1.severParent(simplified);
+                                 simplified = newChild1;
+                             }else if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getType().equals(Node.paramType.Const)) {
+
+                                 double val1 = Double.valueOf(newChild1.getVal());
+                                 double val2 = Double.valueOf(newChild2.getVal());
+
+                                 if (originalFunc.getVal().equals("+")) {
+                                     simplified = new Node(Node.paramType.Const, String.valueOf(val1 + val2));
+                                 } else {
+                                     simplified = new Node(Node.paramType.Const, String.valueOf(val1 - val2));
+                                 }
+                            }
+                        }
+
+                        break;
+                    case "*":
+
+                        newChild1 = null;
+                        if (originalFunc.getChild1() != null) {
+                            switch (originalFunc.getChild1().getType()) {
+                                case Const:
+                                    if (!originalFunc.getChild1().getVal().equals("1.0")) {
+
+                                        newChild1 = originalFunc.getChild1().loneClone();
+                                    }
+                                    break;
+                                case Operation:
+
+                                    newChild1 = simplify(originalFunc.getChild1(), variable);
+
+                                    if (newChild1.getType().equals(Node.paramType.Const) && newChild1.getVal().equals("1.0")) {
+                                        newChild1 = null;
+                                    }
+                                    break;
+                                case Variable:
+
+                                    newChild1 = originalFunc.getChild1().loneClone();
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild1().getChild1(), variable);
+                                    newChild1 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild1().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        newChild2 = null;
+                        if (originalFunc.getChild2() != null) {
+                            switch (originalFunc.getChild2().getType()) {
+                                case Const:
+                                    if (!originalFunc.getChild2().getVal().equals("1.0")) {
+
+                                        newChild2 = originalFunc.getChild2().loneClone();
+                                    }
+                                    break;
+                                case Operation:
+                                    newChild2 = simplify(originalFunc.getChild2(), variable);
+
+                                    if (newChild2.getType().equals(Node.paramType.Const) && newChild2.getVal().equals("1.0")) {
+                                        newChild2 = null;
+                                    }
+                                    break;
+                                case Variable:
+
+                                    newChild2 = originalFunc.getChild2().loneClone();
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild2().getChild1(), variable);
+                                    newChild2 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild2().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        simplified.setChild1(newChild1);
+                        simplified.setChild2(newChild2);
+
+                        if (newChild1 != null && newChild2 != null) {
+
+                            if (newChild1.getVal().equals("0.0") || newChild2.getVal().equals("0.0")) {
+
+                                simplified = new Node(Node.paramType.Const, "0");
+                            } else if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getType().equals(Node.paramType.Const)) {
+
+                                double val1 = Double.valueOf(newChild1.getVal());
+                                double val2 = Double.valueOf(newChild2.getVal());
+
+                                simplified = new Node(Node.paramType.Const, String.valueOf(val1 * val2));
+                            }
+                        } else if (newChild1 == null && newChild2 != null) {
+                            newChild2.severParent(simplified);
+                            simplified = newChild2;
+                        } else if (newChild1 != null) {
+                            newChild1.severParent(simplified);
+                            simplified = newChild1;
+                        }
+                        break;
+                    case "/":
+
+                        newChild1 = null;
+                        if (originalFunc.getChild1() != null) {
+                            switch (originalFunc.getChild1().getType()) {
+                                case Const:
+                                case Variable:
+
+                                    newChild1 = originalFunc.getChild1().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild1 = simplify(originalFunc.getChild1(), variable);
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild1().getChild1(), variable);
+                                    newChild1 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild1().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        newChild2 = null;
+                        if (originalFunc.getChild2() != null) {
+                            switch (originalFunc.getChild2().getType()) {
+                                case Const:
+                                    if (!originalFunc.getChild2().getVal().equals("1.0")) {
+
+                                        newChild2 = originalFunc.getChild2().loneClone();
+                                    }
+                                    break;
+                                case Variable:
+
+                                    newChild2 = originalFunc.getChild2().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild2 = simplify(originalFunc.getChild2(), variable);
+
+                                    if (newChild2.getType().equals(Node.paramType.Const) && newChild2.getVal().equals("1.0")) {
+                                        newChild2 = null;
+                                    }
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild2().getChild1(), variable);
+                                    newChild2 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild2().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        simplified.setChild1(newChild1);
+                        simplified.setChild2(newChild2);
+
+                        if (newChild1 != null && newChild2 != null) {
+
+                            if (newChild1.getVal().equals("0.0")) {
+
+                                simplified = new Node(Node.paramType.Const, "0");
+                            } else if (newChild2.getVal().equals("0.0")) {
+
+                                simplified = new Node(Node.paramType.Const, "NaN");
+                            } else if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getType().equals(Node.paramType.Const)) {
+
+                                double val1 = Double.valueOf(newChild1.getVal());
+                                double val2 = Double.valueOf(newChild2.getVal());
+
+                                simplified = new Node(Node.paramType.Const, String.valueOf(val1 / val2));
+                            }
+                        } else if (newChild1 == null && newChild2 != null) {
+                            // in this case the term is not just 1, it's actually something bad happening
+
+                        } else if (newChild1 != null) {
+                            newChild1.severParent(simplified);
+                            simplified = newChild1;
+                        }
+                        break;
+                    case "^":
+
+                        newChild1 = null;
+                        if (originalFunc.getChild1() != null) {
+                            switch (originalFunc.getChild1().getType()) {
+                                case Const:
+                                    if (!originalFunc.getChild1().getVal().equals("1.0")) {
+
+                                        newChild1 = originalFunc.getChild1().loneClone();
+                                    }
+                                    break;
+                                case Variable:
+
+                                    newChild1 = originalFunc.getChild1().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild1 = simplify(originalFunc.getChild1(), variable);
+
+                                    if (newChild1.getType().equals(Node.paramType.Const) && newChild1.getVal().equals("1.0")) {
+                                        newChild1 = null;
+                                    }
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild1().getChild1(), variable);
+                                    newChild1 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild1().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+
+                        newChild2 = null;
+                        if (originalFunc.getChild2() != null) {
+                            switch (originalFunc.getChild2().getType()) {
+                                case Const:
+                                    if (!originalFunc.getChild2().getVal().equals("1.0")) {
+
+                                        newChild2 = originalFunc.getChild2().loneClone();
+                                    }
+
+                                    break;
+                                case Variable:
+
+                                    newChild2 = originalFunc.getChild2().loneClone();
+                                    break;
+                                case Operation:
+
+                                    newChild2 = simplify(originalFunc.getChild2(), variable);
+
+                                    if (newChild2.getType().equals(Node.paramType.Const) && newChild2.getVal().equals("1.0")) {
+                                        newChild2 = null;
+                                    }
+                                    break;
+                                case T_FUNC:
+
+                                    Node innerFuncSimplified = simplify(originalFunc.getChild2().getChild1(), variable);
+                                    newChild2 = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getChild2().getT_FUNC_TYPE());
+                                    break;
+                            }
+                        }
+                        //System.out.println(newChild2);
+                        simplified.setChild1(newChild1);
+                        simplified.setChild2(newChild2);
+
+                        if (newChild1 != null && newChild2 != null) {
+
+                            if (newChild1.getVal().equals("0.0") || newChild2.getVal().equals("0.0")) {
+
+                                simplified = new Node(Node.paramType.Const, "0");
+                            } else if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getType().equals(Node.paramType.Const)) {
+
+                                double val1 = Double.valueOf(newChild1.getVal());
+                                double val2 = Double.valueOf(newChild2.getVal());
+
+                                simplified = new Node(Node.paramType.Const, String.valueOf(Math.pow(val1, val2)));
+                            }
+                        } else if (newChild1 == null && newChild2 != null) {
+                            simplified = new Node(Node.paramType.Const, "1");
+                        } else if (newChild1 != null) {
+                            newChild1.severParent(simplified);
+                            simplified = newChild1;
+                        }
+
+                        if (newChild1.getVal().equals("x") && newChild2 == null) {
+
+                        }
+                        break;
+                }
+                break;
+            case T_FUNC:
+
+                Node innerFuncSimplified = simplify(originalFunc.getChild1(), variable);
+                simplified = Function.composeTFUNC(innerFuncSimplified, variable, originalFunc.getT_FUNC_TYPE());
+                break;
+        }
 
         // write good code inside here
         // start with the easiest case, when a term in a product is 0
         // anything multiplied by one is the same thing
         // then go to simplifying constants that are operated on, ex. 7 instead of 3 + 4
         // get to the point where you can divide polynomials to get rid of those pesky asymptotes
-
+        simplified.updateLevel();
         return simplified;
     }
 
@@ -1065,6 +1400,36 @@ public class Function {
         // do it recursively!
 
         return inverse;
+    }
+
+    public String toString() {
+        return toString(getRoot());
+    }
+
+    public static String toString(Node root) {
+
+        String function = "";
+
+        switch(root.getType()) {
+            case Const:
+
+                function = root.getVal();
+                break;
+            case Variable:
+
+                function = root.getVal();
+                break;
+            case Operation:
+
+                function = "(" + toString(root.getChild1()) + " " + root.getVal() + " " + toString(root.getChild2()) + ")";
+                break;
+            case T_FUNC:
+
+                function = "(" + root.getVal() + "(" + toString(root.getChild1()) + "))";
+                break;
+        }
+
+        return function;
     }
 
     public static boolean FunctionTypeTester(double input) {
@@ -1150,7 +1515,7 @@ public class Function {
     }
 
     public static void main(String[] args) {
-        testFunctions(0,100);
+//        testFunctions(0,100);
 
 //        Function quadratic = new Function("((x ^ 2) + (2 * x))", "x", new HashMap<String, Double>());
 //        Node newFunc = Function.composeTFUNC(quadratic.getRoot(), quadratic.getVariable(), Node.T_FUNC_TYPES.sin);
@@ -1161,17 +1526,24 @@ public class Function {
 //        Function cardoid = new Function("(1 + (sin(x)))", "x", new HashMap<String, Double>());
         //Function atan2 = new Function("(atan2((x ^ 2) / (x + 4)))", "x", new HashMap<String, Double>());
 
-        Function parabola = new Function("(x ^ 2)", "x", new HashMap<String, Double>());
-        Function derivative1 = Function.derivative(parabola);
-        Function two_X = new Function("(2 * x)", "x", new HashMap<String, Double>());
-        System.out.println(derivative1.output(-10));
-        System.out.println(two_X.output(-10));
+//        Function parabola = new Function("(x ^ 2)", "x", new HashMap<String, Double>());
+//        Function derivative1 = Function.derivative(parabola);
+//        Function two_X = new Function("(2 * x)", "x", new HashMap<String, Double>());
+//        System.out.println(derivative1.output(-10));
+//        System.out.println(two_X.output(-10));
+//        System.out.println(derivative1);
 
-//        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
-//        Function derivative2 = Function.derivative(polynomial);
-//        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
-//
-//        System.out.println(derivative2.output(10));
-//        System.out.println(polyDeriv.output(10));
+        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
+        Function derivative2 = Function.simplify(Function.derivative(polynomial));
+        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
+
+        System.out.println(derivative2);
+        System.out.println(polyDeriv);
+
+//        Function inefficient = new Function("((x ^ (2 * 8)) + (3 * (x * 1)))", "x", new HashMap<String, Double>());
+//        System.out.println(inefficient);
+//        Function efficient = Function.simplify(inefficient);
+//        System.out.println(efficient.getOperationsTree());
+//        System.out.println(efficient);
     }
 }
