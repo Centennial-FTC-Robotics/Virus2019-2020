@@ -23,7 +23,6 @@ public class OdoTest extends LinearOpMode {
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
         waitForStart();
-
         while(opModeIsActive()) {
             updateControllerValues();
             double diagSpeed1 = motorSpeeds.getComponent(0);

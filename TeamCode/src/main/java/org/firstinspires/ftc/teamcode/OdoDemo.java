@@ -11,16 +11,8 @@ import org.virus.util.Vector2D;
 @Autonomous(group = "Autonomous", name = "Odometry Demo")
 
 public class OdoDemo extends LinearOpMode {
-    Vector2D leftStick;
-    Vector2D rightStick;
-    double lefty;
-    double leftx;
-    double steerMag;
     double maxSpeed = 1;
     Vector2D motorSpeeds;
-    PIDController headingController = new PIDController(-.03f, 0 ,0);
-    PIDController xController = new PIDController(.08f,0 ,0);
-    PIDController yController = new PIDController(-.08f,0 ,0);
     Vector2D currentPosition = new Vector2D(0,0);
 
     @Override
@@ -28,7 +20,7 @@ public class OdoDemo extends LinearOpMode {
         Agobot.initialize(this);
 //        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
-        Agobot.drivetrain.initializeIMU();
+        //Agobot.drivetrain.initializeIMU();
 
         waitForStart();
 
@@ -38,13 +30,10 @@ public class OdoDemo extends LinearOpMode {
             telemetry.update();
         }
 
-        headingController.start();
-        xController.start();
-        yController.start();
-        Vector2D newPosition = new Vector2D(0,0);
+        Vector2D newPosition = new Vector2D(12,0);
         double newHeading = 0;
-        while(Agobot.drivetrain.goToPosition(newPosition, newHeading, maxSpeed));
-
+        //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), newHeading, maxSpeed));
+        while(Agobot.drivetrain.goToPosition(new Vector2D(12,0), 90, maxSpeed));
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();
 //            telemetry.addData("Position:", currentPosition);
@@ -62,19 +51,4 @@ public class OdoDemo extends LinearOpMode {
 
 
     }
-
-    public void updateControllerValues(){
-        double x = currentPosition.getComponent(0);
-        double y = currentPosition.getComponent(1);
-        leftStick = new Vector2D((double) xController.getValue(0, (float)x), (double)  yController.getValue(0, (float)y));
-        rightStick = new Vector2D((double) headingController.getValue(0, AngleUnit.normalizeDegrees((float)Math.toDegrees(Agobot.drivetrain.getHeading()))),0);
-        leftStick.rotate(-Agobot.drivetrain.getHeading());
-        leftx = -leftStick.getComponent(0);
-        lefty = -leftStick.getComponent(1);
-        double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
-        double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
-
-        motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
-    }
-
 }

@@ -322,7 +322,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         currentPosition = Agobot.drivetrain.updatePosition();
         opMode.telemetry.addData("Position:", currentPosition);
         opMode.telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+        opMode.telemetry.addData("New Position",newPosition);
+        opMode.telemetry.addData("New Heading", newHeading);
         updateMotorPowers(newPosition, newHeading);
+        opMode.telemetry.addData("Translational Movement", translationalMvmt);
+        opMode.telemetry.addData("Steer Magnitude", steerMag);
         double diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, maxSpeed);
         double diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, maxSpeed);
         if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
@@ -349,7 +353,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double y = currentPosition.getComponent(1);
         translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double)  yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
         steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float)Math.toDegrees(Agobot.drivetrain.getHeading())));
-        translationalMvmt.rotate(-Agobot.drivetrain.getHeading());
+        translationalMvmt.rotate(Agobot.drivetrain.getHeading());
         double leftx = -translationalMvmt.getComponent(0);
         double lefty = -translationalMvmt.getComponent(1);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
