@@ -36,6 +36,6 @@ public class ExampleAuto extends LinearOpMode {
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
 
-        while (ExampleBot.drivetrain.pivot(90f, .5f)); //turns the robot another 90 degrees
+//        while (ExampleBot.drivetrain.pivot(90f, .5f)); //turns the robot another 90 degrees
     }
 }

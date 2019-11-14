@@ -1,4 +1,5 @@
 package org.virus.util;
+import java.sql.SQLOutput;
 import java.util.Arrays;
 
 public class Vector2D {
@@ -8,20 +9,24 @@ public class Vector2D {
     private double theta;
     private double[] components;
 
-    Vector2D(double comp1, double comp2) {
+    public Vector2D(double comp1, double comp2) {
 
         components = new double[] {comp1, comp2};
         genAngles();
     }
 
-    Vector2D(float newTheta, float newMag) {
+    public Vector2D(float newTheta, float newMag, boolean isRad) {
+
+        if (!isRad) {
+            theta = Math.toRadians(theta);
+        }
 
         R = newMag;
         theta = newTheta;
         genComp();
     }
 
-    Vector2D(Vector2D prevV) {
+    public Vector2D(Vector2D prevV) {
 
         components = prevV.getComponents();
         R = prevV.getMag();
@@ -46,7 +51,6 @@ public class Vector2D {
         genMag();
 
         if (components[0] == 0 && components[1] == 0) {
-
             theta = 0;
         } else {
 
@@ -67,7 +71,6 @@ public class Vector2D {
 
                         theta += Math.PI;
                     } else if (components[1] < 0) {
-
                         theta -= Math.PI;
                     } else {
 
@@ -100,12 +103,31 @@ public class Vector2D {
         return Arrays.copyOf(components, components.length);
     }
 
+    public Double getComponent(int component) {
+
+        if (component >= 0 && component < 2) {
+
+            return components[component];
+        }
+
+        return null;
+    }
+
     public String getName() {
 
         return name;
     }
 
     //---------- Vector Operations ----------//
+
+    public void setComponents(double[] newComp) {
+
+        if (newComp.length == 2) {
+
+            components = Arrays.copyOf(newComp, newComp.length);
+            genAngles();
+        }
+    }
 
     public void add(Vector2D term_two) {
 
@@ -185,8 +207,7 @@ public class Vector2D {
      */
     public void rotate(double radians) {
 
-        theta += radians % (2 * Math.PI);
-        theta = theta % (2 * Math.PI);
+        theta = (theta + radians) % (2 * Math.PI);
         genComp();
     }
 
@@ -199,13 +220,43 @@ public class Vector2D {
         return vector;
     }
 
+    public boolean equals(Vector2D compare) {
+
+        for (int c = 0; c < components.length; c++) {
+
+            if (compare.getComponent(c) != this.getComponent(c)) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static void main(String[] args) {
 
-        for (int angle = 0; angle < 360; angle++) {
+//        for (int angle = 0; angle < 360; angle++) {
+//
+//            float theta = (float) Math.toRadians(angle);
+//            Vector2D v = new Vector2D(theta, 1, true);
+//            System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
+//            v.rotate(3 * Math.PI / 4);
+//            v.genAngles();
+//            System.out.println("Rotated Angle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)) + "\n");
+//
+//            if (Math.round(Math.toDegrees(standardPosAngle(v))) != ((angle + 135) % 360)) {
+//                System.out.println("BAD");
+//                break;
+//            }
+//        }
 
-            float theta = (float) Math.toRadians(angle);
-            Vector2D v = new Vector2D(theta, 1);
-            System.out.println("Angle: " + angle + " genAngle: " + Math.toDegrees(v.getTheta()) + " standardPosAngle: " + Math.toDegrees(standardPosAngle(v)));
+        Vector2D rightStick = new Vector2D(-1, 0);
+
+        for (double a = 130; a <= 140; a += 0.05) {
+
+            Vector2D leftStick = new Vector2D(0, 1);
+            leftStick.rotate(Math.toRadians(a));
+            System.out.println(leftStick);
         }
     }
 }

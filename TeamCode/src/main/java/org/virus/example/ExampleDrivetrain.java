@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -41,7 +42,7 @@ public class ExampleDrivetrain extends Drivetrain {
     PIDController headingController;
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    private OpMode opMode;
+    private LinearOpMode opMode;
 
     float prevLeft;
     float prevRight;
@@ -81,7 +82,7 @@ public class ExampleDrivetrain extends Drivetrain {
         initialPitch = currentHeading.thirdAngle;
     }
     @Override
-    public void initialize(OpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");
@@ -168,9 +169,12 @@ public class ExampleDrivetrain extends Drivetrain {
         float targetHeading = path.getHeading(position);
         float correction =  headingController.getValue(0, AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         //correction = 0;
+        opMode.telemetry.addData("heading", currentHeading.firstAngle - initialHeading);
+        opMode.telemetry.addData("leftEncoder", getLeftPos());
+        opMode.telemetry.addData("righttEncoder",getRightPos());
         opMode.telemetry.addData("error", AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
         opMode.telemetry.addData("correction", correction);
-
+        opMode.telemetry.update();
         float power = path.getPower(position);
         float FFLeft=0;
         float FFRight=0;
@@ -212,7 +216,6 @@ public class ExampleDrivetrain extends Drivetrain {
             FFRight =0;
 
         }
-
         runMotors(
                 power + /*FFRight/4f*/ + correction * (3f/4f + power/(4f*path.getMaxPower())),
                 power + /*FFLeft/4f*/ - correction * (3f/4f + power/(4f*path.getMaxPower()))
@@ -220,9 +223,9 @@ public class ExampleDrivetrain extends Drivetrain {
 
         //opMode.telemetry.addData("Heading", currentHeading.firstAngle - initialHeading);
         if(Math.abs(position-path.getDistance())<10 && Math.abs(AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading))<.5){
+            runMotors(0,0);
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -258,7 +261,35 @@ public class ExampleDrivetrain extends Drivetrain {
 
 
 
+    public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
+        double maxPower=1;
 
+        if (Left0!=0&&Left1!=0&&Right0!=0&&Right1!=0) {
+            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
+        }
 
+        Left0=Left0+steerMagnitude;
+        Left1=Left1+steerMagnitude;
+        Right0=Right0-steerMagnitude;
+        Right1=Right1-steerMagnitude;
+        //make sure no exception thrown if power > 0
+        Left0 = Range.clip(Left0, -maxPower, maxPower);
+        Left1 = Range.clip(Left1, -maxPower, maxPower);
+        Right0 = Range.clip(Right0, -maxPower, maxPower);
+        Right1 = Range.clip(Right1, -maxPower, maxPower);
+        rBack.setPower(Right0);
+        rFront.setPower(Right1);
+        lBack.setPower(Left0);
+        lFront.setPower(Left1);
+    }
 
+    //turn around the center of the robot
+//    public boolean pivot(float angle, float speed, PIDController pid) {
+//        //pretend there's implementation here
+//        double distance = ((12.9) * 2 * Math.PI) * ((angle % 360) / 360);
+//
+//
+//        return false;
+//        //once implemented should return true or false based on whether pivot is complete
+//    }
 }

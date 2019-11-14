@@ -10,6 +10,7 @@ public class PIDController {
     private ElapsedTime PIDClock;
     private float prevError = 0;
     private float i = 0;
+    private boolean started=false;
 
     public PIDController(float kP, float kI, float kD){
         this.kP = kP;
@@ -25,33 +26,39 @@ public class PIDController {
     }
 
     public void start(){
+        started=true;
         PIDClock = new ElapsedTime();
         prevError = 0;
         float i = 0;
     }
-
-    public void reset(){
-        start();
+    public void clear(){
+        started=false;
+        PIDClock = null;
+        prevError = 0;
+        float i = 0;
     }
-
     //ideally called every loop, don't wait too long between calls unless running p loop
-    public float getValue(float target, float actual){
-        if (PIDClock==null){
+    public float getValue (float target, float actual) {
+
+        //throw (new Exception("NotStarted"));
+
+        if (!started) {
             start();
         }
         float error = target - actual;
         float p = error;
-        if(antiWind>=0){
-            if(Math.abs(error)<=antiWind){
-                i += (float)(error*PIDClock.seconds());
+        i += (float) (error * PIDClock.seconds());
+        float d = (float) ((error - prevError) / PIDClock.seconds());
+        prevError = error;
+        PIDClock.reset();
+        if (antiWind >= 0) {
+            if (Math.abs(kI * i) >= antiWind) {
+                i = antiWind / kI * (i/Math.abs(i));
+                return kP * p + antiWind*(i/Math.abs(i)) + kD * d;
+            } else {
+                return kP * p + kI * i + kD * d;
             }
         }
-        else{
-            i += (float)(error*PIDClock.seconds());
-        }
-        float d = (float)((error-prevError)/ PIDClock.seconds());
-        prevError=error;
-        PIDClock.reset();
-        return kP*p + kI*i + kD*d;
+        return kP * p + kI * i + kD * d;
     }
 }

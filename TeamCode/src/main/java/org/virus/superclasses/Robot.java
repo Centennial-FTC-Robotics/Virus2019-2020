@@ -8,13 +8,18 @@ public abstract class Robot {
     static RevBulkData hub2Data;
     static ExpansionHubEx hub1;
     static ExpansionHubEx hub2;
-    public static void readHub1Data(){
+    public static void updateHub1Data(){
         hub1Data = hub1.getBulkInputData();
 
     }
-    public static void readHub2Data(){
+    public static void updateHub2Data(){
         hub2Data = hub2.getBulkInputData();
-
+    }
+    public static RevBulkData getHub1Data(){
+        return hub1Data;
+    }
+    public static RevBulkData getHub2Data(){
+        return hub2Data;
     }
     public static void setHub1(ExpansionHubEx hub1){
         Robot.hub1 = hub1;
