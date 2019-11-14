@@ -351,15 +351,15 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
         double x = currentPosition.getComponent(0);
         double y = currentPosition.getComponent(1);
-        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double)  yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
+        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) -yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
         steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float)Math.toDegrees(Agobot.drivetrain.getHeading())));
-        translationalMvmt.rotate(Agobot.drivetrain.getHeading());
-        double leftx = -translationalMvmt.getComponent(0);
-        double lefty = -translationalMvmt.getComponent(1);
+        translationalMvmt.rotate(-Agobot.drivetrain.getHeading());
+        double leftx = translationalMvmt.getComponent(0);
+        double lefty = translationalMvmt.getComponent(1);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
-        motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
+        motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
 
     }
 }
