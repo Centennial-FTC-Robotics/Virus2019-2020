@@ -2,24 +2,23 @@ package org.virus.Advanced_Paths;
 
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
-import org.virus.util.ParametricFunction2D;
 import org.virus.util.Vector2D;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class ParametricPath {
 
     //stuff used to parametrize
     private Function[] functions;
-    private Pair<Integer, Integer>[] tRanges;
-    private Pair<Integer, Integer>[] definedFunctionRanges;
     private double[] functionRotations;
 
     // path definition
     private ParametricFunction2D[] rotatedFunctions;
+    private Pair<Integer, Integer>[] tRanges;
+    private Pair<Integer, Integer>[] definedFunctionRanges;
+    private double maxSpeed;
 
-    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, Pair<Integer, Integer>[] newDefRanges, double[] newAngles) throws FunctionFormatException {
+    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, Pair<Integer, Integer>[] newDefRanges, double[] newAngles, double newMax) throws FunctionFormatException {
 
         // tRange error checking, making sure ranges are consistent and continuous
         if (!checkTRanges(newRanges) && newRanges.length == newDefRanges.length) {
@@ -34,6 +33,9 @@ public class ParametricPath {
 
         // parametrize the paths
         rotatedFunctions = parametrize(functions, functionRotations);
+
+        // stuff about the path movement
+        maxSpeed = newMax;
     }
 
     private static boolean checkTRanges(Pair<Integer, Integer>[] tRanges) {
@@ -67,6 +69,10 @@ public class ParametricPath {
         }
 
         return pathComponents;
+    }
+
+    public double getMaxSpeed() {
+        return maxSpeed;
     }
 
     public double getAngle(double tVal) {
@@ -117,6 +123,15 @@ public class ParametricPath {
         return tValRange;
     }
 
+    public double getSpeed(double tVal) {
+
+        int currentFuncIndex = getPathComponentIndex(tVal);
+        Pair<Integer, Integer> tRange = tRanges[currentFuncIndex];
+        Pair<Integer, Integer> funcRange = definedFunctionRanges[currentFuncIndex];
+
+        return (((double) (funcRange.get2() - funcRange.get1())) / ((double) (tRange.get2() - tRange.get1())));
+    }
+
     public double approximateDistance(double distanceTraveled, double resolution) {
 
         double distance = 0;
@@ -129,6 +144,7 @@ public class ParametricPath {
             Function y = parametricFunc.get2();
 
             double addedDistance = Math.hypot(x.output(tVal + resolution) - x.output(tVal), y.output(tVal + resolution) - y.output(tVal));
+           distance += addedDistance;
             tVal += resolution;
         }
 

@@ -6,7 +6,6 @@ import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynchV1;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
@@ -17,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.openftc.revextensions2.ExpansionHubMotor;
+import org.virus.Advanced_Paths.ParametricPath;
 import org.virus.agobot.Agobot;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
@@ -24,6 +24,7 @@ import org.virus.superclasses.Drivetrain;
 import org.virus.superclasses.Robot;
 import org.virus.util.BetterI2cDeviceSynchImplOnSimple;
 import org.virus.util.PIDController;
+import org.virus.Advanced_Paths.ParametricFunction2D;
 import org.virus.util.Vector2D;
 
 public class MecanumVectorDriveTrain extends Drivetrain {
@@ -260,17 +261,34 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
     }
 
-    public boolean move(Vector2D move) {
+    public boolean movePath(ParametricPath p, PIDController pid) {
 
-        double moveX = move.getComponent(0);
-        double moveY = move.getComponent(1);
-        double scalar = Math.max(Math.abs(moveY - moveX), Math.abs(moveY + moveX)); //scalar and magnitude scale the motor powers based on distance from joystick origin
-        double magnitude = Math.sqrt(Math.pow(moveY, 2) + Math.pow(moveX, 2));
+        // positions
+        // TODO: find a better way to get the position using encoders - copy MecanumVectorDriveTrain
+        updateOrientation();
+        double position = (getRightPos() + getLeftPos())/2; // NOTE: this ONLY works when the robot turns with the path!
+        double tVal = p.approximateDistance(position, 0.001);
 
-        Vector2D motorSpeeds = new Vector2D((moveY - moveX) * (magnitude / scalar), (moveY + moveX) * (magnitude / scalar));
+        // targets
+        double targetHeading = Math.atan2(ParametricFunction2D.derivative(p.getPathComponent(tVal), p.translatePoint(tVal)), 1);
+        Vector2D targetDisplacement = p.getPoint(tVal);
 
-        
+        double headingCorrection = pid.getValue((float) targetHeading, (float) AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading));
+        opMode.telemetry.addData("heading", currentHeading.firstAngle - initialHeading);
+        opMode.telemetry.addData("leftEncoder", getLeftPos());
+        opMode.telemetry.addData("righttEncoder",getRightPos());
+        opMode.telemetry.addData("error", AngleUnit.normalizeDegrees(currentHeading.firstAngle - initialHeading - targetHeading));
+        opMode.telemetry.addData("correction", headingCorrection);
+        opMode.telemetry.update();
+
+
         return false;
+    }
+
+    public boolean move(Vector2D move) { // move relative to the robot, but in the field's heading
+
+        move.add(odometry.currentPosition());
+        return goToPosition(move, currentHeading.firstAngle, 1);
     }
 
     public void runMotors(float right,float left){

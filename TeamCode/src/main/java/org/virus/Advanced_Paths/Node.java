@@ -3,7 +3,7 @@ package org.virus.Advanced_Paths;
 public class Node {
 
     public enum paramType {Const, Variable, Operation, T_FUNC}
-    public enum T_FUNC_TYPES {sin, cos, tan, csc, sec, cot, asin, acos, atan, sinh, cosh, tanh, csch, sech, coth, ln, log10, sgn};
+    public enum T_FUNC_TYPES {sin, cos, tan, csc, sec, cot, asin, acos, atan, sinh, cosh, tanh, csch, sech, coth, ln, log10, sgn, abs};
     private paramType type;
     private T_FUNC_TYPES T_FUNC_TYPE;
 

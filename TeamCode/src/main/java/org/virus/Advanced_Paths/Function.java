@@ -536,6 +536,9 @@ public class Function {
                     case "sgn":
                         output = Math.signum(child1Val);
                         break;
+                    case "abs":
+                        output = Math.abs(child1Val);
+                        break;
                 }
                 break;
         }
@@ -1050,6 +1053,11 @@ public class Function {
                         break;
                     case "sgn":
                         functionDerivative = new Node(Node.paramType.Const, "0");
+                        break;
+                    case "abs":
+                        square = Function.operate(root.getChild1(), new Node(Node.paramType.Const, "2"), "^");
+                        sqRoot = Function.operate(square, new Node(Node.paramType.Const, "0.5"), "^");
+                        functionDerivative = Function.derivative(sqRoot, variable);
                         break;
                 }
 

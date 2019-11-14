@@ -1,8 +1,7 @@
-package org.virus.util;
-import android.graphics.Point;
+package org.virus.Advanced_Paths;
 
-import org.virus.Advanced_Paths.Function;
-import org.virus.Advanced_Paths.Node;
+import org.virus.util.Pair;
+import org.virus.util.Vector2D;
 
 import java.util.HashMap;
 
@@ -36,6 +35,13 @@ public class ParametricFunction2D {
 
     public ParametricFunction2D(Function one, Function two, boolean isPolar) {
 
+        if (!one.getVariable().equals("t")) {
+            Function.replaceVariable(one.getRoot(), "t", one.getVariable(), one.getConstantList());
+        }
+        if (!two.getVariable().equals("t")) {
+            Function.replaceVariable(two.getRoot(), "t", two.getVariable(), two.getConstantList());
+        }
+
         if (isPolar) {
 
             polarComponents = new Pair<Function, Function>(one, two);
@@ -54,6 +60,11 @@ public class ParametricFunction2D {
     }
 
     //---------- Function Properties ----------//
+
+    public String getVariable() {
+        return "t";
+    }
+
     public double genMag(double tVal) {
 
         return Math.sqrt(Math.pow(rectangularComponents.get1().output(tVal), 2) + Math.pow(rectangularComponents.get2().output(tVal), 2));
@@ -255,6 +266,42 @@ public class ParametricFunction2D {
         return (Function.operate(derivative.getRectangularComponents().get2(), derivative.getRectangularComponents().get1(), Function.operation.division));
     }
 
+
+
+    public static Function getSignedCurvature(ParametricFunction2D originalFunc) {
+
+        Function x = originalFunc.getRectangularComponents().get1();
+        Function y = originalFunc.getRectangularComponents().get2();
+
+        // first and second derivatives
+        Function dy_1 = Function.simplify(Function.derivative(y));
+        Function dy_2 = Function.simplify(Function.derivative(dy_1));
+        Function dx_1 = Function.simplify(Function.derivative(x));
+        Function dx_2 = Function.simplify(Function.derivative(dx_1));
+
+        // top term
+        Function topProduct1 = Function.operate(dx_1, dy_2, Function.operation.multiplication);
+        Function topProduct2 = Function.operate(dx_2, dy_1, Function.operation.multiplication);
+        Function topTerm = Function.operate(topProduct1, topProduct2, Function.operation.subtraction);
+
+        // bottom term
+        Node bottomSquare1 =  Function.operate(dx_1.getRoot(), new Node(Node.paramType.Const, "2"), "^");
+        Node bottomSquare2 = Function.operate(dy_1.getRoot(), new Node(Node.paramType.Const, "2"), "^");
+        Node bottomSum = Function.operate(bottomSquare1, bottomSquare2, "+");
+        Node bottomTerm = Function.operate(bottomSum, new Node(Node.paramType.Const, "1.5"), "^");
+
+        Function curvature = Function.operate(topTerm, Function.makeFunction(bottomTerm, dy_2.getVariable()), Function.operation.division);
+
+        return curvature;
+    }
+
+    public static Function getCurvature(ParametricFunction2D originalFunc) {
+        Function curvature = ParametricFunction2D.getSignedCurvature(originalFunc);
+        Node absCurvature = Function.composeTFUNC(curvature.getRoot(), originalFunc.getVariable(), Node.T_FUNC_TYPES.abs);
+
+        return Function.makeFunction(absCurvature, originalFunc.getVariable());
+    }
+
     //---------- Function outputs ----------//
 
     public static Vector2D output(ParametricFunction2D originalFunc, double tValue) {
@@ -278,6 +325,16 @@ public class ParametricFunction2D {
         Function derivative = ParametricFunction2D.derivative(originalFunc);
 
         return derivative.output(tValue);
+    }
+
+    public static double getSignedCurvature(ParametricFunction2D originalFunc, double tValue) {
+
+        return ParametricFunction2D.getSignedCurvature(originalFunc).output(tValue);
+    }
+
+    public static double getCurvature(ParametricFunction2D originalFunc, double tValue) {
+
+        return Math.abs(getSignedCurvature(originalFunc, tValue));
     }
 
     public String toString() {
