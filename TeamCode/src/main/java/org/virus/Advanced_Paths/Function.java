@@ -2,6 +2,7 @@ package org.virus.Advanced_Paths;
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,8 +22,15 @@ public class Function {
     private HashMap<String, Double> constantList;
     private ArrayList<Node> operationsTree; // ArrayList<Pair<Bounds<Start, End>, Relatives<Parent, Children<Positions>>>>
 
-    public Function(String function, String variable, HashMap<String, Double> newConstants) {
+    private boolean parseDebug;
 
+    public Function(String function, String variable, HashMap<String, Double> newConstants) {
+        this(function, variable, newConstants, false);
+    }
+
+    public Function(String function, String variable, HashMap<String, Double> newConstants, boolean debugLog) {
+
+        parseDebug = debugLog;
         funcVariable = variable;
         constantList = newConstants;
         operationsTree = parse(function, funcVariable);
@@ -69,19 +77,19 @@ public class Function {
         ArrayList<Node> functionStructure = new ArrayList<Node>();
 
         // checking for smaller functions inside
-        System.out.println("\n+ New Function: " + function);
+        parseDebug("\n+ New Function: " + function);
         function = function.substring(1, function.length() - 1); // remove garuanteed start and end parentheses
-        System.out.println("Stripped function: " + function + "\n");
+        parseDebug("Stripped function: " + function + "\n");
         ArrayList<Pair<Integer, Integer>> subFunctions = getSubFuncIndex(function);
 
-        System.out.print("Generated SubFunctions: ");
+        parseDebug("Generated SubFunctions: ");
         for (Pair<Integer, Integer> a: subFunctions) {
-            System.out.print(function.substring(a.get1(), a.get2()) + " : ");
+            parseDebug(function.substring(a.get1(), a.get2()) + " : ");
         }
         if (subFunctions.size() == 0) {
-            System.out.print("None");
+            parseDebug("None");
         }
-        System.out.println();
+        parseDebug("\n");
 
         if (subFunctions.size() == 0) { // this is the base case of having a combination of a total of two variables and constants w/ one connecting operation
             String[] components = removeSpaces(function.split(" "));
@@ -114,7 +122,7 @@ public class Function {
                 }
 
                 Node OpRelation = new Node(Node.paramType.Operation, components[1]);
-                System.out.println("Base Components: " + Arrays.toString(components));
+                parseDebug("Base Components: " + Arrays.toString(components));
                 OpRelation.setChild1(child1);
                 OpRelation.setChild2(child2);
 
@@ -139,7 +147,7 @@ public class Function {
                         links.addAll(Arrays.asList(baseBefore.split(" ")));
                         opRef.setT1(links.size() - 1);
 
-                        System.out.println("Base Before: " + baseBefore);
+                        parseDebug("Base Before: " + baseBefore);
                     }
                 } else {
                     String baseBetween = function.substring(subFunctions.get(sf - 1).get2(), subFunctions.get(sf).get1()).trim();
@@ -148,7 +156,7 @@ public class Function {
                         links.addAll(Arrays.asList(baseBetween.split(" ")));
                         opRef.setT1(links.size() - 1);
 
-                        System.out.println("Base between: " + baseBetween);
+                        parseDebug("Base between: " + baseBetween);
                     }
                 }
 
@@ -158,7 +166,8 @@ public class Function {
                     if (!baseAfter.equals("")) {
                         opRef.setT2(links.size());
                         links.addAll(Arrays.asList(baseAfter.split(" ")));
-                        System.out.println("Base after: " + baseAfter);
+
+                        parseDebug("Base after: " + baseAfter);
                     }
                 } else {
                     String baseAfter = function.substring(subFunctions.get(sf).get2(), (subFunctions.get(sf + 1).get1())).trim();
@@ -173,14 +182,16 @@ public class Function {
             }
 
             // printing out subfunctions and their links
-            for (int subFunc = 0; subFunc < subFunctionIndexes.size(); subFunc++) {
-                System.out.println("Parsed SubFunction: " + function.substring(subFunctions.get(subFunc).get1(), subFunctions.get(subFunc).get2()));
-                System.out.print("SubFunction relations: " + ((subFunctionIndexes.get(subFunc).get1() == null) ? "NaN":links.get(subFunctionIndexes.get(subFunc).get1())));
-                System.out.println(" : " + ((subFunctionIndexes.get(subFunc).get2() == null) ? "NaN":links.get(subFunctionIndexes.get(subFunc).get2())));
+            if (parseDebug) {
+                for (int subFunc = 0; subFunc < subFunctionIndexes.size(); subFunc++) {
+                    System.out.println("Parsed SubFunction: " + function.substring(subFunctions.get(subFunc).get1(), subFunctions.get(subFunc).get2()));
+                    System.out.print("SubFunction relations: " + ((subFunctionIndexes.get(subFunc).get1() == null) ? "NaN":links.get(subFunctionIndexes.get(subFunc).get1())));
+                    System.out.println(" : " + ((subFunctionIndexes.get(subFunc).get2() == null) ? "NaN":links.get(subFunctionIndexes.get(subFunc).get2())));
+                }
             }
 
             // now to put the subfunctions and the consts/variables together
-            System.out.println(links);
+            parseDebug(links.toString());
 
             try {
                 functionStructure = linker(variable, links, subFunctionTrees, subFunctionIndexes);
@@ -189,25 +200,46 @@ public class Function {
             }
         }
 
-        System.out.println("Tree: " + functionStructure);
+        parseDebug("Tree: " + functionStructure);
 
         return functionStructure;
     }
 
     public static String[] removeSpaces(String[] components) {
 
-        String list = "";
+        ArrayList<String> newList = new ArrayList<String>();
 
         for (int c = 0; c < components.length; c++) {
-            list += components[c];
+            if (!components[c].equals(" ")) {
+                newList.add(components[c]);
+            }
         }
 
-        list.replaceAll(" ","");
-
-        return list.split("");
+        return newList.toArray(new String[newList.size()]);
     }
 
-    private ArrayList<Pair<Integer, Integer>> getSubFuncIndex(String function) {
+    enum characterStates {T_FUNC, Const, Operator, variable};
+    public static String[] filter(String subFunc, String variable) { // TODO: finish method to improve parser?
+        ArrayList<String> filtered = new ArrayList<String>();
+        String current = "";
+
+        for (int c = 0; c < subFunc.length(); c++) {
+
+            if (subFunc.substring(c, c+1).equals(variable)) {
+
+            } else if ("1234567890".contains(subFunc.substring(c, c+1))) {
+
+            } else if ("+-*/^".contains(subFunc.substring(c, c+1))) {
+
+            } else  {
+
+            }
+        }
+
+        return filtered.toArray(new String[filtered.size()]);
+    }
+
+    private ArrayList<Pair<Integer, Integer>> getSubFuncIndex(String function) { // TODO: write a version of this using regular expressions
 
         ArrayList<Pair<Integer, Integer>> subFunctions = new ArrayList<Pair<Integer, Integer>>();
         Pair<Integer, Integer> currentPair = null;
@@ -240,19 +272,21 @@ public class Function {
 
     private ArrayList<Node> linker(String variable, ArrayList<String> subFunctionLinks, ArrayList<ArrayList<Node>> subFunctionTrees, ArrayList<Pair<Integer, Integer>> subFunctionIndexes) throws FunctionFormatException {
         ArrayList<Node> linkedSubFunctions = new ArrayList<Node>();
+
         for (int subFunc = 0; subFunc < subFunctionTrees.size(); subFunc++) {
             ArrayList<Node> subFunction = subFunctionTrees.get(subFunc);
-            System.out.println(subFunc + ": " + subFunction);
+            parseDebug(subFunc + ": " + subFunction);
         }
-        System.out.println("Links: " + subFunctionLinks);
-        System.out.println("Indexes: " + subFunctionIndexes);
+
+        parseDebug("Links: " + subFunctionLinks);
+        parseDebug("Indexes: " + subFunctionIndexes);
 
         for (int node = 0; node < subFunctionLinks.size(); node++) {
             String subject = subFunctionLinks.get(node);
 
             if ("+-*/^".contains(String.valueOf(subject))) {
                 Pair<Integer, Integer> references = findLinkReferences(subFunctionIndexes, node);
-                System.out.println("Link References: " + references);
+                parseDebug("Link References: " + references);
                 Node link = genNode(subject);
                 Node funcBefore = null;
                 Node funcAfter = null;
@@ -297,9 +331,9 @@ public class Function {
                 link.setChild2(funcAfter);
 
                 // add them to the linked subfunctions list
-                System.out.println("\nFunction Before: " + funcBefore);
-                System.out.println("Link: " + link);
-                System.out.println("Function After: " + funcAfter + "\n");
+                parseDebug("\nFunction Before: " + funcBefore);
+                parseDebug("Link: " + link);
+                parseDebug("Function After: " + funcAfter + "\n");
 
                 linkedSubFunctions.add(link);
                 linkedSubFunctions.add(funcBefore);
@@ -307,7 +341,7 @@ public class Function {
             } else if (isTFUNC(subject)) {
 
                 Pair<Integer, Integer> references = findLinkReferences(subFunctionIndexes, node);
-                System.out.println("Link References: " + references);
+                parseDebug("Link References: " + references);
                 Node link = genNode(subject);
                 Node funcAfter = null;
 
@@ -364,9 +398,6 @@ public class Function {
             }
         }
 
-        if (root == null) {
-            System.out.println("Bad tree: " + tree);
-        }
         return root;
     }
 
@@ -657,11 +688,9 @@ public class Function {
             if (isNumber) {
                 newNode = new Node(Node.paramType.Const, nodeVal);
             } else {
-                System.out.println("List of Constants: " + implicitConsts);
                 if (implicitConsts.containsKey(nodeVal)) {
                     Double val = implicitConsts.get(nodeVal);
                     newNode = new Node(Node.paramType.Const, String.valueOf(val));
-                    System.out.println(nodeVal + " = " + newNode.getVal());
                 } else {
                     throw new FunctionFormatException("Constant " + nodeVal + " does not exist in constant hashmap",(new Exception()).getCause());
                 }
@@ -737,20 +766,6 @@ public class Function {
 
         return newTree;
     }
-
-//    public static Function compose(Function funcOne, Function funcTwo) {
-//
-//        HashMap<String, Double> newConstantList = new HashMap<String, Double>(funcOne.constantList);
-//
-//
-//        return (new Function(compose(funcOne.getRoot(), funcOne.getVariable(), funcTwo.getRoot(), funcTwo.getVariable()), funcOne.getVariable(), true));
-//    }
-//
-//    public static Node compose(Node treeOne, String varOne, Node treeTwo, String varTwo) {
-//
-//
-//    }
-
 
     public static Node composeTFUNC(Node function, String variable, Node.T_FUNC_TYPES T_function) {
 
@@ -914,10 +929,6 @@ public class Function {
                 switch (root.getVal()) {
                     case "+":
                     case "-":
-                        System.out.println(root.getChild1());
-                        System.out.println(root.getChild2());
-                        System.out.println("subderivative 1: " + subDerivative1);
-                        System.out.println("subderivative 2: " + subDerivative2);
                         dRoot = operate(subDerivative1, subDerivative2, root.getVal());
                         break;
                     case "*":
@@ -1124,7 +1135,7 @@ public class Function {
                                  newChild1.severParent(simplified);
                                  simplified = newChild1;
                              }else if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getType().equals(Node.paramType.Const)) {
-
+                                 // this is for when some subfunction is literally just two constants operated together
                                  double val1 = Double.valueOf(newChild1.getVal());
                                  double val2 = Double.valueOf(newChild2.getVal());
 
@@ -1133,7 +1144,7 @@ public class Function {
                                  } else {
                                      simplified = new Node(Node.paramType.Const, String.valueOf(val1 - val2));
                                  }
-                            } else if (originalFunc.getVal().equals("+")) {
+                            } else if (originalFunc.getVal().equals("+")) { // this is for the instances where there is a constant being added to a function that already has a constant inside and is being added
                                  if (newChild1.getType().equals(Node.paramType.Const) && newChild2.getVal().equals("+") && (newChild2.getChild1().getType().equals(Node.paramType.Const) || newChild2.getChild2().getType().equals(Node.paramType.Const))) {
                                      if (!newChild2.getChild1().getType().equals(Node.paramType.Const)) {
                                          simplified.setChild2(newChild2.getChild1());
@@ -1253,7 +1264,7 @@ public class Function {
                                         } else {
                                             simplified.setChild1(new Node(Node.paramType.Const, String.valueOf(val1 * (1.0 / val2))));
                                         }
-                                    } else if (!newChild2.getChild2().getType().equals(Node.paramType.Const) && newChild1.getVal().equals("*") ) {
+                                    } else if (!newChild2.getChild2().getType().equals(Node.paramType.Const) && newChild2.getVal().equals("*") ) {
                                         simplified.setChild2(newChild2.getChild2());
 
                                         double val1 = Double.valueOf(newChild1.getVal());
@@ -1518,6 +1529,12 @@ public class Function {
         return function;
     }
 
+    public void parseDebug(String log) {
+        if (parseDebug) {
+            System.out.println(log);
+        }
+    }
+
     public static boolean FunctionTypeTester(double input) {
 
         boolean passed = true;
@@ -1575,7 +1592,6 @@ public class Function {
         String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
         Function longestFunction = new Function(longest, variable, new HashMap<String, Double>());
         passed = (longestFunction.output(input) == (((((3 * 5) * 45) + (input * (Math.pow(input, 3)))) + (3 * (input / (3.0 * 9.0)))) * (Math.pow((input / 4), input))));
-        System.out.println(true);
         if (!passed) {
             return false;
         }
@@ -1598,7 +1614,7 @@ public class Function {
             }
         }
 
-        System.out.println(passed);
+        System.out.println("Passed test from " + init + " to " + end + ": " + passed + "\n");
     }
 
     public static void main(String[] args) {
@@ -1620,12 +1636,13 @@ public class Function {
 //        System.out.println(two_X.output(-10));
 //        System.out.println(derivative1);
 
-//        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
-//        Function derivative2 = Function.simplify(Function.derivative(polynomial));
-//        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
-//
-//        System.out.println(derivative2);
-//        System.out.println(polyDeriv);
+        Function polynomial = new Function("((((6 * (x ^ 3)) + (4.9 * (x ^ 2))) + (3.5 * x)) + 21.34)", "x", new HashMap<String, Double>() );
+        Function derivative2 = Function.simplify(Function.derivative(polynomial));
+        Function polyDeriv = new Function("(((18 * (x ^ 2)) + (9.8 * x)) + 3.5)", "x", new HashMap<String, Double>());
+
+        System.out.println("Polynomial: " + polynomial);
+        System.out.println("Manual Polynomial derivative: " + polyDeriv);
+        System.out.println("Calculated Polynomial derivative: " + derivative2 + "\n");
 
 //        Function additionSimplified = Function.simplify(new Function("((6.0 + x) + 3.0)", "x", new HashMap<String, Double>()));
 //        System.out.println(additionSimplified);
@@ -1639,9 +1656,9 @@ public class Function {
 //        System.out.println(efficient.getOperationsTree());
 //        System.out.println(efficient);
 
-        String longest = "(((((3 * 5) * 45) + (x * (x  ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
+        String longest = "(((((3 * 5) * 45) + (x * (x ^ 3))) + (3 * (x / (3 * 9)))) * ((x / 4) ^ x))";
         Function longestFunction = new Function(longest, "x", new HashMap<String, Double>());
-        System.out.println(longestFunction);
-        System.out.println(Function.simplify(longestFunction));
+        System.out.println("Longest Function: " + longestFunction);
+        System.out.println("Derivative of longest: " + Function.simplify(longestFunction));
     }
 }

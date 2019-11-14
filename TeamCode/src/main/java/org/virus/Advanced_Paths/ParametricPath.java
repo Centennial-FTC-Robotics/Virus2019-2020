@@ -3,6 +3,7 @@ package org.virus.Advanced_Paths;
 import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
 import org.virus.util.ParametricFunction2D;
+import org.virus.util.Vector2D;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,21 +13,23 @@ public class ParametricPath {
     //stuff used to parametrize
     private Function[] functions;
     private Pair<Integer, Integer>[] tRanges;
+    private Pair<Integer, Integer>[] definedFunctionRanges;
     private double[] functionRotations;
 
     // path definition
     private ParametricFunction2D[] rotatedFunctions;
 
-    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, double[] newAngles) throws FunctionFormatException {
+    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, Pair<Integer, Integer>[] newDefRanges, double[] newAngles) throws FunctionFormatException {
 
         // tRange error checking, making sure ranges are consistent and continuous
-        if (!checkTRanges(newRanges)) {
-            throw new FunctionFormatException("tRanges in new Path incorrectly defined!", (new Exception()).getCause());
+        if (!checkTRanges(newRanges) && newRanges.length == newDefRanges.length) {
+            throw new FunctionFormatException("Ranges in new Path incorrectly defined!", (new Exception()).getCause());
         }
 
         // information to parametrize
         functions = Arrays.copyOf(orderedFunctions, orderedFunctions.length);
         tRanges = Arrays.copyOf(newRanges, newRanges.length);
+        definedFunctionRanges = Arrays.copyOf(newDefRanges, newDefRanges.length);
         functionRotations = Arrays.copyOf(newAngles, newAngles.length);
 
         // parametrize the paths
@@ -64,5 +67,71 @@ public class ParametricPath {
         }
 
         return pathComponents;
+    }
+
+    public double getAngle(double tVal) {
+
+        int pathComponentIndex = getPathComponentIndex(tVal);
+        ParametricFunction2D function = rotatedFunctions[pathComponentIndex];
+        double functionPoint = translatePoint(tVal);
+
+        return function.genAngle(functionPoint);
+    }
+
+    public Vector2D getPoint(double tVal) {
+
+        int pathComponentIndex = getPathComponentIndex(tVal);
+        ParametricFunction2D function = rotatedFunctions[pathComponentIndex];
+        Vector2D point = ParametricFunction2D.output(function, tVal);
+
+        return point;
+    }
+
+    public double translatePoint(double pathPoint) {
+
+        int pathComponentIndex = getPathComponentIndex(pathPoint);
+        Pair<Integer, Integer> pathTRange = tRanges[pathComponentIndex];
+        Pair<Integer, Integer> functionTRange = definedFunctionRanges[pathComponentIndex];
+
+        double functionPoint = (((pathPoint - pathTRange.get1()) / (pathTRange.get2() - pathTRange.get1())) * (functionTRange.get2() - functionTRange.get1())) + functionTRange.get1();
+
+        return functionPoint;
+    }
+
+    public ParametricFunction2D getPathComponent(double tVal) {
+
+        return rotatedFunctions[getPathComponentIndex(tVal)];
+    }
+
+    public int getPathComponentIndex(double tVal) {
+
+        // gets the corresponding range to get the function
+        int tValRange = -1;
+        for (int i = 0; i < tRanges.length; i++) {
+
+            if (tVal > tRanges[i].get1() && tVal < tRanges[i].get2()) {
+                tValRange = i;
+            }
+        }
+
+        return tValRange;
+    }
+
+    public double approximateDistance(double distanceTraveled, double resolution) {
+
+        double distance = 0;
+        double tVal = 0;
+
+        while (distance < distanceTraveled) {
+
+            Pair<Function, Function> parametricFunc = this.getPathComponent(tVal).getRectangularComponents();
+            Function x = parametricFunc.get1();
+            Function y = parametricFunc.get2();
+
+            double addedDistance = Math.hypot(x.output(tVal + resolution) - x.output(tVal), y.output(tVal + resolution) - y.output(tVal));
+            tVal += resolution;
+        }
+
+        return tVal;
     }
 }

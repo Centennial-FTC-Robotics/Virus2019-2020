@@ -1,4 +1,6 @@
 package org.virus.util;
+import android.graphics.Point;
+
 import org.virus.Advanced_Paths.Function;
 import org.virus.Advanced_Paths.Node;
 
@@ -6,10 +8,8 @@ import java.util.HashMap;
 
 public class ParametricFunction2D {
 
-    private String name = "Vector";
     private Pair<Function, Function> polarComponents;
     private Pair<Function, Function> rectangularComponents;
-
 
     /**
      * @Description
@@ -19,10 +19,10 @@ public class ParametricFunction2D {
     public ParametricFunction2D(Function combined, boolean isPolar) {
 
         if (isPolar) {
-            polarComponents = parametrize(combined);
+            polarComponents = parametrize(combined, isPolar);
             rectangularComponents = rectangularize(polarComponents.get1(), polarComponents.get2());
         } else {
-            rectangularComponents = parametrize(combined);
+            rectangularComponents = parametrize(combined, isPolar);
             polarComponents = polarize(rectangularComponents.get1(), rectangularComponents.get2());
         }
     }
@@ -99,11 +99,6 @@ public class ParametricFunction2D {
         return theta;
     }
 
-    public void setName(String newName) {
-
-        name = newName;
-    }
-
     public Pair<Function, Function> getRectangularComponents() {
         return (new Pair<Function, Function>(Function.makeFunctionCopy(rectangularComponents.get1()), Function.makeFunctionCopy(rectangularComponents.get2())));
     }
@@ -112,19 +107,18 @@ public class ParametricFunction2D {
         return (new Pair<Function, Function>(Function.makeFunctionCopy(polarComponents.get1()), Function.makeFunctionCopy(polarComponents.get2())));
     }
 
-    public String getName() {
-
-        return name;
-    }
-
     //---------- Function Operations ----------//
 
-    public static Pair<Function, Function> parametrize(Function pathComponent) {
+    public static Pair<Function, Function> parametrize(Function pathComponent, boolean isPolar) {
 
         Node dependent = Function.replaceVariable(pathComponent.getRoot(), "t", pathComponent.getVariable(), pathComponent.getConstantList());
         Node independent = new Node(Node.paramType.Variable, "t");
 
-        return new Pair<Function, Function>(Function.makeFunction(independent, "t"), Function.makeFunction(dependent, "t"));
+        if (isPolar) {
+            return new Pair<Function, Function>(Function.makeFunction(dependent, "t"), Function.makeFunction(independent, "t"));
+        } else {
+            return new Pair<Function, Function>(Function.makeFunction(independent, "t"), Function.makeFunction(dependent, "t"));
+        }
     }
 
     public static Pair<Function, Function> polarize(Function x, Function y) {
@@ -246,9 +240,49 @@ public class ParametricFunction2D {
         return (new ParametricFunction2D(newScale, newTheta, true));
     }
 
+    public static ParametricFunction2D derivativeParametric(ParametricFunction2D originalFunc) {
+
+        Function derivativeyt = Function.simplify(Function.derivative(originalFunc.getRectangularComponents().get2()));
+        Function derivativext = Function.simplify(Function.derivative(originalFunc.getRectangularComponents().get1()));
+
+        return (new ParametricFunction2D(derivativeyt, derivativext, false));
+    }
+
+    public static Function derivative(ParametricFunction2D originalFunc) {
+
+        ParametricFunction2D derivative = derivativeParametric(originalFunc);
+
+        return (Function.operate(derivative.getRectangularComponents().get2(), derivative.getRectangularComponents().get1(), Function.operation.division));
+    }
+
+    //---------- Function outputs ----------//
+
+    public static Vector2D output(ParametricFunction2D originalFunc, double tValue) {
+
+        double x = originalFunc.getRectangularComponents().get1().output(tValue);
+        double y = originalFunc.getRectangularComponents().get2().output(tValue);
+
+        return (new Vector2D(x, y));
+    }
+
+    public static Vector2D derivativeParametric(ParametricFunction2D originalFunc, double tValue) {
+        ParametricFunction2D parametricDerivative = ParametricFunction2D.derivativeParametric(originalFunc);
+
+        double x = parametricDerivative.getRectangularComponents().get1().output(tValue);
+        double y = parametricDerivative.getRectangularComponents().get2().output(tValue);
+
+        return (new Vector2D(x, y));
+    }
+
+    public static double derivative(ParametricFunction2D originalFunc, double tValue) {
+        Function derivative = ParametricFunction2D.derivative(originalFunc);
+
+        return derivative.output(tValue);
+    }
+
     public String toString() {
 
-        String vector = name + ": <";
+        String vector = "<";
         vector += rectangularComponents.get1() + ", ";
         vector += rectangularComponents.get2() + ">";
 
