@@ -129,8 +129,9 @@ public class ExampleDrivetrain extends Drivetrain {
 
     }
 
-    public void updateOrientation() {
+    public Orientation updateOrientation() {
         currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentHeading;
     }
 
     //follows a defined smooth continuous path

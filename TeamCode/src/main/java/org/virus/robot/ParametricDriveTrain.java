@@ -1,8 +1,12 @@
 package org.virus.robot;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.Advanced_Paths.ParametricPath;
@@ -28,7 +32,7 @@ public class ParametricDriveTrain extends Drivetrain {
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
 
-    private OpMode opModeRef;
+    private LinearOpMode opModeRef;
 
     // path definitions
     private Vector2D displacement;
@@ -41,7 +45,12 @@ public class ParametricDriveTrain extends Drivetrain {
         return 0;
     }
 
-    public void initialize(OpMode opMode) {
+    public Orientation updateOrientation() {
+        currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentHeading;
+    }
+
+    public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");

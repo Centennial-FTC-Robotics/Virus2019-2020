@@ -23,9 +23,7 @@ public abstract class Drivetrain extends Subsystem {
 
     //public abstract boolean motorsBusy();
 
-    public void updateOrientation() {
-        orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    }
+    public abstract Orientation updateOrientation();
 
     public double getRawZ() {
         updateOrientation();

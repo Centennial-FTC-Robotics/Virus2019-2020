@@ -272,8 +272,9 @@ public class TankDrivetrain extends Drivetrain {
         resetOrientation();
     }
 
-    public void updateOrientation() {
+    public Orientation updateOrientation() {
         currentHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentHeading;
     }
 
     public void resetOrientation(){
