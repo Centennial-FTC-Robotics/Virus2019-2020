@@ -51,7 +51,6 @@ public class Vector2D {
         genMag();
 
         if (components[0] == 0 && components[1] == 0) {
-
             theta = 0;
         } else {
 
@@ -72,7 +71,6 @@ public class Vector2D {
 
                         theta += Math.PI;
                     } else if (components[1] < 0) {
-
                         theta -= Math.PI;
                     } else {
 

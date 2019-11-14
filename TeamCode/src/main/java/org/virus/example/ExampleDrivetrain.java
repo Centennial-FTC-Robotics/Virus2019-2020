@@ -230,6 +230,13 @@ public class ExampleDrivetrain extends Drivetrain {
         }
     }
 
+    private boolean turnAbsolute(float angle, float speed, PIDController pid) {
+
+
+
+        return false;
+    }
+
     public void runMotors(float right,float left){
         if(prevLeft!=left){
             lFront.setPower(Range.clip(left,-1,1));
@@ -242,6 +249,17 @@ public class ExampleDrivetrain extends Drivetrain {
         prevLeft = left;
         prevRight = right;
     }
+
+    //turn around the center of the robot
+    public boolean pivot(float angle, float speed){
+        //pretend there's implementation here
+
+
+        return false;
+        //once implemented should return true or false based on whether pivot is complete
+    }
+
+
 
     public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
         double maxPower=1;

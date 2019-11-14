@@ -56,8 +56,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     Vector2D translationalMvmt;
 
 //    Odometry odometry = new Odometry();
-
-
     @Override
     public float encoderToInch(int encoder) {
         return (float)(encoder/ENCODER_COUNTS_PER_INCH);
