@@ -41,6 +41,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     float initialPitch;
     float initialRoll;
     private Orientation currentOrientation;
+    private double heading;
     private Vector2D currentPosition;
     PIDController headingController = new PIDController(-.04f, 0 ,0);
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
@@ -105,11 +106,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             odometry.updatePosition();
         }
         currentOrientation.firstAngle = (float) odometry.relativeHeading();
+        heading = odometry.currentHeading();
         odoLoopCounter++;
         return odometry.currentPosition();
     }
     public double getHeading(){ //returns in degrees
-        return currentOrientation.firstAngle;
+        return heading;
         //return AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
     }
     public void initialize(LinearOpMode opMode) {
@@ -347,7 +349,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         currentPosition = Agobot.drivetrain.updatePosition();
         opMode.telemetry.addData("Position:", currentPosition);
-        opMode.telemetry.addData("Heading:", odometry.currentHeading());
+        opMode.telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
         opMode.telemetry.addData("New Position",newPosition);
         opMode.telemetry.addData("New Heading", newHeading);
 
@@ -367,7 +369,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
-        double headingDiff = odometry.currentHeading() - newHeading;
+        double headingDiff = Agobot.drivetrain.getHeading() - newHeading;
 
         if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
             Agobot.drivetrain.runMotors(0,0,0,0,0);
@@ -384,8 +386,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double y = currentPosition.getComponent(1);
 
         translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) -yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
-        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float) odometry.currentHeading()));
-        translationalMvmt.rotate(-Math.toRadians(odometry.currentHeading()));
+        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float) Agobot.drivetrain.getHeading()));
+        translationalMvmt.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
 
         double leftx = translationalMvmt.getComponent(0);
         double lefty = translationalMvmt.getComponent(1);
