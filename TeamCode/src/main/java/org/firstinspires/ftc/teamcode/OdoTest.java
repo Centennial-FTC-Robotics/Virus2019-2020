@@ -15,6 +15,10 @@ public class OdoTest extends LinearOpMode {
     double leftx;
     Vector2D motorSpeeds;
 
+    // testing
+    private Vector2D startPosition = new Vector2D(10, 10); //against wall to the right
+    private double startHeading = 90; //straight left
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -22,18 +26,20 @@ public class OdoTest extends LinearOpMode {
 //        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
         while(opModeIsActive()) {
-            updateControllerValues();
-            double diagSpeed1 = motorSpeeds.getComponent(0);
-            double diagSpeed2 = motorSpeeds.getComponent(1);
-            if (leftx!=0 || lefty!=0){
-                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
-            } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
-            }
-            telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
-            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+            //updateControllerValues();
+//            double diagSpeed1 = motorSpeeds.getComponent(0);
+//            double diagSpeed2 = motorSpeeds.getComponent(1);
+//            if (leftx!=0 || lefty!=0){
+//                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
+//            } else {
+//                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
+//            }
+            telemetry.addData("Position: ", Agobot.drivetrain.updatePosition());
+            telemetry.addData("Relative Heading: ", Agobot.drivetrain.getHeading());
+            telemetry.addData("Heading: ", Agobot.drivetrain.odometry.currentHeading());
             /*
             telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
             telemetry.addData("rEncoder:", Agobot.drivetrain.odometry.getrEncoderCounts());

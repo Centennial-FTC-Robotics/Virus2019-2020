@@ -19,6 +19,7 @@ public class Odometry extends Subsystem {
     public ExpansionHubMotor bEncoder;
     public Vector2D position; // this has to be in inches
     public double heading = 0;
+    double startHeading = 0;
 
     //make any of these directions -1 to reverse the encoder without affecting the corresponding drive motor
     public int lEncoderDirection = 1;
@@ -65,7 +66,8 @@ public class Odometry extends Subsystem {
     }
     public void setStartLocation(Vector2D startPosition, double startHeading){ //inches, and degrees
         position = new Vector2D(startPosition);
-        heading = Math.toRadians(startHeading);
+        this.startHeading = Math.toRadians(startHeading);
+        heading += this.startHeading;
     }
 
     public void resetAllEncoders(){
@@ -139,14 +141,17 @@ public class Odometry extends Subsystem {
     }
     public Vector2D currentPosition(){
         return position;
-    }
+    }//degrees
     public double currentHeading(){
-        return heading;
+        return Math.toDegrees(heading);
+    }//degrees
+    public double relativeHeading(){ return Math.toDegrees(heading - startHeading); }//degrees
+    public void setHeading(double heading){ //degrees
+        this.heading = Math.toRadians(heading);
     }
-    public void setHeading(double heading){
-        this.heading=heading;
+    public void setRelativeHeading(double relativeHeading){
+        heading = Math.toRadians(relativeHeading) + startHeading;
     }
-
 
     public float encoderToInch(double encoder) {
         return (float)(encoder/ENCODER_COUNTS_PER_INCH);

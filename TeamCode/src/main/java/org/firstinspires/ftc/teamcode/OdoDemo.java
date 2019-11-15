@@ -26,14 +26,14 @@ public class OdoDemo extends LinearOpMode {
 
         while(!gamepad1.a && opModeIsActive()){
             telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
-            telemetry.addData("Heading:", Math.toDegrees(Agobot.drivetrain.getHeading()));
+            telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
             telemetry.update();
         }
 
         Vector2D newPosition = new Vector2D(12,0);
         double newHeading = 0;
         //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), newHeading, maxSpeed));
-        while(Agobot.drivetrain.goToPosition(new Vector2D(12,0), 90, maxSpeed));
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), 90, maxSpeed));
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();
 //            telemetry.addData("Position:", currentPosition);

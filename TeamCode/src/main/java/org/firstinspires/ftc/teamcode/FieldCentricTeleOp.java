@@ -51,7 +51,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
         rightStick.setComponents(new double[] {gamepad1.right_stick_x, gamepad1.right_stick_y});
         telemetry.addData("leftStick: ", leftStick.toString());
         Agobot.drivetrain.updatePosition();
-        leftStick.rotate(-Agobot.drivetrain.getHeading());
+        leftStick.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
         telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
         telemetry.addData("leftStick Rotated: ", leftStick.toString());
 
