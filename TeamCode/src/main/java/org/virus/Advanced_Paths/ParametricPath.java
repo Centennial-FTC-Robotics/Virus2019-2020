@@ -4,6 +4,7 @@ import org.virus.util.FunctionFormatException;
 import org.virus.util.Pair;
 import org.virus.util.Vector2D;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ParametricPath {
@@ -14,21 +15,22 @@ public class ParametricPath {
 
     // path definition
     private ParametricFunction2D[] rotatedFunctions;
-    private Pair<Integer, Integer>[] tRanges;
-    private Pair<Integer, Integer>[] definedFunctionRanges;
+    private Vector2D[] translations;
+    private double[][] definedFunctionRanges;
+    private double[][] tRanges;
     private double maxSpeed;
 
-    public ParametricPath(Function[] orderedFunctions, Pair<Integer, Integer>[] newRanges, Pair<Integer, Integer>[] newDefRanges, double[] newAngles, double newMax) throws FunctionFormatException {
+    public ParametricPath(Function[] orderedFunctions, Vector2D[] newTranslations, double[] newRanges, double[][] newDefRanges, double[] newAngles, double newMax) throws FunctionFormatException {
 
         // tRange error checking, making sure ranges are consistent and continuous
-        if (!checkTRanges(newRanges) && newRanges.length == newDefRanges.length) {
+        if (checkDefinedRanges(newDefRanges) && !anyNegative(newRanges) && (newRanges.length == newDefRanges.length)) {
             throw new FunctionFormatException("Ranges in new Path incorrectly defined!", (new Exception()).getCause());
         }
 
         // information to parametrize
         functions = Arrays.copyOf(orderedFunctions, orderedFunctions.length);
-        tRanges = Arrays.copyOf(newRanges, newRanges.length);
-        definedFunctionRanges = Arrays.copyOf(newDefRanges, newDefRanges.length);
+        definedFunctionRanges = newDefRanges;
+        tRanges = generateTRanges(Arrays.copyOf(newRanges, newRanges.length));
         functionRotations = Arrays.copyOf(newAngles, newAngles.length);
 
         // parametrize the paths
@@ -38,24 +40,54 @@ public class ParametricPath {
         maxSpeed = newMax;
     }
 
-    private static boolean checkTRanges(Pair<Integer, Integer>[] tRanges) {
+    public double[][] generateTRanges(double[] orderedRanges) {
+
+        double[][] newRanges = new double[orderedRanges.length][];
+        double start = 0;
+
+        for (int r = 0; r < orderedRanges.length; r++) {
+
+            newRanges[r] = new double[] {start, start + orderedRanges[r]};
+            start += orderedRanges[r];
+        }
+
+        return newRanges;
+    }
+
+    private static boolean checkDefinedRanges(double[][] tRanges) {
+
         for (int i = 0; i < tRanges.length; i++) {
             // check individual tRanges don't go backwards
-            if (tRanges[i].get1() < tRanges[i].get2()) {
+            if (tRanges[i][0] < tRanges[i][1]) {
                 return false;
-            } else if (Math.abs(tRanges[i].get2() - tRanges[i].get1()) < 0.01) {
+            } else if (Math.abs(tRanges[i][1] - tRanges[i][0]) < 0.01) {
                 // maybe remove "redundant" function paths
             }
-            // check tRanges around current are properly connected
-            if (i > 0 && i < (tRanges.length - 1)) {
 
-                if ((!tRanges[i].get1().equals(tRanges[i - 1].get2())) || (!tRanges[i].get2().equals(tRanges[i + 1].get1()))) {
-                    return false;
-                }
-            }
+            // don't need this if I'm going to make this for defined function ranges, they don't need to be connected
+//            // check tRanges around current are properly connected
+//            if (i > 0 && i < (tRanges.length - 1)) {
+//
+//                if ((!tRanges[i].get1().equals(tRanges[i - 1].get2())) || (!tRanges[i].get2().equals(tRanges[i + 1].get1()))) {
+//                    return false;
+//                }
+//            }
         }
 
         return true;
+    }
+
+    public boolean anyNegative(double[] list) {
+
+        for (int i = 0; i < list.length; i++) {
+
+            if (list[i] < 0) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static ParametricFunction2D[] parametrize(Function[] functions, double[] functionRotations) {
@@ -96,10 +128,10 @@ public class ParametricPath {
     public double translatePoint(double pathPoint) {
 
         int pathComponentIndex = getPathComponentIndex(pathPoint);
-        Pair<Integer, Integer> pathTRange = tRanges[pathComponentIndex];
-        Pair<Integer, Integer> functionTRange = definedFunctionRanges[pathComponentIndex];
+        double[] pathTRange = tRanges[pathComponentIndex];
+        double[] functionTRange = definedFunctionRanges[pathComponentIndex];
 
-        double functionPoint = (((pathPoint - pathTRange.get1()) / (pathTRange.get2() - pathTRange.get1())) * (functionTRange.get2() - functionTRange.get1())) + functionTRange.get1();
+        double functionPoint = (((pathPoint - pathTRange[0]) / (pathTRange[1] - pathTRange[0])) * (functionTRange[1] - functionTRange[0])) + functionTRange[0];
 
         return functionPoint;
     }
@@ -115,7 +147,7 @@ public class ParametricPath {
         int tValRange = -1;
         for (int i = 0; i < tRanges.length; i++) {
 
-            if (tVal > tRanges[i].get1() && tVal < tRanges[i].get2()) {
+            if (tVal > tRanges[i][0] && tVal < tRanges[i][1]) {
                 tValRange = i;
             }
         }
@@ -126,10 +158,10 @@ public class ParametricPath {
     public double getSpeed(double tVal) {
 
         int currentFuncIndex = getPathComponentIndex(tVal);
-        Pair<Integer, Integer> tRange = tRanges[currentFuncIndex];
-        Pair<Integer, Integer> funcRange = definedFunctionRanges[currentFuncIndex];
+        double[] tRange = tRanges[currentFuncIndex];
+        double[] funcRange = definedFunctionRanges[currentFuncIndex];
 
-        return (((double) (funcRange.get2() - funcRange.get1())) / ((double) (tRange.get2() - tRange.get1())));
+        return (((double) (funcRange[1] - funcRange[0])) / ((double) (tRange[1] - tRange[0])));
     }
 
     public double approximateDistance(double distanceTraveled, double resolution) {
