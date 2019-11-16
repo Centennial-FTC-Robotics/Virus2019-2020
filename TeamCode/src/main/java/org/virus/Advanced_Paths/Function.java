@@ -1538,6 +1538,18 @@ public class Function {
         return function;
     }
 
+    public static Function[] copy(Function[] original) {
+
+        Function[] newList = new Function[original.length];
+
+        for (int f = 0; f < original.length; f++) {
+
+            newList[f] = new Function(original[f].getRoot(), original[f].getVariable(), original[f].getConstantList(), false);
+        }
+
+        return newList;
+    }
+
     public void parseDebug(String log) {
         if (parseDebug) {
             System.out.println(log);

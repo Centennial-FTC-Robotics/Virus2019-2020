@@ -22,22 +22,28 @@ public class ParametricPath {
 
     public ParametricPath(Function[] orderedFunctions, Vector2D[] newTranslations, double[] newRanges, double[][] newDefRanges, double[] newAngles, double newMax) throws FunctionFormatException {
 
-        // tRange error checking, making sure ranges are consistent and continuous
-        if (checkDefinedRanges(newDefRanges) && !anyNegative(newRanges) && (newRanges.length == newDefRanges.length)) {
-            throw new FunctionFormatException("Ranges in new Path incorrectly defined!", (new Exception()).getCause());
-        }
-
         // information to parametrize
-        functions = Arrays.copyOf(orderedFunctions, orderedFunctions.length);
-        definedFunctionRanges = newDefRanges;
+        functions = Function.copy(orderedFunctions);
+        definedFunctionRanges = copyDouble2D(newDefRanges);
         tRanges = generateTRanges(Arrays.copyOf(newRanges, newRanges.length));
         functionRotations = Arrays.copyOf(newAngles, newAngles.length);
+        translations = Vector2D.copy(newTranslations);
 
         // parametrize the paths
         rotatedFunctions = parametrize(functions, functionRotations);
 
         // stuff about the path movement
         maxSpeed = newMax;
+
+        // tRange error checking, making sure ranges are consistent and continuous
+        boolean matching = (newRanges.length == orderedFunctions.length)
+                && (newDefRanges.length == orderedFunctions.length)
+                && (newAngles.length == orderedFunctions.length)
+                && (newTranslations.length == orderedFunctions.length);
+
+        if (!checkDefinedRanges(newDefRanges) || !allPositive(newRanges) || !matching || !checkTranslations()) {
+            throw new FunctionFormatException("Functions in new Path incorrectly defined!", (new Exception()).getCause());
+        }
     }
 
     public double[][] generateTRanges(double[] orderedRanges) {
@@ -77,17 +83,36 @@ public class ParametricPath {
         return true;
     }
 
-    public boolean anyNegative(double[] list) {
+    private boolean checkTranslations() {
 
-        for (int i = 0; i < list.length; i++) {
+        for (int t = 1; t < (translations.length - 1); t++) {
 
-            if (list[i] < 0) {
+            Vector2D startTranslation = translations[t];
+            Vector2D endTranslation = Vector2D.add(ParametricFunction2D.output(rotatedFunctions[t], definedFunctionRanges[t][1]), startTranslation);
 
-                return true;
+            Vector2D previousEnd = Vector2D.add(ParametricFunction2D.output(rotatedFunctions[t - 1], definedFunctionRanges[t - 1][1]), translations[t - 1]);
+            Vector2D nextStart = translations[t + 1];
+
+            if (!startTranslation.equals(previousEnd) || !endTranslation.equals(nextStart)) {
+
+                return false;
             }
         }
 
-        return false;
+        return true;
+    }
+
+    public boolean allPositive(double[] list) {
+
+        for (int i = 0; i < list.length; i++) {
+
+            if (list[i] <= 0) {
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static ParametricFunction2D[] parametrize(Function[] functions, double[] functionRotations) {
@@ -119,8 +144,9 @@ public class ParametricPath {
     public Vector2D getPoint(double tVal) {
 
         int pathComponentIndex = getPathComponentIndex(tVal);
+        double functionPoint = translatePoint(tVal);
         ParametricFunction2D function = rotatedFunctions[pathComponentIndex];
-        Vector2D point = ParametricFunction2D.output(function, tVal);
+        Vector2D point = Vector2D.add(ParametricFunction2D.output(function, functionPoint), translations[pathComponentIndex]);
 
         return point;
     }
@@ -147,7 +173,7 @@ public class ParametricPath {
         int tValRange = -1;
         for (int i = 0; i < tRanges.length; i++) {
 
-            if (tVal > tRanges[i][0] && tVal < tRanges[i][1]) {
+            if (tVal >= tRanges[i][0] && tVal < tRanges[i][1]) {
                 tValRange = i;
             }
         }
@@ -181,5 +207,17 @@ public class ParametricPath {
         }
 
         return tVal;
+    }
+
+    public static double[][] copyDouble2D(double[][] original) {
+
+        double[][] newList = new double[original.length][];
+
+        for (int d = 0; d < original.length; d++) {
+
+            newList[d] = Arrays.copyOf(original[d], original[d].length);
+        }
+
+        return newList;
     }
 }

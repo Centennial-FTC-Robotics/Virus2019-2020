@@ -142,7 +142,23 @@ public class Vector2D {
         add(invert(term_two));
     }
 
-    public Vector2D invert(Vector2D term_two) {
+    public static Vector2D add(Vector2D term_one, Vector2D term_two) {
+
+        double[] one_comp = term_one.getComponents();
+        double[] two_comp = term_two.getComponents();
+
+        double newX = one_comp[0] + two_comp[0];
+        double newY = one_comp[1] + two_comp[1];
+
+        return (new Vector2D(newX, newY));
+    }
+
+    public static Vector2D sub(Vector2D term_one, Vector2D term_two) {
+
+        return Vector2D.add(term_one, invert(term_two));
+    }
+
+    public static Vector2D invert(Vector2D term_two) {
 
         Vector2D iTwo = new Vector2D(term_two);
         iTwo.scale(-1);
@@ -231,6 +247,18 @@ public class Vector2D {
         }
 
         return true;
+    }
+
+    public static Vector2D[] copy(Vector2D[] original) {
+
+        Vector2D[] newList = new Vector2D[original.length];
+
+        for (int v = 0; v < original.length; v++) {
+
+            newList[v] = new Vector2D(original[v]);
+        }
+
+        return newList;
     }
 
     public static void main(String[] args) {
