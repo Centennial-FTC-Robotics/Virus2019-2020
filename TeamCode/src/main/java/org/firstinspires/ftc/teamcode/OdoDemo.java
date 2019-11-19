@@ -20,20 +20,20 @@ public class OdoDemo extends LinearOpMode {
         Agobot.initialize(this);
 //        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
-        //Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(0,12), 90);
 
         waitForStart();
 
-        while(!gamepad1.a && opModeIsActive()){
-            telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
-            telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
-            telemetry.update();
-        }
+//        while(!gamepad1.a && opModeIsActive()){
+//            telemetry.addData("Position:", Agobot.drivetrain.updatePosition());
+//            telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
+//            telemetry.update();
+//        }
 
-        Vector2D newPosition = new Vector2D(12,0);
         double newHeading = 0;
-        //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), newHeading, maxSpeed));
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), 90, maxSpeed));
+        while(Agobot.drivetrain.goToPosition(new Vector2D(12,0), 0, maxSpeed));
+        //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), 90, maxSpeed));
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();
 //            telemetry.addData("Position:", currentPosition);
