@@ -47,7 +47,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
     PIDController xController = new PIDController(.06f,.05f ,0, 0.1f);
-    PIDController yController = new PIDController(-.06f,-.05f ,0,0.1f);
+    PIDController yController = new PIDController(.06f,.05f ,0,0.1f);
     private LinearOpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
@@ -385,12 +385,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double x = currentPosition.getComponent(0);
         double y = currentPosition.getComponent(1);
 
-        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) -yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
+        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
         steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float) Agobot.drivetrain.getHeading()));
         translationalMvmt.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
 
-        double leftx = translationalMvmt.getComponent(0);
-        double lefty = translationalMvmt.getComponent(1);
+        double leftx = -translationalMvmt.getComponent(1); //because 0 degrees has the robot pointed right, so global y movement corresponds to robot x movement at 0 degrees
+        double lefty = translationalMvmt.getComponent(0);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
