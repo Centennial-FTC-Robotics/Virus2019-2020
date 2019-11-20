@@ -44,5 +44,11 @@ public class RedDepot extends LinearOpMode {
         while(Agobot.drivetrain.goToPosition(new Vector2D(12, -12), 90, 0.6)){
 
         }
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -12), 90, 0.6)){
+
+        }
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 48), 0, 0.6)){
+
+        }
     }
 }
