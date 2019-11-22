@@ -370,7 +370,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
         double headingDiff = Agobot.drivetrain.getHeading() - newHeading;
-
+        opMode.telemetry.addData("Heading Difference: ", headingDiff);
         if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
             Agobot.drivetrain.runMotors(0,0,0,0,0);
             xController.clear();
@@ -395,6 +395,5 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
         motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
-
     }
 }

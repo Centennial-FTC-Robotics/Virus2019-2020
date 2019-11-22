@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOP", name = "OdometryTest")
-public class OdoTest extends LinearOpMode {
+@TeleOp(group = "TeleOP", name = "Odometry Information")
+public class OdoInfo extends LinearOpMode {
 
     Vector2D leftStick;
     Vector2D rightStick;
@@ -16,8 +16,8 @@ public class OdoTest extends LinearOpMode {
     Vector2D motorSpeeds;
 
     // testing
-    private Vector2D startPosition = new Vector2D(10, 10); //against wall to the right
-    private double startHeading = 90; //straight left
+    private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
+    private double startHeading = 180; //straight left
 
     @Override
     public void runOpMode() throws InterruptedException {

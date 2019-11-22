@@ -41,6 +41,7 @@ public class Odometry extends Subsystem {
     public double deltax;
     public double deltay;
     public Vector2D deltaDisp;
+    public Vector2D deltaDispFieldCentric;
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
@@ -127,9 +128,10 @@ public class Odometry extends Subsystem {
         deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
         robotCentricDelta = new Vector2D(deltaDisp);
 
-        deltaDisp.rotate(heading);
-        fieldCentricDelta = new Vector2D(deltaDisp);
-        position.add(deltaDisp);
+        deltaDispFieldCentric = new Vector2D(encoderToInch(deltay), encoderToInch(-deltax));
+        deltaDispFieldCentric.rotate(heading);
+        fieldCentricDelta = new Vector2D(deltaDispFieldCentric);
+        position.add(deltaDispFieldCentric);
         //return deltaDisp;
     }
 

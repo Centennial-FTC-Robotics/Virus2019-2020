@@ -9,14 +9,14 @@ import org.virus.util.Vector2D;
 @Autonomous
 public class RedDepot extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
-    private double startHeading = 180; //straight left
+    private double startHeading = 179; //straight left
     private Vector2D skyStoneLocation;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Agobot.initialize(this);
         Agobot.drivetrain.initializeIMU();
-        Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.drivetrain.odometry.setStartLocation(startPosition, 180);
         waitForStart();
 
         //go to (63, -60)
@@ -44,11 +44,11 @@ public class RedDepot extends LinearOpMode {
         while(Agobot.drivetrain.goToPosition(new Vector2D(12, -12), 90, 0.6)){
 
         }
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -12), 90, 0.6)){
-
-        }
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 48), 0, 0.6)){
-
-        }
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -12), 90, 0.6)){
+//
+//        }
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 48), 0, 0.6)){
+//
+//        }
     }
 }
