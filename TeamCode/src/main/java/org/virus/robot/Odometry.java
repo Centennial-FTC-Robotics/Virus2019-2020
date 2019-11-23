@@ -40,8 +40,6 @@ public class Odometry extends Subsystem {
     public double deltaHeading;
     public double deltax;
     public double deltay;
-    public Vector2D deltaDisp;
-    public Vector2D deltaDispFieldCentric;
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
@@ -118,21 +116,18 @@ public class Odometry extends Subsystem {
         bEncoderPrevious = getbEncoderCounts();
 
         deltaHeading = (deltarEncoder - deltalEncoder)/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH); //it's in radians
-        heading += deltaHeading;
+        heading = normalizeRadians(heading + deltaHeading);
 
         deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
 
-        deltay = (deltarEncoder + deltalEncoder)/2;
+        deltay = (deltarEncoder + deltalEncoder)/2; //robot centric y and x
         deltax = deltaHorizontal;
 
-        deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
-        robotCentricDelta = new Vector2D(deltaDisp);
+        robotCentricDelta = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
 
-        deltaDispFieldCentric = new Vector2D(encoderToInch(deltay), encoderToInch(-deltax));
-        deltaDispFieldCentric.rotate(heading);
-        fieldCentricDelta = new Vector2D(deltaDispFieldCentric);
-        position.add(deltaDispFieldCentric);
-        //return deltaDisp;
+        fieldCentricDelta = new Vector2D(encoderToInch(deltay), encoderToInch(-deltax));
+        fieldCentricDelta.rotate(heading);
+        position.add(fieldCentricDelta);
     }
 
     public Vector2D getRobotCentricDelta(){
@@ -161,6 +156,16 @@ public class Odometry extends Subsystem {
 
     public int inchToEncoder(float inches) {
         return (int) (inches * ENCODER_COUNTS_PER_INCH);
+    }
+
+    public double normalizeRadians(double angle){
+        while(angle > 2*Math.PI) {
+            angle -= 2*Math.PI;
+        }
+        while(angle < 0.0) {
+            angle += 2*Math.PI;
+        }
+        return angle;
     }
 
 }

@@ -99,7 +99,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public Vector2D updatePosition(){
         if(odoLoopCounter%IMUUPDATERATE==0){
             currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            currentOrientation.firstAngle = AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
+            currentOrientation.firstAngle = (float)normalizeDegrees(currentOrientation.firstAngle - initialHeading);
             odometry.setRelativeHeading(currentOrientation.firstAngle);
             odometry.updatePosition();
         } else {
@@ -114,6 +114,16 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         return heading;
         //return AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
     }
+    public double normalizeDegrees(double angle){
+        while(angle >= 360.0) {
+            angle -= 360.0;
+        }
+        while(angle < 0.0) {
+            angle += 360.0;
+        }
+        return angle;
+    }
+
     public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
@@ -386,7 +396,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double y = currentPosition.getComponent(1);
 
         translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
-        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float) Agobot.drivetrain.getHeading()));
+        steerMag = headingController.getValue((float)angleDifference(newHeading, Agobot.drivetrain.getHeading()));
         translationalMvmt.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
 
         double leftx = -translationalMvmt.getComponent(1); //because 0 degrees has the robot pointed right, so global y movement corresponds to robot x movement at 0 degrees
@@ -395,5 +405,16 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
         motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
+    }
+
+    public double angleDifference(double target, double current){
+        double difference = normalizeDegrees(target) - normalizeDegrees(current);
+        if (difference > 180) {
+            difference -= 360.0;
+        }
+        if (difference <= -180) {
+            difference += 360.0;
+        }
+        return difference;
     }
 }
