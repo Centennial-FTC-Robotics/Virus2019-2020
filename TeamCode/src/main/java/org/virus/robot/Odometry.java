@@ -66,7 +66,7 @@ public class Odometry extends Subsystem {
     public void setStartLocation(Vector2D startPosition, double startHeading){ //inches, and degrees
         position = new Vector2D(startPosition);
         this.startHeading = Math.toRadians(startHeading);
-        heading += this.startHeading;
+        heading = normalizeRadians(heading + this.startHeading);
     }
 
     public void resetAllEncoders(){
@@ -142,12 +142,12 @@ public class Odometry extends Subsystem {
     public double currentHeading(){
         return Math.toDegrees(heading);
     }//degrees
-    public double relativeHeading(){ return Math.toDegrees(heading - startHeading); }//degrees
+    public double relativeHeading(){ return Math.toDegrees(normalizeRadians(heading - startHeading)); }//degrees
     public void setHeading(double heading){ //degrees
-        this.heading = Math.toRadians(heading);
+        this.heading = normalizeRadians(Math.toRadians(heading));
     }
     public void setRelativeHeading(double relativeHeading){
-        heading = Math.toRadians(relativeHeading) + startHeading;
+        heading = normalizeRadians(Math.toRadians(relativeHeading) + startHeading);
     }
 
     public float encoderToInch(double encoder) {
@@ -159,7 +159,7 @@ public class Odometry extends Subsystem {
     }
 
     public double normalizeRadians(double angle){
-        while(angle > 2*Math.PI) {
+        while(angle >= 2*Math.PI) {
             angle -= 2*Math.PI;
         }
         while(angle < 0.0) {
