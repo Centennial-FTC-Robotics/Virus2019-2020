@@ -43,11 +43,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     private Orientation currentOrientation;
     private double heading;
     private Vector2D currentPosition;
-    PIDController headingController = new PIDController(-.04f, 0 ,0);
+    public PIDController headingController = new PIDController(-.05f, 0 ,0);
     final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
     final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    PIDController xController = new PIDController(.06f,.05f ,0, 0.1f);
-    PIDController yController = new PIDController(.06f,.05f ,0,0.1f);
+    public PIDController xController = new PIDController(.04f,.3f ,0f, 0.2f);
+    public PIDController yController = new PIDController(.06f,.05f ,0.001f,0.05f);
     private LinearOpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
@@ -56,6 +56,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     double steerMag;
     Vector2D motorSpeeds;
     Vector2D translationalMvmt;
+    double minSpeed = 0.07;
+    double distTolerance = 0.5;
 
 //    Odometry odometry = new Odometry();
     @Override
@@ -358,17 +360,27 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
 
         currentPosition = Agobot.drivetrain.updatePosition();
-        opMode.telemetry.addData("Position:", currentPosition);
-        opMode.telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
-        opMode.telemetry.addData("New Position",newPosition);
-        opMode.telemetry.addData("New Heading", newHeading);
+//        opMode.telemetry.addData("Position:", currentPosition);
+//        opMode.telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
+//        opMode.telemetry.addData("New Position",newPosition);
+//        opMode.telemetry.addData("New Heading", newHeading);
 
         updateMotorPowers(newPosition, newHeading);
-        opMode.telemetry.addData("Translational Movement", translationalMvmt);
-        opMode.telemetry.addData("Steer Magnitude", steerMag);
+//        opMode.telemetry.addData("Translational Movement", translationalMvmt);
+//        opMode.telemetry.addData("Steer Magnitude", steerMag);
 
-        double diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, maxSpeed);
-        double diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, maxSpeed);
+        double diagSpeed1 = 0;
+        double diagSpeed2 = 0;
+        if (motorSpeeds.getComponent(0) > 0) {
+            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), minSpeed, maxSpeed);
+        }else if(motorSpeeds.getComponent(0) < 0){
+            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, -minSpeed);
+        }
+        if (motorSpeeds.getComponent(1) > 0) {
+            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), minSpeed, maxSpeed);
+        }else if(motorSpeeds.getComponent(1) < 0){
+            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, -minSpeed);
+        }
 
         if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
             Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
@@ -380,8 +392,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
         double headingDiff = Agobot.drivetrain.getHeading() - newHeading;
-        opMode.telemetry.addData("Heading Difference: ", headingDiff);
-        if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
+        //opMode.telemetry.addData("Heading Difference: ", headingDiff);
+        if (Math.abs(xDiff) < distTolerance && Math.abs(yDiff) < distTolerance && Math.abs(headingDiff) < 0.5) {
             Agobot.drivetrain.runMotors(0,0,0,0,0);
             xController.clear();
             yController.clear();

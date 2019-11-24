@@ -38,10 +38,10 @@ public class PIDModeTester extends LinearOpMode {
 
         int trials = 4;
         int modePointer = 0;
-        double Ku = 0.04;
-        double Tu = 0.664;
+        double Ku = 0.4;
+        double Tu = 0.45;
 
-        double[][] porportions = {
+        double[][] proportions = {
                 {0.5, 0, 0},
                 {0.45, 0.54, 0},
                 {0.8, 0, 1.0 / 10.0},
@@ -75,9 +75,9 @@ public class PIDModeTester extends LinearOpMode {
             if (gamepad1.a) {
                 double[] PIDVal = new double[3];
 
-                PIDVal[0] = porportions[modePointer % modes.values().length][0] * Ku;
-                PIDVal[1] = porportions[modePointer % modes.values().length][1] * (Ku / Tu);
-                PIDVal[2] = porportions[modePointer % modes.values().length][2] * (Ku * Tu);
+                PIDVal[0] = proportions[modePointer % modes.values().length][0] * Ku;
+                PIDVal[1] = proportions[modePointer % modes.values().length][1] * (Ku / Tu);
+                PIDVal[2] = proportions[modePointer % modes.values().length][2] * (Ku * Tu);
 
                 ElapsedTime clock = new ElapsedTime();
                 alltrials = new double[trials];
