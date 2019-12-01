@@ -4,11 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.virus.agobot.Agobot;
-import org.virus.example.ExampleBot;
-import org.virus.paths.Arc;
-import org.virus.paths.Line;
-import org.virus.paths.Path;
-import org.virus.paths.PathComponent;
 import org.virus.util.Vector2D;
 
 @Autonomous(name="TestPointMoves", group="Autonomous")

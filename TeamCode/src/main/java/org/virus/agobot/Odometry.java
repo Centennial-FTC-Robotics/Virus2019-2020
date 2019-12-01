@@ -1,4 +1,4 @@
-package org.virus.robot;
+package org.virus.agobot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
