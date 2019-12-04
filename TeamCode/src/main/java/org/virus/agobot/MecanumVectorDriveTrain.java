@@ -408,12 +408,17 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
-        double x = currentPosition.getComponent(0);
-        double y = currentPosition.getComponent(1);
+        Vector2D robotPos = new Vector2D(newPosition);
+        robotPos.sub(currentPosition);
+        //robotPos.rotate(-Math.toRadians(getHeading()));
+        opMode.telemetry.addData("Current Position", currentPosition);
+        opMode.telemetry.addData("new Position", newPosition);
+        opMode.telemetry.addData("Robot centric movement", robotPos);
 
-        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
+        translationalMvmt = new Vector2D((double) xController.getValue((float) robotPos.getComponent(0).doubleValue()), (double) yController.getValue((float) robotPos.getComponent(1).doubleValue()));
         steerMag = headingController.getValue((float)angleDifference(newHeading, getHeading()));
         translationalMvmt.rotate(-Math.toRadians(getHeading()));
+        opMode.telemetry.addData("Translational error", translationalMvmt);
 
         double leftx = -translationalMvmt.getComponent(1); //because 0 degrees has the robot pointed right, so global y movement corresponds to robot x movement at 0 degrees
         double lefty = translationalMvmt.getComponent(0);
