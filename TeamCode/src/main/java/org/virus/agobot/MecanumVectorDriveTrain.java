@@ -17,8 +17,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.Advanced_Paths.ParametricPath;
-import org.virus.agobot.Odometry;
-import org.virus.agobot.PIDControllers;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
 import org.virus.superclasses.Drivetrain;
@@ -57,7 +55,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public Odometry odometry;
     double steerMag;
     Vector2D motorSpeeds;
-    Vector2D translationalMvmt;
+    Vector2D robotCentricMvmt;
     double minSpeed = 0.05;
     double distTolerance = 0.5;
 
@@ -103,7 +101,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public Vector2D updatePosition(){
         if(odoLoopCounter%IMUUPDATERATE==0){
             currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            currentOrientation.firstAngle = (float)normalizeDegrees(currentOrientation.firstAngle - initialHeading);
+            currentOrientation.firstAngle = (float)normalizeAngle(currentOrientation.firstAngle - initialHeading);
             odometry.setRelativeHeading(currentOrientation.firstAngle);
             odometry.updatePosition();
         } else {
@@ -117,15 +115,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public double getHeading(){ //returns in degrees
         return heading;
         //return AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
-    }
-    public double normalizeDegrees(double angle){
-        while(angle >= 360.0) {
-            angle -= 360.0;
-        }
-        while(angle < 0.0) {
-            angle += 360.0;
-        }
-        return angle;
     }
 
     public void initialize(LinearOpMode opMode) {
@@ -369,7 +358,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("New Heading", newHeading);
 
         updateMotorPowers(newPosition, newHeading);
-//        opMode.telemetry.addData("Translational Movement", translationalMvmt);
+//        opMode.telemetry.addData("Translational Movement", robotCentricMvmt);
 //        opMode.telemetry.addData("Steer Magnitude", steerMag);
 
         double diagSpeed1 = 0;
@@ -386,7 +375,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
         steerMag=Range.clip(steerMag, -maxSpeed * .8d, maxSpeed *.8d);
 
-        if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
+        if ((robotCentricMvmt.getComponent(0) != 0) || (robotCentricMvmt.getComponent(1) != 0)){
             runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
         } else {
             runMotors(0, 0, 0, 0, steerMag);
@@ -408,20 +397,19 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
-        Vector2D robotPos = new Vector2D(newPosition);
-        robotPos.sub(currentPosition);
-        //robotPos.rotate(-Math.toRadians(getHeading()));
+        Vector2D deltaPos = new Vector2D(newPosition);
+        deltaPos.sub(currentPosition);
+        deltaPos.rotate(-Math.toRadians(getHeading()));
         opMode.telemetry.addData("Current Position", currentPosition);
         opMode.telemetry.addData("new Position", newPosition);
-        opMode.telemetry.addData("Robot centric movement", robotPos);
+        opMode.telemetry.addData("Change in position (rotated)", deltaPos);
 
-        translationalMvmt = new Vector2D((double) xController.getValue((float) robotPos.getComponent(0).doubleValue()), (double) yController.getValue((float) robotPos.getComponent(1).doubleValue()));
+        robotCentricMvmt = new Vector2D((double) xController.getValue((float) -deltaPos.getComponent(1).doubleValue()), (double) yController.getValue((float) deltaPos.getComponent(0).doubleValue()));
         steerMag = headingController.getValue((float)angleDifference(newHeading, getHeading()));
-        translationalMvmt.rotate(-Math.toRadians(getHeading()));
-        opMode.telemetry.addData("Translational error", translationalMvmt);
+        opMode.telemetry.addData("Robot Centric Movement", robotCentricMvmt);
 
-        double leftx = -translationalMvmt.getComponent(1); //because 0 degrees has the robot pointed right, so global y movement corresponds to robot x movement at 0 degrees
-        double lefty = translationalMvmt.getComponent(0);
+        double leftx = robotCentricMvmt.getComponent(0);
+        double lefty = robotCentricMvmt.getComponent(1);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
@@ -429,7 +417,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public double angleDifference(double target, double current){
-        double difference = normalizeDegrees(target) - normalizeDegrees(current);
+        double difference = normalizeAngle(target) - normalizeAngle(current);
         if (difference > 180) {
             difference -= 360.0;
         }
