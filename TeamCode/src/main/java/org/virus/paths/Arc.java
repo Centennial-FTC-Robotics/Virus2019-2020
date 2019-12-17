@@ -1,17 +1,17 @@
 package org.virus.paths;
 
-import org.virus.util.OdometryMath;
+import org.virus.agobot.Agobot;
 
 public class Arc extends PathComponent {
     private float radius;
     private float degrees;
     public Arc(float radius, float degrees){
-        this.radius = OdometryMath.inchToEncoder(radius);
+        this.radius = Agobot.drivetrain.odometry.inchToEncoder(radius);
         this.degrees = degrees;
     }
     public Arc(float radius, float degrees, int units){
         if(units == Path.INCH){
-            this.radius = OdometryMath.inchToEncoder(radius);
+            this.radius = Agobot.drivetrain.odometry.inchToEncoder(radius);
             this.degrees = degrees;
         }
         else if (units == Path.ENCODER){

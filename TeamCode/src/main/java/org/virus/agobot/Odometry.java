@@ -1,4 +1,4 @@
-package org.virus.robot;
+package org.virus.agobot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -40,7 +40,6 @@ public class Odometry extends Subsystem {
     public double deltaHeading;
     public double deltax;
     public double deltay;
-    public Vector2D deltaDisp;
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
@@ -67,7 +66,7 @@ public class Odometry extends Subsystem {
     public void setStartLocation(Vector2D startPosition, double startHeading){ //inches, and degrees
         position = new Vector2D(startPosition);
         this.startHeading = Math.toRadians(startHeading);
-        heading += this.startHeading;
+        heading = normalizeRadians(heading + this.startHeading);
     }
 
     public void resetAllEncoders(){
@@ -117,20 +116,18 @@ public class Odometry extends Subsystem {
         bEncoderPrevious = getbEncoderCounts();
 
         deltaHeading = (deltarEncoder - deltalEncoder)/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH); //it's in radians
-        heading += deltaHeading;
+        heading = normalizeRadians(heading + deltaHeading);
 
         deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
 
-        deltay = (deltarEncoder + deltalEncoder)/2;
+        deltay = (deltarEncoder + deltalEncoder)/2; //robot centric y and x
         deltax = deltaHorizontal;
 
-        deltaDisp = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
-        robotCentricDelta = new Vector2D(deltaDisp);
+        robotCentricDelta = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
 
-        deltaDisp.rotate(heading);
-        fieldCentricDelta = new Vector2D(deltaDisp);
-        position.add(deltaDisp);
-        //return deltaDisp;
+        fieldCentricDelta = new Vector2D(encoderToInch(deltay), encoderToInch(-deltax));
+        fieldCentricDelta.rotate(heading);
+        position.add(fieldCentricDelta);
     }
 
     public Vector2D getRobotCentricDelta(){
@@ -145,12 +142,12 @@ public class Odometry extends Subsystem {
     public double currentHeading(){
         return Math.toDegrees(heading);
     }//degrees
-    public double relativeHeading(){ return Math.toDegrees(heading - startHeading); }//degrees
+    public double relativeHeading(){ return Math.toDegrees(normalizeRadians(heading - startHeading)); }//degrees
     public void setHeading(double heading){ //degrees
-        this.heading = Math.toRadians(heading);
+        this.heading = normalizeRadians(Math.toRadians(heading));
     }
     public void setRelativeHeading(double relativeHeading){
-        heading = Math.toRadians(relativeHeading) + startHeading;
+        heading = normalizeRadians(Math.toRadians(relativeHeading) + startHeading);
     }
 
     public float encoderToInch(double encoder) {
@@ -159,6 +156,16 @@ public class Odometry extends Subsystem {
 
     public int inchToEncoder(float inches) {
         return (int) (inches * ENCODER_COUNTS_PER_INCH);
+    }
+
+    public double normalizeRadians(double angle){
+        while(angle >= 2*Math.PI) {
+            angle -= 2*Math.PI;
+        }
+        while(angle < 0.0) {
+            angle += 2*Math.PI;
+        }
+        return angle;
     }
 
 }

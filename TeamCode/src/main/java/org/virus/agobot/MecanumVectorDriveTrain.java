@@ -1,4 +1,4 @@
-package org.virus.robot;
+package org.virus.agobot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -17,7 +17,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.Advanced_Paths.ParametricPath;
-import org.virus.agobot.Agobot;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
 import org.virus.superclasses.Drivetrain;
@@ -43,11 +42,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     private Orientation currentOrientation;
     private double heading;
     private Vector2D currentPosition;
-    PIDController headingController = new PIDController(-.04f, 0 ,0);
-    final PIDController moveController = new PIDController(.01f ,0.000f ,.0000f);
-    final PIDController arcController = new PIDController(.01f ,0.000f ,.0000f);
-    PIDController xController = new PIDController(.06f,.05f ,0, 0.1f);
-    PIDController yController = new PIDController(.06f,.05f ,0,0.1f);
+    final PIDController moveController = PIDControllers.moveController;
+    final PIDController arcController = PIDControllers.arcController;
+    public PIDController xController = PIDControllers.xController;
+    public PIDController yController = PIDControllers.yController;
+    public PIDController headingController = PIDControllers.headingController;
+
     private LinearOpMode opMode;
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
@@ -55,7 +55,9 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public Odometry odometry;
     double steerMag;
     Vector2D motorSpeeds;
-    Vector2D translationalMvmt;
+    Vector2D robotCentricMvmt;
+    double minSpeed = 0.05;
+    double distTolerance = 0.5;
 
 //    Odometry odometry = new Odometry();
     @Override
@@ -79,11 +81,11 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         if(opMode.getClass()== LinearOpMode.class){
             while (((LinearOpMode)opMode).opModeIsActive() && !imu.isGyroCalibrated()) ;
         }
-        try {
+        /*try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         resetOrientation();
     }
     public void resetOrientation(){
@@ -99,7 +101,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     public Vector2D updatePosition(){
         if(odoLoopCounter%IMUUPDATERATE==0){
             currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            currentOrientation.firstAngle = AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
+            currentOrientation.firstAngle = (float)normalizeAngle(currentOrientation.firstAngle - initialHeading);
             odometry.setRelativeHeading(currentOrientation.firstAngle);
             odometry.updatePosition();
         } else {
@@ -114,6 +116,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         return heading;
         //return AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
     }
+
     public void initialize(LinearOpMode opMode) {
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
@@ -142,7 +145,9 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         I2cDeviceSynch idkWhatThisMeans = new BetterI2cDeviceSynchImplOnSimple(
                 new LynxI2cDeviceSynchV1(AppUtil.getDefContext(), module, 0), true);
         imu = new LynxEmbeddedIMU(idkWhatThisMeans);
-        imu.initialize(new BNO055IMU.Parameters());
+
+        //imu.initialize(new BNO055IMU.Parameters());
+
         currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         lFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -297,7 +302,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public boolean move(Vector2D move) { // move relative to the robot, but in the field's heading
-
         move.add(odometry.currentPosition());
         return goToPosition(move, currentOrientation.firstAngle, 1);
     }
@@ -347,32 +351,43 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
     public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
 
-        currentPosition = Agobot.drivetrain.updatePosition();
-        opMode.telemetry.addData("Position:", currentPosition);
-        opMode.telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
-        opMode.telemetry.addData("New Position",newPosition);
-        opMode.telemetry.addData("New Heading", newHeading);
+        currentPosition = updatePosition();
+//        opMode.telemetry.addData("Position:", currentPosition);
+//        opMode.telemetry.addData("Heading:", Agobot.drivetrain.getHeading());
+//        opMode.telemetry.addData("New Position",newPosition);
+//        opMode.telemetry.addData("New Heading", newHeading);
 
         updateMotorPowers(newPosition, newHeading);
-        opMode.telemetry.addData("Translational Movement", translationalMvmt);
-        opMode.telemetry.addData("Steer Magnitude", steerMag);
+//        opMode.telemetry.addData("Translational Movement", robotCentricMvmt);
+//        opMode.telemetry.addData("Steer Magnitude", steerMag);
 
-        double diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, maxSpeed);
-        double diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, maxSpeed);
+        double diagSpeed1 = 0;
+        double diagSpeed2 = 0;
+        if (motorSpeeds.getComponent(0) > 0) {
+            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), minSpeed, maxSpeed);
+        }else if(motorSpeeds.getComponent(0) < 0){
+            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, -minSpeed);
+        }
+        if (motorSpeeds.getComponent(1) > 0) {
+            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), minSpeed, maxSpeed);
+        }else if(motorSpeeds.getComponent(1) < 0){
+            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, -minSpeed);
+        }
+        steerMag=Range.clip(steerMag, -maxSpeed * .8d, maxSpeed *.8d);
 
-        if ((translationalMvmt.getComponent(0) != 0) || (translationalMvmt.getComponent(1) != 0)){
-            Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
+        if ((robotCentricMvmt.getComponent(0) != 0) || (robotCentricMvmt.getComponent(1) != 0)){
+            runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, steerMag); //var1 and 2 are computed values found in theUpdateControllerValues method
         } else {
-            Agobot.drivetrain.runMotors(0, 0, 0, 0, steerMag);
+            runMotors(0, 0, 0, 0, steerMag);
         }
         opMode.telemetry.update();
 
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
-        double headingDiff = Agobot.drivetrain.getHeading() - newHeading;
-
-        if (Math.abs(xDiff) < 0.5 && Math.abs(yDiff) < 0.5 && Math.abs(headingDiff) < 0.5) {
-            Agobot.drivetrain.runMotors(0,0,0,0,0);
+        double headingDiff = getHeading() - newHeading;
+        //opMode.telemetry.addData("Heading Difference: ", headingDiff);
+        if (Math.abs(xDiff) < distTolerance && Math.abs(yDiff) < distTolerance && Math.abs(headingDiff) < 1) {
+            runMotors(0,0,0,0,0);
             xController.clear();
             yController.clear();
             headingController.clear();
@@ -382,19 +397,33 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
-        double x = currentPosition.getComponent(0);
-        double y = currentPosition.getComponent(1);
+        Vector2D deltaPos = new Vector2D(newPosition);
+        deltaPos.sub(currentPosition);
+        deltaPos.rotate(-Math.toRadians(getHeading()));
+        opMode.telemetry.addData("Current Position", currentPosition);
+        opMode.telemetry.addData("new Position", newPosition);
+        opMode.telemetry.addData("Change in position (rotated)", deltaPos);
 
-        translationalMvmt = new Vector2D((double) xController.getValue((float)(double)newPosition.getComponent(0), (float)x), (double) yController.getValue((float)(double)newPosition.getComponent(1), (float)y));
-        steerMag = headingController.getValue((float)newHeading, AngleUnit.normalizeDegrees((float) Agobot.drivetrain.getHeading()));
-        translationalMvmt.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
+        robotCentricMvmt = new Vector2D((double) xController.getValue((float) -deltaPos.getComponent(1).doubleValue()), (double) yController.getValue((float) deltaPos.getComponent(0).doubleValue()));
+        steerMag = headingController.getValue((float)angleDifference(newHeading, getHeading()));
+        opMode.telemetry.addData("Robot Centric Movement", robotCentricMvmt);
 
-        double leftx = -translationalMvmt.getComponent(1); //because 0 degrees has the robot pointed right, so global y movement corresponds to robot x movement at 0 degrees
-        double lefty = translationalMvmt.getComponent(0);
+        double leftx = robotCentricMvmt.getComponent(0);
+        double lefty = robotCentricMvmt.getComponent(1);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
         motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
+    }
 
+    public double angleDifference(double target, double current){
+        double difference = normalizeAngle(target) - normalizeAngle(current);
+        if (difference > 180) {
+            difference -= 360.0;
+        }
+        if (difference <= -180) {
+            difference += 360.0;
+        }
+        return difference;
     }
 }

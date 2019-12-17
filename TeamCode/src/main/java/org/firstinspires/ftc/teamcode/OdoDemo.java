@@ -21,7 +21,7 @@ public class OdoDemo extends LinearOpMode {
 //        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
-        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(0,12), 90);
+        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(63, -36), 179);
 
         waitForStart();
 
@@ -32,7 +32,7 @@ public class OdoDemo extends LinearOpMode {
 //        }
 
         double newHeading = 0;
-        while(Agobot.drivetrain.goToPosition(new Vector2D(12,0), 0, maxSpeed));
+        while(Agobot.drivetrain.goToPosition(new Vector2D(63, -60), 0, maxSpeed));
         //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), 90, maxSpeed));
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();

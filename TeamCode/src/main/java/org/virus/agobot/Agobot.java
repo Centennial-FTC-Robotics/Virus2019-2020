@@ -1,11 +1,9 @@
 package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.openftc.revextensions2.ExpansionHubEx;
-import org.virus.robot.MecanumVectorDriveTrain;
 import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 

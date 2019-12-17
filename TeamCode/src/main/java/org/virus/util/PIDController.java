@@ -39,13 +39,16 @@ public class PIDController {
     }
     //ideally called every loop, don't wait too long between calls unless running p loop
     public float getValue (float target, float actual) {
+        return getValue(target - actual);
+    }
+
+    public float getValue (float error) {
 
         //throw (new Exception("NotStarted"));
 
         if (!started) {
             start();
         }
-        float error = target - actual;
         float p = error;
         i += (float) (error * PIDClock.seconds());
         float d = (float) ((error - prevError) / PIDClock.seconds());

@@ -1,18 +1,19 @@
 package org.virus.paths;
 
-import org.virus.util.OdometryMath;
+
+import org.virus.agobot.Agobot;
 
 public class Line extends PathComponent {
     public float distance;
     public Line(float distance){
-        this.distance = OdometryMath.inchToEncoder(distance);
+        this.distance = Agobot.drivetrain.odometry.inchToEncoder(distance);
     }
     public Line(float distance, int units){
         if(units== Path.ENCODER){
             this.distance = distance;
         }
         else if(units== Path.INCH){
-            this.distance = OdometryMath.inchToEncoder(distance);
+            this.distance = Agobot.drivetrain.odometry.inchToEncoder(distance);
         }
     }
 
