@@ -1,13 +1,12 @@
 package org.virus.agobot;
 
-import android.graphics.Path;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -45,15 +44,17 @@ public class ElementLocator extends Subsystem {
     private static final float quadField  = 36 * mmPerInch;
 
     //TODO: Change these in response to our build!
-    final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-    final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
+    final float CAMERA_FORWARD_DISPLACEMENT  = 0;   // eg: Camera is -2 Inches in front of robot center
+    final float CAMERA_VERTICAL_DISPLACEMENT = 0;   // eg: Camera is 3 Inches above ground
     final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
 
     private LinearOpMode opModeReference;
+    VuforiaLocalizer.Parameters parameters;
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
     private VuforiaTrackables targetsSkyStone;
     List<VuforiaTrackable> allTrackables;
+    List<Vector2D> reportedLocations;
 
     private boolean targetVisible = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
@@ -85,7 +86,7 @@ public class ElementLocator extends Subsystem {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
@@ -141,6 +142,8 @@ public class ElementLocator extends Subsystem {
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
+
+        reportedLocations = new ArrayList<Vector2D>();
 
         stoneTarget.setLocation(OpenGLMatrix
                 .translation(0, 0, stoneZ)
@@ -206,6 +209,15 @@ public class ElementLocator extends Subsystem {
         if (PHONE_IS_PORTRAIT) {
             phoneXRotate = 90 ;
         }
+
+        OpenGLMatrix robotFromCamera = OpenGLMatrix
+                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, phoneXRotate, phoneYRotate, phoneZRotate));
+
+        /**  Let all the trackable listeners know where the phone is.  */
+        for (VuforiaTrackable trackable : allTrackables) {
+            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        }
     }
 
     public VuforiaLocalizer getVuforia() {
@@ -259,9 +271,108 @@ public class ElementLocator extends Subsystem {
                 }
             }
 
-//            if (allTrackables.) TODO: Find the trackables in the vuforia assets that correspond to the navigation targets
+            Vector2D robotPos = getRobotPos();
+
+            double distanceToStones = robotPos.getComponent(0) - stoneZ; // this probably doesn't work
         }
 
         return skyStonePositions;
+    }
+
+    public Vector2D getRobotPos() {
+
+        updateRobotPositions();
+
+        Vector2D robotPos = null;
+
+        double xTolerance = 10;
+        double yTolerance = 10;
+
+        if (reportedLocations.size() > 0) {
+
+            int maxToleranceCount = 0;
+            ArrayList<Vector2D>  maxWithinTolerance = new ArrayList<Vector2D>();
+
+            for (int v = 0; v < reportedLocations.size(); v++) {
+
+                int toleranceCount = 0;
+                ArrayList<Vector2D> withinTolerance = new ArrayList<Vector2D>();
+                Vector2D currentVector = reportedLocations.get(v);
+
+                for (int c = 0; c < reportedLocations.size(); c++) {
+                    if (c != v) {
+                        Vector2D compared = reportedLocations.get(c);
+                        boolean withinX = false;
+                        boolean withinY = false;
+
+                        if (Math.abs(compared.getComponent(0) - currentVector.getComponent(0)) < xTolerance) {
+
+                            withinX = true;
+                        }
+
+                        if (Math.abs(compared.getComponent(1) - currentVector.getComponent(1)) < yTolerance) {
+
+                            withinY = true;
+                        }
+
+                        if (withinX && withinY) {
+
+                            withinTolerance.add(compared);
+                            toleranceCount++;
+                        }
+                    }
+                }
+
+                if (toleranceCount > maxToleranceCount) {
+
+                    maxToleranceCount = toleranceCount;
+                    maxWithinTolerance.clear();
+                    maxWithinTolerance.addAll(withinTolerance);
+                    maxWithinTolerance.add(currentVector);
+                }
+            }
+
+            robotPos = new Vector2D(0, 0);
+
+            for (Vector2D w: maxWithinTolerance) {
+
+                robotPos.add(w);
+            }
+
+            robotPos.scale( 1.0 / maxWithinTolerance.size());
+        }
+
+        return robotPos;
+    }
+
+    public void updateRobotPositions() {
+
+        for (VuforiaTrackable trackable : allTrackables) {
+            if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+                opModeReference.telemetry.addData("Visible Target", trackable.getName());
+
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                if (robotLocationTransform != null) {
+
+                    int lastLocDataIndex = -1;
+                    for (int r = 0; r < reportedLocations.size(); r++) {
+                        if (reportedLocations.get(r).getName().equals(trackable.getName())) {
+                            lastLocDataIndex = r;
+                        }
+                    }
+
+                    Vector2D location = new Vector2D(robotLocationTransform.toVector().get(0), robotLocationTransform.toVector().get(1));
+
+                    if (lastLocDataIndex == -1) {
+                        reportedLocations.add(location);
+                    } else {
+
+                        reportedLocations.set(lastLocDataIndex, location);
+                    }
+                }
+            }
+
+            opModeReference.telemetry.update();
+        }
     }
 }
