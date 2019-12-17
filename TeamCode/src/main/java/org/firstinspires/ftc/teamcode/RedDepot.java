@@ -19,35 +19,42 @@ public class RedDepot extends LinearOpMode {
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
 
-        //go to (63, -60)
-//        while(Agobot.drivetrain.goToPosition(new Vector2D(-24, 0), 0, 0.6)){
-//
-//        }
+        //go towards depot
         while(Agobot.drivetrain.goToPosition(new Vector2D(63, -60), startHeading, 0.6)){
 
         }
         //scan stones
         //Agobot.tracker.getTensorFlowObject().getUpdatedRecognitions();
-        //strafe to (63, -63) for left, (63, -57) for right, stay put for center
+        //skyStoneLocation = new Vector2D(21, )
 
         //go to (12, y) (just keep y values from previous step)
-//        while(Agobot.drivetrain.goToPosition(new Vector2D(-24, 51), 0, 0.6)){
-//
-//        }
         while(Agobot.drivetrain.goToPosition(new Vector2D(12, -60), startHeading, 0.6)){
 
         }
         //go to (12, -12) and turn to face 90 degrees
-//        while(Agobot.drivetrain.goToPosition(new Vector2D(24, 51), -90, 0.6)){
-//
-//        }
         while(Agobot.drivetrain.goToPosition(new Vector2D(12, -12), 90, 0.6)){
 
         }
         while(Agobot.drivetrain.goToPosition(new Vector2D(36, -12), 90, 0.6)){
 
         }
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 48), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 40), 0, 0.6)){
+
+        }
+        while(Agobot.drivetrain.goToPosition(new Vector2D(33, 40), 0, 0.6)){
+            //bring dragger down
+        }
+        //drop
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 40), 270, 0.6)){
+
+        }
+        //push against wall
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 44.5), 270, 0.6)){
+
+        }
+        //retract foundation grabber
+        //park
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 0), 270, 0.6)){
 
         }
     }
