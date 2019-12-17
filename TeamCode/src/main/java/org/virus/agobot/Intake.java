@@ -1,4 +1,4 @@
-package org.virus.robot;
+package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,7 +27,7 @@ public class Intake extends Subsystem {
         rightIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         leftIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void runIntake(double leftSpeed, double rightSpeed){

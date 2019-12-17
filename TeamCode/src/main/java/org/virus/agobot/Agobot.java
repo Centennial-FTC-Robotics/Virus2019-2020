@@ -11,11 +11,13 @@ public class Agobot extends Robot {
     public static MecanumVectorDriveTrain drivetrain = new MecanumVectorDriveTrain();
     public static ElementLocator tracker = new ElementLocator();
     //public static ExampleSlides verticalSlides = new ExampleSlides();
-    //public static ExampleSlides horizontalSlides = new ExampleSlides();
+    public static Slides horizontalSlides = new Slides();
+    public static Intake intake = new Intake();
+
 
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, tracker};
+    static Subsystem[] subsystems = {drivetrain, tracker, horizontalSlides, intake};
 
     public static void initialize(LinearOpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));

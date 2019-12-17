@@ -7,8 +7,8 @@ import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
 @Autonomous
-public class RedDepot extends LinearOpMode {
-    private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
+public class RedBridge extends LinearOpMode {
+    private Vector2D startPosition = new Vector2D(63, -12); //against wall to the right
     private double startHeading = 180; //straight left
     private Vector2D skyStoneLocation;
 
@@ -19,24 +19,18 @@ public class RedDepot extends LinearOpMode {
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
 
-        //go towards depot
-        while(Agobot.drivetrain.goToPosition(new Vector2D(63, -60), startHeading, 0.6)){
-
-        }
-
-        //get ready to position to start scanning
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -60), startHeading, 0.6)){
+        //go towards skystones
+        //TODO: maybe have path go hypotenuse instead of legs (talk to ere if confusion)
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -12), startHeading, 0.6)){
 
         }
 
         //TODO: scan stones
-        //Agobot.tracker.getTensorFlowObject().getUpdatedRecognitions();
-        //skyStoneLocation = new Vector2D(21, )
 
         //TODO: grab skystone
 
         //recenter position, face backwards to be ready to place skystone
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -40), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -18), 0, 0.6)){
 
         }
 
@@ -61,8 +55,14 @@ public class RedDepot extends LinearOpMode {
             //TODO: retract foundation grabber
         }
 
-        //park on red tape, closer to left side
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 0), 270, 0.6)){
+        //go towards alliance wall
+        //TODO: also another place to go hypotenuse instead
+        while(Agobot.drivetrain.goToPosition(new Vector2D(63, 44.5), 270, 0.6)) {
+
+        }
+
+        //park on red tape, closer to wall
+        while(Agobot.drivetrain.goToPosition(new Vector2D(63, 0), 270, 0.6)){
 
         }
     }

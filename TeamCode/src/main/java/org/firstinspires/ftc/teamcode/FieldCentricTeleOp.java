@@ -43,6 +43,12 @@ public class FieldCentricTeleOp extends LinearOpMode {
             } else {
                 Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
             }
+
+            //TODO: brake and throttle
+            //TODO: slides, arm, intake, grabber
+            //TODO: shortcut buttons (automatic foundation pulling)
+            //TODO: snap 90 for driver 1
+            //TODO: dpad stone heights
         }
     }
 
