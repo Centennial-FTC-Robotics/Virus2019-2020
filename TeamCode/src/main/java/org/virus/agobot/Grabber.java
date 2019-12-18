@@ -13,24 +13,23 @@ public class Grabber extends Subsystem {
 
     public Servo grabber;
     public double position = 0.0;
+    //TODO: fix values when testing
     private final double grabPosition = 1.0;
     private final double releasePosition = 0.0;
 
     @Override
     public void initialize(LinearOpMode opMode) {
-        grabber = (ExpansionHubServo)opMode.hardwareMap.servo.get("grabber");
+        grabber = opMode.hardwareMap.servo.get("grabber");
     }
 
     //more methods TODO
     public void grabber(boolean grab){
         if(grab){
-            //TODO: fix values
-            grabber.setPosition(1.0);
-            position = 1.0;
+            grabber.setPosition(grabPosition);
+            position = grabPosition;
         }else{
-            //TODO: fix values
-            grabber.setPosition(0.0);
-
+            grabber.setPosition(releasePosition);
+            position = releasePosition;
         }
     }
 }

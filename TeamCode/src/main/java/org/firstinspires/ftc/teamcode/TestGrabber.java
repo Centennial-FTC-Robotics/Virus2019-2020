@@ -19,12 +19,9 @@ public class TestGrabber extends LinearOpMode {
         while(opModeIsActive()) {
             Agobot.slides.slidePower(gamepad2.left_stick_y);
 
-            telemetry.addData("Grabber Position");
-            telemetry.addData("Left Slide", Agobot.slides.slideLeft.getCurrentPosition());
-            telemetry.addData("Right Slide", Agobot.slides.slideRight.getCurrentPosition());
-            telemetry.addData("Slide Min ", Agobot.slides.slideMin);
-            telemetry.addData("Slide Max", Agobot.slides.slideMax);
-            telemetry.addData("Slide Error", Agobot.slides.error);
+            telemetry.addData("Grabber Position", Agobot.grabber.position);
+            telemetry.addData("Button A", gamepad2.a);
+            telemetry.addData("Button B", gamepad2.b);
             telemetry.update();
         }
     }
