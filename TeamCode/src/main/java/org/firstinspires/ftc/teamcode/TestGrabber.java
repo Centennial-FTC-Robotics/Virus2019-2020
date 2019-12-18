@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOp", name = "Slide Tester")
-public class TestSlides extends LinearOpMode {
+@TeleOp(group = "TeleOp", name = "Grabber Tester")
+public class TestGrabber extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Agobot.initialize(this);
@@ -19,7 +19,7 @@ public class TestSlides extends LinearOpMode {
         while(opModeIsActive()) {
             Agobot.slides.slidePower(gamepad2.left_stick_y);
 
-            telemetry.addData("Gamepad 2 Left Stick Y Value", gamepad2.left_stick_y);
+            telemetry.addData("Grabber Position");
             telemetry.addData("Left Slide", Agobot.slides.slideLeft.getCurrentPosition());
             telemetry.addData("Right Slide", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.addData("Slide Min ", Agobot.slides.slideMin);
