@@ -23,7 +23,7 @@ public class Grabber extends Subsystem {
     }
 
     //more methods TODO
-    public void grabber(boolean grab){
+    public void grab(boolean grab){
         if(grab){
             grabber.setPosition(grabPosition);
             position = grabPosition;
