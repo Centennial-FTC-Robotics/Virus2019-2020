@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOp", name = "Grabber Tester")
-public class TestGrabber extends LinearOpMode {
+@TeleOp(group = "TeleOp", name = "Arm Tester")
+public class TestArm extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Agobot.initialize(this);
@@ -17,18 +17,18 @@ public class TestGrabber extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-
-            if(gamepad2.a) {
-                Agobot.grabber.grab(true);
+            if(gamepad2.x) {
+                Agobot.arm.armFlipIn(true);
             }
 
-            if(gamepad2.b){
-                Agobot.grabber.grab(false);
+            if(gamepad2.y){
+                Agobot.arm.armFlipIn(false);
             }
 
-            telemetry.addData("Grabber Position", Agobot.grabber.position);
-            telemetry.addData("Button A", gamepad2.a);
-            telemetry.addData("Button B", gamepad2.b);
+            telemetry.addData("Left Arm Position", Agobot.arm.leftPosition);
+            telemetry.addData("Right Arm Position", Agobot.arm.rightPosition);
+            telemetry.addData("Button X", gamepad2.x);
+            telemetry.addData("Button Y", gamepad2.y);
             telemetry.update();
         }
     }

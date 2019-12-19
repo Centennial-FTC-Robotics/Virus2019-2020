@@ -13,9 +13,8 @@ public class Arm extends Subsystem {
 
     public Servo leftArm;
     public Servo rightArm;
-    public double leftPosition;
-    public double rightPosition;
-    //TODO: fix values when testing
+    public double leftPosition = 0.0;
+    public double rightPosition = 1.0;
 
 
     @Override
@@ -26,5 +25,18 @@ public class Arm extends Subsystem {
     }
 
     //more methods TODO
-//    public void
+    //TODO: fix values when testing
+    public void armFlipIn(boolean in){
+        if(in){
+            leftArm.setPosition(0.0);
+            rightArm.setPosition(1.0);
+            leftPosition = 0.0;
+            rightPosition = 1.0;
+        }else{
+            leftArm.setPosition(1.0);
+            rightArm.setPosition(0.0);
+            leftPosition = 1.0;
+            rightPosition = 0.0;
+        }
+    }
 }
