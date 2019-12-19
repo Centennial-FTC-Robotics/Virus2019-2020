@@ -86,7 +86,8 @@ public class ElementLocator extends Subsystem {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
-        parameters = new VuforiaLocalizer.Parameters();
+        int cameraMonitorViewId = opModeReference.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opModeReference.hardwareMap.appContext.getPackageName());
+        parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
@@ -218,6 +219,8 @@ public class ElementLocator extends Subsystem {
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
+
+        targetsSkyStone.activate();
     }
 
     public VuforiaLocalizer getVuforia() {
@@ -233,15 +236,20 @@ public class ElementLocator extends Subsystem {
         if (opModeReference.opModeIsActive()) {
 
             if (tfod != null) {
+
                 tfod.activate();
+            }
+
+            if (tfod != null) {
                 // put good code in here to check if there are skystones
-                List<Recognition> elements = tfod.getUpdatedRecognitions();
+                List<Recognition> elements = tfod.getRecognitions();
+//                opModeReference.telemetry.addData("elements", elements);
+                if (elements != null) {
+                    for (Recognition r : elements) {
+                        if (r.getLabel().toUpperCase().equals(LABEL_SECOND_ELEMENT.toUpperCase())) {
 
-                for (Recognition r : elements) {
-
-                    if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
-
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
@@ -259,14 +267,16 @@ public class ElementLocator extends Subsystem {
             if (tfod != null) {
                 tfod.activate();
                 // put good code in here to check if there are skystones
-                List<Recognition> elements = tfod.getUpdatedRecognitions();
+                List<Recognition> elements = tfod.getRecognitions();
                 // TODO: modify to use vuforia trackables and get the positions of the skystones to convert to a vector!
 
-                for (Recognition r : elements) {
+                if (elements != null) {
+                    for (Recognition r : elements) {
 
-                    if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                        if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
 
-                        double angle = r.estimateAngleToObject(AngleUnit.RADIANS);
+                            double angle = r.estimateAngleToObject(AngleUnit.RADIANS);
+                        }
                     }
                 }
             }
@@ -349,7 +359,7 @@ public class ElementLocator extends Subsystem {
 
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                opModeReference.telemetry.addData("Visible Target", trackable.getName());
+                //opModeReference.telemetry.addData("Visible Target", trackable.getName());
 
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
