@@ -52,6 +52,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     final static double ENCODER_COUNTS_PER_INCH = (1120.0/(100.0*Math.PI))*25.4;
     float prevLeft;
     float prevRight;
+    float prevLeft0 = 0;
+    float prevLeft1 = 0;
+    float prevRight0 = 0;
+    float prevRight1 = 0;
     public Odometry odometry;
     double steerMag;
     Vector2D motorSpeeds;
@@ -321,6 +325,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
     public void runMotors(double Left0, double Left1, double Right0, double Right1, double steerMagnitude){
         double maxPower = 1;
+        double threshold = 0.01;
 
 //        if (Math.abs(Left0) > 0.01 && Math.abs(Left1) > 0.01 && Math.abs(Right0) > 0.01 && Math.abs(Right1) > 0.01) {
 //            steerMagnitude *= 2 * Math.max(Math.max(Left0, Left1), Math.max(Right0, Right1));
@@ -337,10 +342,23 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         Right0 = Range.clip(Right0, -maxPower, maxPower);
         Right1 = Range.clip(Right1, -maxPower, maxPower);
 
-        rBack.setPower(Right1);
-        rFront.setPower(Right0);
-        lBack.setPower(Left1);
-        lFront.setPower(Left0);
+        if(Math.abs(Left0 - prevLeft0) > threshold){
+            lFront.setPower(Left0);
+        }
+        if(Math.abs(Left1 - prevLeft1) > threshold){
+            lBack.setPower(Left1);
+        }
+        if(Math.abs(Right0 - prevRight0) > threshold){
+            rFront.setPower(Right0);
+        }
+        if(Math.abs(Right1 - prevLeft1) > threshold){
+            rBack.setPower(Right1);
+        }
+
+        prevLeft0 = (float)Left0;
+        prevLeft1 = (float)Left1;
+        prevRight0 = (float)Right0;
+        prevRight1 = (float)Right1;
 //
 //        opMode.telemetry.addData("Left Odometry Encoder", odometry.lEncoder.getCurrentPosition());
 //        opMode.telemetry.addData("Right Odometry Encoder", odometry.rEncoder.getCurrentPosition());

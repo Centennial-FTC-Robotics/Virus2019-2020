@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -35,7 +36,7 @@ public class Intake extends Subsystem {
         rightSpeed = Range.clip(rightSpeed, -1, 1);
 
         leftIntake.setPower(leftSpeed);
-        rightIntake.setPower(leftSpeed);
+        rightIntake.setPower(rightSpeed);
     }
 
     public void runIntake(double speed){ //for convenience, if they both have the same speed
@@ -55,10 +56,14 @@ public class Intake extends Subsystem {
                 runIntake(0);
             }
         }
-        return intakeDeployed;
+        return !intakeDeployed; //so that it returns true until it's done, when it returns false
     }
 
-//    public boolean detectJam(double leftSpeed, double rightSpeed){
-//
-//    }
+    public boolean detectJam(DcMotorEx motor, double speed){
+        double threshold = 0.3;
+        double actualSpeed = motor.getVelocity()/TICKS_PER_SEC_TO_SPEED;
+
+        return Math.abs(speed - actualSpeed) > threshold;
+    }
+
 }

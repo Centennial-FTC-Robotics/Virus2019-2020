@@ -18,7 +18,9 @@ public class TestIntake extends LinearOpMode {
 
         while(opModeIsActive()) {
             //TODO: keertik write this
+            if(gamepad2.right_bumper){
 
+            }
             telemetry.update();
         }
     }
