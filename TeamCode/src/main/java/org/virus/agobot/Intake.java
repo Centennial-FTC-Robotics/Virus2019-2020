@@ -31,6 +31,14 @@ public class Intake extends Subsystem {
         rightIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public boolean isDeployed(){
+        return intakeDeployed;
+    }
+
+    public boolean isDeploying(){
+        return intakeDeploying;
+    }
+
     public void runIntake(double leftSpeed, double rightSpeed){
         leftSpeed = Range.clip(leftSpeed, -1, 1);
         rightSpeed = Range.clip(rightSpeed, -1, 1);
@@ -48,7 +56,7 @@ public class Intake extends Subsystem {
             if (!intakeDeploying){
                 deployTimer.reset();
             }
-            runIntake(1, -1);
+            runIntake(1, 0);
             intakeDeploying = true;
             if (deployTimer.seconds() >= 0.5){
                 intakeDeploying = false;
@@ -59,11 +67,11 @@ public class Intake extends Subsystem {
         return !intakeDeployed; //so that it returns true until it's done, when it returns false
     }
 
-    public boolean detectJam(DcMotorEx motor, double speed){
+    public boolean detectJam(DcMotorEx motor, double intendedSpeed){
         double threshold = 0.3;
         double actualSpeed = motor.getVelocity()/TICKS_PER_SEC_TO_SPEED;
 
-        return Math.abs(speed - actualSpeed) > threshold;
+        return Math.abs(intendedSpeed - actualSpeed) > threshold; //
     }
 
 }

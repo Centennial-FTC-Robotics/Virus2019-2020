@@ -19,7 +19,15 @@ public class TestIntake extends LinearOpMode {
         while(opModeIsActive()) {
             //TODO: keertik write this
             if(gamepad2.right_bumper){
-
+                if(Agobot.intake.deployIntake()){ //deployIntake returns true when the intake has been deployed and returns false otherwise and deploys the intake
+                    Agobot.intake.runIntake(1);
+                }
+            }else if(gamepad2.left_bumper){
+                if(Agobot.intake.deployIntake()){
+                    Agobot.intake.runIntake(-1);
+                }
+            }else{
+                Agobot.intake.runIntake(0);
             }
             telemetry.update();
         }
