@@ -16,6 +16,8 @@ public class Intake extends Subsystem {
     private boolean intakeDeploying = false; //is intake currently deploying?
     private boolean intakeDeployed = false; //is intake already deployed?
     final static double TICKS_PER_SEC_TO_SPEED = 1;
+    private double prevLeft = 0;
+    private double prevRight = 0;
 
     @Override
     public void initialize(LinearOpMode opMode) {
@@ -31,20 +33,19 @@ public class Intake extends Subsystem {
         rightIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public boolean isDeployed(){
-        return intakeDeployed;
-    }
-
-    public boolean isDeploying(){
-        return intakeDeploying;
-    }
-
     public void runIntake(double leftSpeed, double rightSpeed){
         leftSpeed = Range.clip(leftSpeed, -1, 1);
         rightSpeed = Range.clip(rightSpeed, -1, 1);
 
-        leftIntake.setPower(leftSpeed);
-        rightIntake.setPower(rightSpeed);
+        if(leftSpeed != prevLeft){
+            leftIntake.setPower(leftSpeed);
+        }
+        if(rightSpeed != prevRight){
+            rightIntake.setPower(rightSpeed);
+        }
+
+        prevLeft = leftSpeed;
+        prevRight = rightSpeed;
     }
 
     public void runIntake(double speed){ //for convenience, if they both have the same speed
