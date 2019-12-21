@@ -402,7 +402,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         double xDiff = currentPosition.getComponent(0) - newPosition.getComponent(0);
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
-        double headingDiff = getHeading() - newHeading;
+        double headingDiff = angleDifference(newHeading, getHeading());
         //opMode.telemetry.addData("Heading Difference: ", headingDiff);
         if (Math.abs(xDiff) < distTolerance && Math.abs(yDiff) < distTolerance && Math.abs(headingDiff) < 1) {
             runMotors(0,0,0,0,0);
