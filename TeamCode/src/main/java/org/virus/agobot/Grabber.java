@@ -14,8 +14,8 @@ public class Grabber extends Subsystem {
     public Servo grabber;
     public double position = 0.0;
     //TODO: fix values when testing
-    private final double grabPosition = 1.0;
-    private final double releasePosition = 0.0;
+    private final double grabPosition = 0.0;
+    private final double releasePosition = 1.0;
 
     @Override
     public void initialize(LinearOpMode opMode) {

@@ -31,6 +31,9 @@ public class Intake extends Subsystem {
 
         leftIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        intakeDeploying = false;
+        intakeDeployed = false;
     }
 
     public void runIntake(double leftSpeed, double rightSpeed){
