@@ -46,6 +46,19 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             //TODO: brake and throttle
             //TODO: slides, arm, intake, grabber
+            Agobot.slides.slidePower(gamepad2.left_stick_y);
+
+            if(gamepad1.right_bumper){
+                if(!Agobot.intake.deployIntake()){ //deployIntake returns true when the intake has been deployed and returns false otherwise and deploys the intake
+                    Agobot.intake.runIntake(1);
+                }
+            }else if(gamepad1.left_bumper){
+                if(!Agobot.intake.deployIntake()){
+                    Agobot.intake.runIntake(-1);
+                }
+            }else{
+                Agobot.intake.runIntake(0);
+            }
             //TODO: shortcut buttons (automatic foundation pulling)
             //TODO: snap 90 for driver 1
             //TODO: dpad stone heights

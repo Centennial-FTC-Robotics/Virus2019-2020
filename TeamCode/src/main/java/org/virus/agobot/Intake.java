@@ -62,7 +62,7 @@ public class Intake extends Subsystem {
             }
             runIntake(1, 0);
             intakeDeploying = true;
-            if (deployTimer.seconds() >= 0.5){
+            if (deployTimer.seconds() >= 0.3){
                 intakeDeploying = false;
                 intakeDeployed = true;
                 runIntake(0);

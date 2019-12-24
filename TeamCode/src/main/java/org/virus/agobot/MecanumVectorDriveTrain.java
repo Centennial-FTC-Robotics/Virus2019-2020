@@ -61,7 +61,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     Vector2D motorSpeeds;
     Vector2D robotCentricMvmt;
     double minSpeed = 0.05;
-    double distTolerance = 0.5;
 
 //    Odometry odometry = new Odometry();
     @Override
@@ -367,7 +366,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("Odometry Heading",odometry.heading);
     }
 
-    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance){
 
         currentPosition = updatePosition();
 //        opMode.telemetry.addData("Position:", currentPosition);
@@ -404,7 +403,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
         double headingDiff = angleDifference(newHeading, getHeading());
         //opMode.telemetry.addData("Heading Difference: ", headingDiff);
-        if (Math.abs(xDiff) < distTolerance && Math.abs(yDiff) < distTolerance && Math.abs(headingDiff) < 1) {
+        if (Math.abs(xDiff) < tolerance && Math.abs(yDiff) < tolerance && Math.abs(headingDiff) < 1) {
             runMotors(0,0,0,0,0);
             xController.clear();
             yController.clear();
@@ -413,6 +412,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
         return true;
     }
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
+        return goToPosition(newPosition,newHeading,maxSpeed,.75);
+    }
+
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
         Vector2D deltaPos = new Vector2D(newPosition);

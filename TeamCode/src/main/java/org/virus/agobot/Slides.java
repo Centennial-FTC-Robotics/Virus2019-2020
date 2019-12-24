@@ -13,7 +13,7 @@ public class Slides extends Subsystem {
 
     //TODO: test for correct values
     public final int slideMin = 0;
-    public final int slideMax = 5000;
+    public final int slideMax = 900;
     public final int error = 50;
 
     public int position = 0;
@@ -25,8 +25,8 @@ public class Slides extends Subsystem {
 
         slideRight.setDirection(DcMotor.Direction.REVERSE);
 
-        slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -62,7 +62,7 @@ public class Slides extends Subsystem {
     //TODO: might need to make method use slideLeft instead (adjust while testing)
     public void slidePower(double power){
         //restrict slide movement between min and max values
-        if(slideRight.getCurrentPosition() <= 0 || slideRight.getCurrentPosition() >= slideMax){
+        if(slideRight.getCurrentPosition() <= -5 || slideRight.getCurrentPosition() >= slideMax){
             slideRight.setPower(0);
             slideLeft.setPower(0);
         }else{
