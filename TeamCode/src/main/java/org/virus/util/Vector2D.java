@@ -135,6 +135,8 @@ public class Vector2D {
 
         components[0] += two_comp[0];
         components[1] += two_comp[1];
+
+        genAngles();
     }
 
     public void sub(Vector2D term_two) {
