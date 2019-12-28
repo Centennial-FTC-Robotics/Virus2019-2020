@@ -15,7 +15,7 @@ public class Vector2D {
         genAngles();
     }
 
-    public Vector2D(float newTheta, float newMag, boolean isRad) {
+    public Vector2D(double newTheta, double newMag, boolean isRad) {
 
         if (!isRad) {
             theta = Math.toRadians(theta);

@@ -281,7 +281,7 @@ public class ElementLocator extends Subsystem {
                             double distanceToStones = robotPos.getComponent(1) - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
                             double specificStoneDist = distanceToStones / Math.cos(angle);
 
-                            Vector2D relativeStonePos = new Vector2D(specificStoneDist, angle);
+                            Vector2D relativeStonePos = new Vector2D(angle, specificStoneDist, true);
 
                             skyStonePositions.add(relativeStonePos);
                         }
@@ -388,5 +388,24 @@ public class ElementLocator extends Subsystem {
 
             opModeReference.telemetry.update();
         }
+    }
+
+    public OpenGLMatrix[] getRobotLocationTransform() {
+
+        OpenGLMatrix[] locationTransforms = new OpenGLMatrix[allTrackables.size()];
+
+        int t = 0;
+        for (VuforiaTrackable trackable : allTrackables) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                //opModeReference.telemetry.addData("Visible Target", trackable.getName());
+
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                locationTransforms[t] = robotLocationTransform;
+            }
+
+            t++;
+        }
+
+        return locationTransforms;
     }
 }
