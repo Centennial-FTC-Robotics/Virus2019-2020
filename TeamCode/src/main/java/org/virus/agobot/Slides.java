@@ -23,7 +23,7 @@ public class Slides extends Subsystem {
         slideLeft = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "slideLeft");
         slideRight = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "slideRight");
 
-        slideRight.setDirection(DcMotor.Direction.REVERSE);
+        slideLeft.setDirection(DcMotor.Direction.REVERSE);
 
         slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
