@@ -22,17 +22,18 @@ public class VuforiaTesting extends LinearOpMode {
 //            telemetry.addData("Is SkyStone Visible", tracker.isSkyStoneVisible());
 //            telemetry.addData("sky Stone Positions", tracker.getSkyStonePositions());
 
-            OpenGLMatrix locationTransform = tracker.getRobotLocationTransform()[0];
+            OpenGLMatrix[] transforms = tracker.getRobotLocationTransform();
+            for (int i = 0; i < transforms.length; i++) {
+                OpenGLMatrix locationTransform = transforms[i];
 
-            if (locationTransform != null) {
-                float[] data = locationTransform.getData();
-                telemetry.addData("Camera X-axis", "X %.3f Y %.3f Z %.3f", data[0], data[1], data[2]);
-                telemetry.addData("Camera Y-axis", "X %.3f Y %.3f Z %.3f", data[4], data[5], data[6]);
-                telemetry.addData("Camera Z-axis", "X %.3f : %.3f Z %.3f", data[8], data[9], data[10]);
-            } else {
-                telemetry.addLine("No transforms found!");
+                if (locationTransform != null) {
+                    float[] data = locationTransform.getData();
+                    telemetry.addData("Camera X-axis", "X %.3f Y %.3f Z %.3f", data[0], data[1], data[2]);
+                    telemetry.addData("Camera Y-axis", "X %.3f Y %.3f Z %.3f", data[4], data[5], data[6]);
+                    telemetry.addData("Camera Z-axis", "X %.3f : %.3f Z %.3f", data[8], data[9], data[10]);
+                }
             }
-
+            
             telemetry.update();
         }
     }
