@@ -62,7 +62,7 @@ public class Slides extends Subsystem {
     //TODO: might need to make method use slideLeft instead (adjust while testing)
     public void slidePower(double power){
         //restrict slide movement between min and max values
-        if(-slideRight.getCurrentPosition() <= -5 || -slideRight.getCurrentPosition() >= slideMax){
+        if(slideRight.getCurrentPosition() <= -10 || slideRight.getCurrentPosition() >= slideMax){
             slideRight.setPower(0);
             slideLeft.setPower(0);
         }else{
