@@ -30,7 +30,7 @@ public class ElementLocator extends Subsystem {
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
 
     // Constant for Stone Target
-    private static final float stoneZ = 2.00f * mmPerInch;
+    private static final float stoneY = 2.00f * mmPerInch;
 
     // Constants for the center support targets
     private static final float bridgeZ = 6.42f * mmPerInch;
@@ -58,10 +58,10 @@ public class ElementLocator extends Subsystem {
 
     private boolean targetVisible = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
-    private float phoneXRotate    = 0;
-    private float phoneYRotate    = 0;
-    private float phoneZRotate    = 0;
+    private static final boolean PHONE_IS_PORTRAIT = false;
+    private float phoneXRotate = 90; // robot initially facing (positive?) y direction, so the phone is rotated on a perpendicular axis, the x axis, 90 degrees to face forward
+    private float phoneYRotate = 0;
+    private float phoneZRotate = 0;
 
     // vision initialization stuff
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
@@ -147,7 +147,7 @@ public class ElementLocator extends Subsystem {
         reportedLocations = new ArrayList<Vector2D>();
 
         stoneTarget.setLocation(OpenGLMatrix
-                .translation(0, 0, stoneZ)
+                .translation(0, 0, stoneY)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
         //Set the position of the bridge support targets with relation to origin (center of field)
@@ -258,9 +258,9 @@ public class ElementLocator extends Subsystem {
         return false;
     }
 
-    public Vector2D[] getSkyStonePositions() {
+    public ArrayList<Vector2D>  getSkyStonePositions() {
 
-        Vector2D[] skyStonePositions = null;
+        ArrayList<Vector2D> skyStonePositions = new ArrayList<Vector2D>();
 
         if (opModeReference.opModeIsActive()) {
 
@@ -275,15 +275,19 @@ public class ElementLocator extends Subsystem {
 
                         if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
 
+                            Vector2D robotPos = getRobotPos();
+
                             double angle = r.estimateAngleToObject(AngleUnit.RADIANS);
+                            double distanceToStones = robotPos.getComponent(1) - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
+                            double specificStoneDist = distanceToStones / Math.cos(angle);
+
+                            Vector2D relativeStonePos = new Vector2D(specificStoneDist, angle);
+
+                            skyStonePositions.add(relativeStonePos);
                         }
                     }
                 }
             }
-
-            Vector2D robotPos = getRobotPos();
-
-            double distanceToStones = robotPos.getComponent(0) - stoneZ; // this probably doesn't work
         }
 
         return skyStonePositions;

@@ -18,7 +18,8 @@ public class VuforiaTesting extends LinearOpMode {
         while (opModeIsActive()) {
 
             telemetry.addData("Robot Pos: ", tracker.getRobotPos());
-            //telemetry.addData("Is SkyStone Visible", tracker.isSkyStoneVisible());
+            telemetry.addData("Is SkyStone Visible", tracker.isSkyStoneVisible());
+            telemetry.addData("sky Stone Positions", tracker.getSkyStonePositions());
             telemetry.update();
         }
     }
