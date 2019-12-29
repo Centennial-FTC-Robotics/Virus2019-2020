@@ -101,6 +101,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         //currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return currentOrientation;
     }
+    public double imuHeading() {
+        currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentOrientation.firstAngle;
+    }
     public Vector2D updatePosition(){
         if(odoLoopCounter%IMUUPDATERATE==0){
             currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
