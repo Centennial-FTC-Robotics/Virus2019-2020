@@ -118,10 +118,21 @@ public class Odometry extends Subsystem {
         deltaHeading = (deltarEncoder - deltalEncoder)/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH); //it's in radians
         heading = normalizeRadians(heading + deltaHeading);
 
-        deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
+//        deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
+//
+//        deltay = (deltarEncoder + deltalEncoder)/2; //robot centric y and x
+//        deltax = deltaHorizontal;
 
-        deltay = (deltarEncoder + deltalEncoder)/2; //robot centric y and x
-        deltax = deltaHorizontal;
+        if(deltaHeading == 0){ //have to do it like this because java doesn't do l'Hopital's rule
+            deltax = deltabEncoder;
+            deltay = (deltalEncoder + deltarEncoder)/2;
+        }else{
+            double turnRadius = RADIUS*ENCODER_COUNTS_PER_INCH*(deltalEncoder + deltarEncoder)/(deltarEncoder - deltalEncoder);
+            double strafeRadius = deltabEncoder/deltaHeading - BENCODER_OFFSET;
+
+            deltax = turnRadius*(Math.cos(deltaHeading) - 1) + strafeRadius*Math.sin(deltaHeading);
+            deltay = turnRadius*Math.sin(deltaHeading) + strafeRadius*(1 - Math.cos(deltaHeading));
+        }
 
         robotCentricDelta = new Vector2D(encoderToInch(deltax), encoderToInch(deltay));
 

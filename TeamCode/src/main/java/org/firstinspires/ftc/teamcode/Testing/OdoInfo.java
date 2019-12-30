@@ -30,34 +30,16 @@ public class OdoInfo extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
             //updateControllerValues();
-//            double diagSpeed1 = motorSpeeds.getComponent(0);
-//            double diagSpeed2 = motorSpeeds.getComponent(1);
-//            if (leftx!=0 || lefty!=0){
-//                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
-//            } else {
-//                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
-//            }
+            //Agobot.drivetrain.runMotors(0,0.5,0,-0.5, 0);
+
             telemetry.addData("Position: ", Agobot.drivetrain.updatePosition());
             telemetry.addData("Relative Heading: ", Agobot.drivetrain.getHeading());
             telemetry.addData("Heading: ", Agobot.drivetrain.odometry.currentHeading());
-            /*
+
             telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
             telemetry.addData("rEncoder:", Agobot.drivetrain.odometry.getrEncoderCounts());
             telemetry.addData("bEncoder:", Agobot.drivetrain.odometry.getbEncoderCounts());
-            telemetry.addData("lEncoderPrevious",Agobot.drivetrain.odometry.lEncoderPrevious);
-            telemetry.addData("rEncoderPrevious",Agobot.drivetrain.odometry.rEncoderPrevious);
-            telemetry.addData("bEncoderPrevious",Agobot.drivetrain.odometry.bEncoderPrevious);
-            telemetry.addData("diagSpeed1", diagSpeed1);
-            telemetry.addData("diagSpeed2", diagSpeed2);
-            telemetry.addData("deltalEncoder",Agobot.drivetrain.odometry.deltalEncoder);
-            telemetry.addData("deltarEncoder",Agobot.drivetrain.odometry.deltarEncoder);
-            telemetry.addData("deltabEncoder",Agobot.drivetrain.odometry.deltabEncoder);
-            telemetry.addData("deltaHeading",Agobot.drivetrain.odometry.deltaHeading);
-            telemetry.addData("deltax",Agobot.drivetrain.odometry.deltax);
-            telemetry.addData("deltay",Agobot.drivetrain.odometry.deltay);
-            telemetry.addData("lEncoder Run Mode",Agobot.drivetrain.odometry.lEncoder.getMode().toString());
-            telemetry.addData("deltaDisp",Agobot.drivetrain.odometry.deltaDisp);
-            telemetry.addData("Position = deltaDisp?", Agobot.drivetrain.odometry.currentPosition().equals(Agobot.drivetrain.odometry.deltaDisp));*/
+
 
             telemetry.update();
 

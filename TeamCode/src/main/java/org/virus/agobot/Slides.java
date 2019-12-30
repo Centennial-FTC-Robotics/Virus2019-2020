@@ -67,7 +67,7 @@ public class Slides extends Subsystem {
     public void slidePower(double power){
         //restrict slide movement between min and max values
         int slidePos = getPosition();
-        if(slidePos <= -10 || slidePos >= slideMax){
+        if((slidePos <= 0 && power < 0)||(slidePos >= slideMax && power > 0)){
             slideRight.setPower(0);
             slideLeft.setPower(0);
         }else{
