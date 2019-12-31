@@ -13,6 +13,8 @@ import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 import org.virus.util.Vector2D;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
+
 public class Odometry extends Subsystem {
     public ExpansionHubMotor lEncoder;
     public ExpansionHubMotor rEncoder;
@@ -41,10 +43,12 @@ public class Odometry extends Subsystem {
     public double deltax;
     public double deltay;
 
+    public double headingCorrection=0;
+
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
-    final static double RADIUS = 14.553420608108109/2.0   * 928.0/1080.0;
-    final static double BENCODER_OFFSET = 5079.53754590155;
+    final static double RADIUS = 12.80873957/2.0 * 722.0/720.0;/*14.553420608108109/2.0   * 928.0/1080.0;*/
+    final static double BENCODER_OFFSET = 4956.20177;
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
 
@@ -116,7 +120,7 @@ public class Odometry extends Subsystem {
         bEncoderPrevious = getbEncoderCounts();
 
         deltaHeading = (deltarEncoder - deltalEncoder)/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH); //it's in radians
-        heading = normalizeRadians(heading + deltaHeading);
+        heading = /*normalizeRadians(heading + deltaHeading);*/ normalizeRadians((getrEncoderCounts()-getlEncoderCounts())/(2.0*RADIUS*ENCODER_COUNTS_PER_INCH) + startHeading+headingCorrection);
 
 //        deltaHorizontal = deltabEncoder - (deltaHeading*BENCODER_OFFSET); //takes away the bEncoder counts that were a result of turning
 //
@@ -156,6 +160,9 @@ public class Odometry extends Subsystem {
     public double relativeHeading(){ return Math.toDegrees(normalizeRadians(heading - startHeading)); }//degrees
     public void setHeading(double heading){ //degrees
         this.heading = normalizeRadians(Math.toRadians(heading));
+    }
+    public void setHeadingCorrection(double correct){
+        headingCorrection = normalizeRadians(correct-this.heading+headingCorrection);
     }
     public void setRelativeHeading(double relativeHeading){
         heading = normalizeRadians(Math.toRadians(relativeHeading) + startHeading);
