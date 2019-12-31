@@ -84,6 +84,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         if(opMode.getClass()== LinearOpMode.class){
             while (((LinearOpMode)opMode).opModeIsActive() && !imu.isGyroCalibrated()) ;
         }
+        opMode.telemetry.addData("imu", imu.isSystemCalibrated());
         /*try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -98,11 +99,15 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         initialPitch = currentOrientation.thirdAngle;
     }
     public Orientation updateOrientation() {
-        //currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return currentOrientation;
     }
     public double imuHeading() {
         currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        opMode.telemetry.addData("1", currentOrientation.firstAngle);
+        opMode.telemetry.addData("2", currentOrientation.secondAngle);
+        opMode.telemetry.addData("3", currentOrientation.thirdAngle);
+        opMode.telemetry.update();
         return currentOrientation.firstAngle;
     }
     public Vector2D updatePosition(){
@@ -110,11 +115,9 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             currentOrientation.firstAngle = (float)normalizeAngle(currentOrientation.firstAngle - initialHeading);
             odometry.setRelativeHeading(currentOrientation.firstAngle);
-            odometry.updatePosition();
-        } else {
-            odometry.updatePosition();
         }
-        currentOrientation.firstAngle = (float) odometry.relativeHeading();
+        odometry.updatePosition();
+        //currentOrientation.firstAngle = (float) odometry.relativeHeading();
         heading = odometry.currentHeading();
         odoLoopCounter++;
         return odometry.currentPosition();
@@ -428,6 +431,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         opMode.telemetry.addData("Current Position", currentPosition);
         opMode.telemetry.addData("new Position", newPosition);
         opMode.telemetry.addData("Change in position (rotated)", deltaPos);
+        opMode.telemetry.addData("heading", getHeading());
 
         robotCentricMvmt = new Vector2D((double) xController.getValue((float) -deltaPos.getComponent(1)), (double) yController.getValue((float) deltaPos.getComponent(0).doubleValue()));
         steerMag = headingController.getValue((float)angleDifference(newHeading, getHeading()));

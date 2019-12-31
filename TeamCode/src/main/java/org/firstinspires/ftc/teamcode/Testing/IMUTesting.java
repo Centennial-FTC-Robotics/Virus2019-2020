@@ -13,8 +13,9 @@ public class IMUTesting extends LinearOpMode {
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
         while(true){
-            telemetry.addData("IMU Heading", Agobot.drivetrain.imuHeading());
-            telemetry.update();
+            //telemetry.addData("IMU Heading", ;
+            //telemetry.update();
+            Agobot.drivetrain.imuHeading();
         }
     }
 }
