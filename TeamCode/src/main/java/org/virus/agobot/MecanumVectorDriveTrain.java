@@ -429,13 +429,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         deltaPos.sub(currentPosition);
         deltaPos.rotate(-Math.toRadians(getHeading()));
         opMode.telemetry.addData("Current Position", currentPosition);
-        opMode.telemetry.addData("new Position", newPosition);
-        opMode.telemetry.addData("Change in position (rotated)", deltaPos);
-        opMode.telemetry.addData("heading", getHeading());
+//        opMode.telemetry.addData("new Position", newPosition);
+//        opMode.telemetry.addData("Change in position (rotated)", deltaPos);
 
         robotCentricMvmt = new Vector2D((double) xController.getValue((float) -deltaPos.getComponent(1)), (double) yController.getValue((float) deltaPos.getComponent(0).doubleValue()));
         steerMag = headingController.getValue((float)angleDifference(newHeading, getHeading()));
-        opMode.telemetry.addData("Robot Centric Movement", robotCentricMvmt);
+//        opMode.telemetry.addData("Robot Centric Movement", robotCentricMvmt);
 
         double leftx = robotCentricMvmt.getComponent(0);
         double lefty = robotCentricMvmt.getComponent(1);
