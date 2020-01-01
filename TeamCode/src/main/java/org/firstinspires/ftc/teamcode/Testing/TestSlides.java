@@ -18,7 +18,9 @@ public class TestSlides extends LinearOpMode {
 
         while(opModeIsActive()) {
             Agobot.slides.slidePower(gamepad2.left_stick_y);
-
+            if(gamepad1.b){
+                Agobot.slides.slides(600);
+            }
             telemetry.addData("Gamepad 2 Left Stick Y Value", gamepad2.left_stick_y);
             telemetry.addData("Left Slide", Agobot.slides.slideLeft.getCurrentPosition());
             telemetry.addData("Right Slide", Agobot.slides.slideRight.getCurrentPosition());

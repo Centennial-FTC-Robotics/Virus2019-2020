@@ -48,8 +48,8 @@ public class Slides extends Subsystem {
         slideLeft.setTargetPosition(position);
         slideRight.setTargetPosition(position);
         //set speed of slides
-        slideLeft.setPower(0.8);
-        slideRight.setPower(0.8);
+        slideLeft.setPower(1);
+        slideRight.setPower(1);
         //wait until slides are within error
         while (Math.abs(getPosition()-position) > error);
         //stop slides
