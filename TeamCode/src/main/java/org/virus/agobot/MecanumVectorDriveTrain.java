@@ -31,7 +31,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 public class MecanumVectorDriveTrain extends Drivetrain {
     public static final float TRACKWIDTHIN =13.25f;
     //standard 4 motor drivetrain
-    private int IMUUPDATERATE=100;
+    private int IMUUPDATERATE=50;
     private int odoLoopCounter=0;
     private ExpansionHubMotor lFront;
     private ExpansionHubMotor rFront;

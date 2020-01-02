@@ -9,7 +9,7 @@ import org.virus.util.Vector2D;
 @Autonomous(name = "Red Depot", group = "Auto")
 public class RedDepot extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
-    private double startHeading = 180; //straight left
+    private double startHeading = 270; //straight left
     private Vector2D skyStoneLocation;
 
     @Override
@@ -25,7 +25,7 @@ public class RedDepot extends LinearOpMode {
         }
 
         //get ready to position to start scanning
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -60), startHeading, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, -60), startHeading, 0.6)){
 
         }
 
@@ -36,17 +36,17 @@ public class RedDepot extends LinearOpMode {
         //TODO: grab skystone
 
         //recenter position, face backwards to be ready to place skystone
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, -40), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, -40), 0, 0.6)){
 
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 40), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, 40), 0, 0.6)){
 
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(33, 40), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 40), 0, 0.6)){
             //TODO: place skystone
             //TODO: bring dragger down
         }
@@ -62,7 +62,7 @@ public class RedDepot extends LinearOpMode {
         }
 
         //park on red tape, closer to left side
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 0), 270, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, 0), 270, 0.6)){
 
         }
     }
