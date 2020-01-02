@@ -15,7 +15,7 @@ public class Intake extends Subsystem {
     private ElapsedTime deployTimer = new ElapsedTime();
     private boolean intakeDeploying = false; //is intake currently deploying?
     private boolean intakeDeployed = false; //is intake already deployed?
-    final static double TICKS_PER_SEC_TO_SPEED = 1;
+    final static double TICKS_PER_SEC_TO_POWER = 3350; //only true if motor power is 0.85 or less
     private double prevLeft = 0;
     private double prevRight = 0;
 
@@ -71,11 +71,15 @@ public class Intake extends Subsystem {
         return !intakeDeployed; //so that it returns true until it's done, when it returns false
     }
 
-    public boolean detectJam(DcMotorEx motor, double intendedSpeed){
-        double threshold = 0.3;
-        double actualSpeed = motor.getVelocity()/TICKS_PER_SEC_TO_SPEED;
-
-        return Math.abs(intendedSpeed - actualSpeed) > threshold; //
+    public boolean detectJam(DcMotorEx motor, double intendedPower){
+        double actualSpeed = motor.getVelocity();
+        double intendedSpeed;
+        if(intendedPower <= 0.85){
+            intendedSpeed = intendedPower*TICKS_PER_SEC_TO_POWER;
+        }else{
+            intendedSpeed = 2860;
+        }
+        return intendedSpeed/actualSpeed > 2; //
     }
 
 }

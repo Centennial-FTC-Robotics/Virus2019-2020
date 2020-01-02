@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.openftc.revextensions2.ExpansionHubMotor;
+import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 
 public class Slides extends Subsystem {
@@ -31,7 +32,10 @@ public class Slides extends Subsystem {
         slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
+    public int getPosition(){
+        Robot.updateHub2Data();
+        return (Robot.getHub2Data().getMotorCurrentPosition(slideLeft) + Robot.getHub2Data().getMotorCurrentPosition(slideLeft))/2;
+    }
     //position in encoder counts
     public boolean slides(int position){
         slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -44,10 +48,10 @@ public class Slides extends Subsystem {
         slideLeft.setTargetPosition(position);
         slideRight.setTargetPosition(position);
         //set speed of slides
-        slideLeft.setPower(0.8);
-        slideRight.setPower(0.8);
+        slideLeft.setPower(1);
+        slideRight.setPower(1);
         //wait until slides are within error
-        while (Math.abs(slideLeft.getCurrentPosition()-position) > error);
+        while (Math.abs(getPosition()-position) > error);
         //stop slides
         slideLeft.setPower(0);
         slideRight.setPower(0);
@@ -62,7 +66,8 @@ public class Slides extends Subsystem {
     //TODO: might need to make method use slideLeft instead (adjust while testing)
     public void slidePower(double power){
         //restrict slide movement between min and max values
-        if(-slideRight.getCurrentPosition() <= -5 || -slideRight.getCurrentPosition() >= slideMax){
+        int slidePos = getPosition();
+        if((slidePos <= 0 && power < 0)||(slidePos >= slideMax && power > 0)){
             slideRight.setPower(0);
             slideLeft.setPower(0);
         }else{

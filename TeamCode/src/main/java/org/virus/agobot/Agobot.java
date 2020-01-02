@@ -13,18 +13,22 @@ public class Agobot extends Robot {
     public static Slides slides = new Slides();
     public static Intake intake = new Intake();
     public static Grabber grabber = new Grabber();
-    public static Arm  arm = new Arm();
+    public static Arm arm = new Arm();
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, tracker, slides, intake, grabber, arm};
+    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, tracker};
 
     public static void initialize(LinearOpMode opMode){
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
-        //setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
+        setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
         updateHub1Data();
-        //readHub2Data();
-        for(int i=0; i<subsystems.length; i++){
+        updateHub2Data();
+        for(int i=0; i<subsystems.length-1; i++){
             subsystems[i].initialize(opMode);
         }
+    }
+    public static void initializeWithVision(LinearOpMode opMode){
+        initialize(opMode);
+        tracker.initialize(opMode);
     }
 }

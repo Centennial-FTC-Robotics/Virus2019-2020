@@ -1,15 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOP", name = "MechDrive")
-public class MechDrive extends LinearOpMode {
+@TeleOp(group = "TeleOP", name = "Odometry Information")
+public class OdoInfo extends LinearOpMode {
 
     Vector2D leftStick;
     Vector2D rightStick;
@@ -17,32 +15,34 @@ public class MechDrive extends LinearOpMode {
     double leftx;
     Vector2D motorSpeeds;
 
+    // testing
+    private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
+    private double startHeading = 180; //straight left
+
     @Override
     public void runOpMode() throws InterruptedException {
 
         Agobot.initialize(this);
-        Agobot.drivetrain.setAllRunUsingEncoders();
+//        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
-
         while(opModeIsActive()) {
-            updateControllerValues();
-            double diagSpeed1 = motorSpeeds.getComponent(0);
-            double diagSpeed2 = motorSpeeds.getComponent(1);
+            //updateControllerValues();
+            //Agobot.drivetrain.runMotors(0,0.5,0,-0.5, 0);
 
-            if (leftx!=0 || lefty!=0){
-                telemetry.addData("lFront:", diagSpeed1);
-                telemetry.addData("lBack:", diagSpeed2);
-                telemetry.addData("rFront:", diagSpeed2);
-                telemetry.addData("rBack:", diagSpeed1);
-                telemetry.update();
-                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
-            } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
-            }
+            telemetry.addData("Position: ", Agobot.drivetrain.updatePosition());
+            telemetry.addData("Relative Heading: ", Agobot.drivetrain.getHeading());
+            telemetry.addData("Heading: ", Agobot.drivetrain.odometry.currentHeading());
 
-            telemetry.addData("GamePad 1:", (gamepad1 == null));
+            telemetry.addData("lEncoder:", Agobot.drivetrain.odometry.getlEncoderCounts());
+            telemetry.addData("rEncoder:", Agobot.drivetrain.odometry.getrEncoderCounts());
+            telemetry.addData("bEncoder:", Agobot.drivetrain.odometry.getbEncoderCounts());
+
+
+            telemetry.update();
+
         }
     }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@Autonomous
+@Autonomous(name = "Blue Depot", group = "Auto")
 public class BlueDepot extends LinearOpMode {
     //TODO
 

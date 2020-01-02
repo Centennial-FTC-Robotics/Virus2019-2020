@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,6 +15,7 @@ public class TestPointMoves extends LinearOpMode {
         Agobot.initialize(this);
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(0,0),90);
         waitForStart();
 
         //ExampleBot.horizontalSlides.move(500);
@@ -23,22 +24,22 @@ public class TestPointMoves extends LinearOpMode {
           //  ExampleBot.drivetrain.moveLeftTest();
         //}
 
-        while (Agobot.drivetrain.goToPosition(new Vector2D(12,12),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(24,24),90,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
-        while (Agobot.drivetrain.goToPosition(new Vector2D(-12,12),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(-24,24),90,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
-        while (Agobot.drivetrain.goToPosition(new Vector2D(-12,-12),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(-24,-24),180,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
-        while (Agobot.drivetrain.goToPosition(new Vector2D(12,-12),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(24,-24),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
-        while (Agobot.drivetrain.goToPosition(new Vector2D(12,12),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(24,24),270,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
-        while (Agobot.drivetrain.goToPosition(new Vector2D(0,0),0,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
+        while (Agobot.drivetrain.goToPosition(new Vector2D(0,0),90,.6)) { //moves the robot along the path, while loop ends when path is complete (move method returns false)
             //ExampleBot.verticalSlides.move(200); //moves the vertical slides while the robot is following the path
         }
 

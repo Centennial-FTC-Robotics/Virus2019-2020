@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,7 +18,9 @@ public class TestSlides extends LinearOpMode {
 
         while(opModeIsActive()) {
             Agobot.slides.slidePower(gamepad2.left_stick_y);
-
+            if(gamepad1.b){
+                Agobot.slides.slides(600);
+            }
             telemetry.addData("Gamepad 2 Left Stick Y Value", gamepad2.left_stick_y);
             telemetry.addData("Left Slide", Agobot.slides.slideLeft.getCurrentPosition());
             telemetry.addData("Right Slide", Agobot.slides.slideRight.getCurrentPosition());
