@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.virus.agobot.Agobot;
+import org.virus.agobot.ElementLocator;
 import org.virus.util.Vector2D;
+
+import java.util.Arrays;
 
 @Autonomous(name = "Red Depot", group = "Auto")
 public class RedDepot extends LinearOpMode {
@@ -14,9 +18,11 @@ public class RedDepot extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Agobot.initialize(this);
+        Agobot.initializeWithVision(this);
+
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+
         waitForStart();
 
         //go towards depot
@@ -24,15 +30,23 @@ public class RedDepot extends LinearOpMode {
 
         }
 
-        //get ready to position to start scanning
-        while(Agobot.drivetrain.goToPosition(new Vector2D(39, -60), startHeading, 0.6)){
+        //get ready to pick up skystone
+        while(Agobot.drivetrain.goToPosition(new Vector2D(54, -60), startHeading, 0.6)){
 
         }
 
         //TODO: scan stones
+        ElapsedTime t = new ElapsedTime();
+        while (opModeIsActive() && t.seconds() < 3) {}
+        telemetry.addData("Sky stone positions", Arrays.toString(Agobot.tracker.relativeSkyStonePos()));
+        telemetry.update();
+        t.reset();
+        while (opModeIsActive() && t.seconds() < 3) {}
+        Agobot.tracker.deactivate();
 
-        //Agobot.tracker.getTensorFlowObject().getUpdatedRecognitions();
-        //skyStoneLocation = new Vector2D(21, )
+        while(Agobot.drivetrain.goToPosition(new Vector2D(48, -60), 225, 0.6)){
+
+        }
 
         //TODO: grab skystone
 

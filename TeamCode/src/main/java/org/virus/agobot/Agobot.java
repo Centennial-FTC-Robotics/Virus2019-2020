@@ -19,11 +19,13 @@ public class Agobot extends Robot {
     static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, tracker};
 
     public static void initialize(LinearOpMode opMode){
+
         setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
         setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
         updateHub1Data();
         updateHub2Data();
-        for(int i=0; i<subsystems.length-1; i++){
+
+        for(int i=0; i < subsystems.length-1; i++){
             subsystems[i].initialize(opMode);
         }
     }

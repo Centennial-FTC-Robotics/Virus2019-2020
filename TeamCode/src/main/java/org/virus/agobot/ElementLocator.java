@@ -84,6 +84,12 @@ public class ElementLocator extends Subsystem {
         }
     }
 
+    public void deactivate() {
+
+        tfod.deactivate();
+        targetsSkyStone.deactivate();
+    }
+
     private void initVuforia() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -260,6 +266,76 @@ public class ElementLocator extends Subsystem {
         return false;
     }
 
+    public double recognitionWidth(String recognition) {
+
+        double avgWidth = 0;
+        double recognitions = 0;
+
+        if (opModeReference.opModeIsActive()) {
+
+            if (tfod != null) {
+
+                tfod.activate();
+            }
+
+            if (tfod != null) {
+                // put good code in here to check if there are skystones
+                List<Recognition> elements = tfod.getRecognitions();
+//                opModeReference.telemetry.addData("elements", elements);
+                if (elements != null) {
+                    for (Recognition r : elements) {
+                        if (r.getLabel().toUpperCase().equals(recognition.toUpperCase())) {
+
+                            avgWidth += r.getHeight();
+                            recognitions++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return (avgWidth / recognitions);
+    }
+
+    public String[] relativeSkyStonePos() {
+
+        ArrayList<String> recognizedStones = new ArrayList<String>();
+
+        if (opModeReference.opModeIsActive()) {
+
+            if (tfod != null) {
+
+                tfod.activate();
+            }
+
+            if (tfod != null) {
+                // put good code in here to check if there are skystones
+                List<Recognition> elements = tfod.getRecognitions();
+//                opModeReference.telemetry.addData("elements", elements);
+                if (elements != null) {
+                    for (Recognition r : elements) {
+                        if (r.getLabel().toUpperCase().equals(LABEL_SECOND_ELEMENT.toUpperCase()) && r.getHeight() > 300) {
+
+                            String relativePos = "Middle";
+
+                            if (r.getBottom() < 150) {
+
+                                relativePos = "Left";
+                            } else if (r.getTop() > 1050) {
+
+                                relativePos = "Right";
+                            }
+
+                            recognizedStones.add(relativePos);
+                        }
+                    }
+                }
+            }
+        }
+
+        return recognizedStones.toArray(new String[0]);
+    }
+
     public ArrayList<Vector2D>  getSkyStonePositions() {
 
         ArrayList<Vector2D> skyStonePositions = new ArrayList<Vector2D>();
@@ -400,7 +476,7 @@ public class ElementLocator extends Subsystem {
         int t = 0;
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
-                //opModeReference.telemetry.addData("Visible Target", trackable.getName());
+                opModeReference.telemetry.addData("Visible Target", trackable.getName());
 
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
                 locationTransforms[t] = robotLocationTransform;
