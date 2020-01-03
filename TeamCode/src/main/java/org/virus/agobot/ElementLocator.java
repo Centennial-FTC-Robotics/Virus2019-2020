@@ -21,6 +21,7 @@ import java.util.List;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
 public class ElementLocator extends Subsystem {
@@ -59,7 +60,7 @@ public class ElementLocator extends Subsystem {
     private boolean targetVisible = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false;
-    private float phoneXRotate = 90; // robot initially facing (positive?) y direction, so the phone is rotated on a perpendicular axis, the x axis, 90 degrees to face forward
+    private float phoneXRotate = 0; // robot initially facing (positive?) y direction, so the phone is rotated on a perpendicular axis, the x axis and thus , 90 degrees to face forward
     private float phoneYRotate = 0;
     private float phoneZRotate = 0;
 

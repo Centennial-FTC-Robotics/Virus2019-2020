@@ -33,7 +33,7 @@ public class VuforiaTesting extends LinearOpMode {
                     telemetry.addData("Camera Z-axis", "X %.3f : %.3f Z %.3f", data[8], data[9], data[10]);
                 }
             }
-            
+
             telemetry.update();
         }
     }
