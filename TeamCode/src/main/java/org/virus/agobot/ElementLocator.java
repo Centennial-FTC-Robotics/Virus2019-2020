@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -55,7 +56,7 @@ public class ElementLocator extends Subsystem {
     private TFObjectDetector tfod;
     private VuforiaTrackables targetsSkyStone;
     List<VuforiaTrackable> allTrackables;
-    List<Vector2D> reportedLocations;
+    List<VectorF> reportedLocations;
 
     private boolean targetVisible = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
@@ -145,7 +146,7 @@ public class ElementLocator extends Subsystem {
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
 
-        reportedLocations = new ArrayList<Vector2D>();
+        reportedLocations = new ArrayList<VectorF>();
 
         stoneTarget.setLocation(OpenGLMatrix
                 .translation(0, 0, stoneY)
@@ -214,7 +215,7 @@ public class ElementLocator extends Subsystem {
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, phoneXRotate, phoneYRotate, phoneZRotate));
+                .multiplied(Orientation.getRotationMatrix(INTRINSIC, XYZ, DEGREES, phoneXRotate, phoneYRotate, phoneZRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -276,10 +277,10 @@ public class ElementLocator extends Subsystem {
 
                         if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
 
-                            Vector2D robotPos = getRobotPos();
+                            VectorF robotPos = getRobotPos();
 
                             double angle = r.estimateAngleToObject(AngleUnit.RADIANS);
-                            double distanceToStones = robotPos.getComponent(1) - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
+                            double distanceToStones = robotPos.getData()[1] - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
                             double specificStoneDist = distanceToStones / Math.cos(angle);
 
                             Vector2D relativeStonePos = new Vector2D(angle, specificStoneDist, true);
@@ -294,11 +295,11 @@ public class ElementLocator extends Subsystem {
         return skyStonePositions;
     }
 
-    public Vector2D getRobotPos() {
+    public VectorF getRobotPos() {
 
         updateRobotPositions();
 
-        Vector2D robotPos = null;
+        VectorF robotPos = null;
 
         double xTolerance = 10;
         double yTolerance = 10;
@@ -306,26 +307,26 @@ public class ElementLocator extends Subsystem {
         if (reportedLocations.size() > 0) {
 
             int maxToleranceCount = 0;
-            ArrayList<Vector2D>  maxWithinTolerance = new ArrayList<Vector2D>();
+            ArrayList<VectorF>  maxWithinTolerance = new ArrayList<VectorF>();
 
             for (int v = 0; v < reportedLocations.size(); v++) {
 
                 int toleranceCount = 0;
-                ArrayList<Vector2D> withinTolerance = new ArrayList<Vector2D>();
-                Vector2D currentVector = reportedLocations.get(v);
+                ArrayList<VectorF> withinTolerance = new ArrayList<VectorF>();
+                VectorF currentVector = reportedLocations.get(v);
 
                 for (int c = 0; c < reportedLocations.size(); c++) {
                     if (c != v) {
-                        Vector2D compared = reportedLocations.get(c);
+                        VectorF compared = reportedLocations.get(c);
                         boolean withinX = false;
                         boolean withinY = false;
 
-                        if (Math.abs(compared.getComponent(0) - currentVector.getComponent(0)) < xTolerance) {
+                        if (Math.abs(compared.getData()[0] - currentVector.getData()[0]) < xTolerance) {
 
                             withinX = true;
                         }
 
-                        if (Math.abs(compared.getComponent(1) - currentVector.getComponent(1)) < yTolerance) {
+                        if (Math.abs(compared.getData()[1] - currentVector.getData()[1]) < yTolerance) {
 
                             withinY = true;
                         }
@@ -347,14 +348,14 @@ public class ElementLocator extends Subsystem {
                 }
             }
 
-            robotPos = new Vector2D(0, 0);
+            robotPos = new VectorF(0, 0);
 
-            for (Vector2D w: maxWithinTolerance) {
+            for (VectorF w: maxWithinTolerance) {
 
                 robotPos.add(w);
             }
 
-            robotPos.scale( 1.0 / maxWithinTolerance.size());
+            robotPos.multiply( (float) (1.0 / maxWithinTolerance.size()));
         }
 
         return robotPos;
@@ -369,21 +370,22 @@ public class ElementLocator extends Subsystem {
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
 
-                    int lastLocDataIndex = -1;
-                    for (int r = 0; r < reportedLocations.size(); r++) {
-                        if (reportedLocations.get(r).getName().equals(trackable.getName())) {
-                            lastLocDataIndex = r;
-                        }
-                    }
+//                    int lastLocDataIndex = -1;
+//                    for (int r = 0; r < reportedLocations.size(); r++) {
+//                        if (reportedLocations.get(r).getName().equals(trackable.getName())) {
+//                            lastLocDataIndex = r;
+//                        }
+//                    }
 
-                    Vector2D location = new Vector2D(robotLocationTransform.toVector().get(0), robotLocationTransform.toVector().get(1));
+                    VectorF location = robotLocationTransform.toVector();
+                    reportedLocations.add(location);
 
-                    if (lastLocDataIndex == -1) {
-                        reportedLocations.add(location);
-                    } else {
-
-                        reportedLocations.set(lastLocDataIndex, location);
-                    }
+//                    if (lastLocDataIndex == -1) {
+//                        reportedLocations.add(location);
+//                    } else {
+//
+//                        reportedLocations.set(lastLocDataIndex, location);
+//                    }
                 }
             }
 

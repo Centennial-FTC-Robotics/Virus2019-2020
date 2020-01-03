@@ -30,6 +30,7 @@ public class RedDepot extends LinearOpMode {
         }
 
         //TODO: scan stones
+
         //Agobot.tracker.getTensorFlowObject().getUpdatedRecognitions();
         //skyStoneLocation = new Vector2D(21, )
 
