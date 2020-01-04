@@ -14,9 +14,10 @@ public class Agobot extends Robot {
     public static Intake intake = new Intake();
     public static Grabber grabber = new Grabber();
     public static Arm arm = new Arm();
+    public static FoundationDragger dragger = new FoundationDragger();
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, tracker};
+    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger,tracker};
 
     public static void initialize(LinearOpMode opMode){
 

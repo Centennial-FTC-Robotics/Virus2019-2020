@@ -25,7 +25,7 @@ public class VuforiaTesting extends LinearOpMode {
 //            telemetry.addData("sky Stone Positions", tracker.getSkyStonePositions());
 
             OpenGLMatrix[] transforms = tracker.getRobotLocationTransform();
-            
+
             for (int i = 0; i < transforms.length; i++) {
                 OpenGLMatrix locationTransform = transforms[i];
 
