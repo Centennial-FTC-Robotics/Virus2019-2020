@@ -91,41 +91,41 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input)
         {
-            rectCrop = new Rect(new Point(200,300) , new Point(500,600));
-            Rect regStoneCrop = new Rect(new Point(200, 0), new Point(500, 600));
+            rectCrop = new Rect(new Point(150,375) , new Point(1050,525));
+            //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
             //cropped = new Mat(input, rectCrop);
             Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
-            Mat croppedGrayScale = new Mat(gray, rectCrop);
+//            Mat croppedGrayScale = new Mat(gray, rectCrop);
 
-            double skystoneAverage = 0;
+//            double skystoneAverage = 0;
+//
+//            for (int i = 0; i < croppedGrayScale.rows(); i++) {
+//                for (int j = 0; j < croppedGrayScale.cols(); j++) {
+//
+//                    skystoneAverage += croppedGrayScale.get(i, j)[0];
+//                }
+//            }
+//
+//            skystoneAverage /= (croppedGrayScale.cols() * croppedGrayScale.rows());
+//
+//
+//            Mat croppedGrayScaleStone = new Mat(gray, regStoneCrop);
+//
+//            double stoneAverage = 0;
+//
+//            for (int i = 0; i < croppedGrayScaleStone.rows(); i++) {
+//                for (int j = 0; j < croppedGrayScaleStone.cols(); j++) {
+//
+//                    stoneAverage += croppedGrayScaleStone.get(i, j)[0];
+//                }
+//            }
+//
+//            stoneAverage /= (croppedGrayScaleStone.cols() * croppedGrayScaleStone.rows());
+//
+//            opMode.telemetry.addData("Skystone Strip Average", skystoneAverage);
+//            opMode.telemetry.addData("Stone, Strip Average", stoneAverage);
 
-            for (int i = 0; i < croppedGrayScale.rows(); i++) {
-                for (int j = 0; j < croppedGrayScale.cols(); j++) {
-
-                    skystoneAverage += croppedGrayScale.get(i, j)[0];
-                }
-            }
-
-            skystoneAverage /= (croppedGrayScale.cols() * croppedGrayScale.rows());
-
-
-            Mat croppedGrayScaleStone = new Mat(gray, regStoneCrop);
-
-            double stoneAverage = 0;
-
-            for (int i = 0; i < croppedGrayScaleStone.rows(); i++) {
-                for (int j = 0; j < croppedGrayScaleStone.cols(); j++) {
-
-                    stoneAverage += croppedGrayScaleStone.get(i, j)[0];
-                }
-            }
-
-            stoneAverage /= (croppedGrayScaleStone.cols() * croppedGrayScaleStone.rows());
-
-            opMode.telemetry.addData("Skystone Strip Average", skystoneAverage);
-            opMode.telemetry.addData("Stone, Strip Average", stoneAverage);
-
-            Imgproc.threshold(gray, thresh, 15, 255, THRESH_BINARY_INV);
+            Imgproc.threshold(gray, thresh, 90, 255, THRESH_BINARY_INV);
             cropped = new Mat(thresh, rectCrop);
 
             double sum = 0;
@@ -139,13 +139,14 @@ public class StripDetector {
                     }
                 }
             }
-            double weightedAvg= sum/(double)(total);
-            opMode.telemetry.addData("weighted skystoneAverage",weightedAvg);
+            double weightedAvg = sum/(double)(total);
+            opMode.telemetry.addData("weighted skystone Average",weightedAvg);
             opMode.telemetry.update();
 
             distFromCenter = weightedAvg;
 
             Imgproc.rectangle(thresh, rectCrop, new Scalar(128), 3);
+            //Imgproc.rectangle(thresh, regStoneCrop, new Scalar(128), 3);
             //rectUnCrop = new Rect(new Point(0,0) , new Point(319,239));
             //unCropped = new Mat(thresh, rectUnCrop);
 

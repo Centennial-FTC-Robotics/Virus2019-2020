@@ -318,10 +318,10 @@ public class ElementLocator extends Subsystem {
 
         String relativePos = "Middle";
 
-        if (stripCenterDist < 150) {
+        if (stripCenterDist < -400) {
 
             relativePos = "Left";
-        } else if (stripCenterDist > 1050) {
+        } else if (stripCenterDist > 400) {
 
             relativePos = "Right";
         }
