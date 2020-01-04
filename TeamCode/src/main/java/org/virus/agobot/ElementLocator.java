@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.virus.superclasses.Subsystem;
 import org.virus.util.Vector2D;
+import org.virus.vision.StripDetector;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -54,6 +55,8 @@ public class ElementLocator extends Subsystem {
     VuforiaLocalizer.Parameters parameters;
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
+    private StripDetector detector;
+
     private VuforiaTrackables targetsSkyStone;
     List<VuforiaTrackable> allTrackables;
     List<VectorF> reportedLocations;
@@ -76,12 +79,18 @@ public class ElementLocator extends Subsystem {
 
         opModeReference = opMode;
 
+        // Vuforia Initialization
         initVuforia();
+
+        // Tensorflow Initialization
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
         } else {
             opModeReference.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
         }
+
+        // Custom OpenCV initialization
+        initOpenCV();
     }
 
     public void deactivate() {
@@ -231,6 +240,12 @@ public class ElementLocator extends Subsystem {
         targetsSkyStone.activate();
     }
 
+    public void initOpenCV() {
+
+        detector = new StripDetector();
+        detector.initialize(opModeReference);
+    }
+
     public VuforiaLocalizer getVuforia() {
         return vuforia;
     }
@@ -295,6 +310,23 @@ public class ElementLocator extends Subsystem {
         }
 
         return (avgWidth / recognitions);
+    }
+
+    public String relativeSkyStonePosOpenCV() {
+
+        double stripCenterDist = detector.getCurrentDist();
+
+        String relativePos = "Middle";
+
+        if (stripCenterDist < 150) {
+
+            relativePos = "Left";
+        } else if (stripCenterDist > 1050) {
+
+            relativePos = "Right";
+        }
+
+        return relativePos;
     }
 
     public String[] relativeSkyStonePos() {

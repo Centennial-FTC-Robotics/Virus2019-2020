@@ -12,6 +12,6 @@ public class OCVTest extends LinearOpMode {
         StripDetector detector = new StripDetector();
         detector.initialize(this);
         waitForStart();
-        while (true);
+        while (opModeIsActive());
     }
 }

@@ -2,7 +2,6 @@ package org.virus.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -21,7 +20,9 @@ public class StripDetector {
     OpenCvCamera phoneCam;
     OpMode opMode;
 
-    public void initialize(OpMode opMode){
+    private double distFromCenter = 0;
+
+    public void initialize(OpMode opMode) {
         this.opMode=opMode;
         int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -52,11 +53,25 @@ public class StripDetector {
          * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
          * away from the user.
          */
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
-
+        activate();
     }
-    class SamplePipeline extends OpenCvPipeline
-    {
+
+    public void activate() {
+
+        phoneCam.startStreaming(1280, 720, OpenCvCameraRotation.SIDEWAYS_LEFT);
+    }
+
+    public void deactivate() {
+
+        phoneCam.stopStreaming();
+    }
+
+    public double getCurrentDist() {
+
+        return distFromCenter;
+    }
+
+    class SamplePipeline extends OpenCvPipeline {
         /*
          * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
          * highly recommended to declare them here as instance variables and re-use them for
@@ -76,10 +91,41 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input)
         {
-            rectCrop = new Rect(new Point(0,0) , new Point(230,80));
-            cropped = new Mat(input, rectCrop);
+            rectCrop = new Rect(new Point(200,300) , new Point(500,600));
+            Rect regStoneCrop = new Rect(new Point(200, 0), new Point(500, 600));
+            //cropped = new Mat(input, rectCrop);
             Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.threshold(gray, thresh, 10, 255, THRESH_BINARY_INV);
+            Mat croppedGrayScale = new Mat(gray, rectCrop);
+
+            double skystoneAverage = 0;
+
+            for (int i = 0; i < croppedGrayScale.rows(); i++) {
+                for (int j = 0; j < croppedGrayScale.cols(); j++) {
+
+                    skystoneAverage += croppedGrayScale.get(i, j)[0];
+                }
+            }
+
+            skystoneAverage /= (croppedGrayScale.cols() * croppedGrayScale.rows());
+
+
+            Mat croppedGrayScaleStone = new Mat(gray, regStoneCrop);
+
+            double stoneAverage = 0;
+
+            for (int i = 0; i < croppedGrayScaleStone.rows(); i++) {
+                for (int j = 0; j < croppedGrayScaleStone.cols(); j++) {
+
+                    stoneAverage += croppedGrayScaleStone.get(i, j)[0];
+                }
+            }
+
+            stoneAverage /= (croppedGrayScaleStone.cols() * croppedGrayScaleStone.rows());
+
+            opMode.telemetry.addData("Skystone Strip Average", skystoneAverage);
+            opMode.telemetry.addData("Stone, Strip Average", stoneAverage);
+
+            Imgproc.threshold(gray, thresh, 15, 255, THRESH_BINARY_INV);
             cropped = new Mat(thresh, rectCrop);
 
             double sum = 0;
@@ -94,8 +140,11 @@ public class StripDetector {
                 }
             }
             double weightedAvg= sum/(double)(total);
-            opMode.telemetry.addData("weighted average",weightedAvg);
+            opMode.telemetry.addData("weighted skystoneAverage",weightedAvg);
             opMode.telemetry.update();
+
+            distFromCenter = weightedAvg;
+
             Imgproc.rectangle(thresh, rectCrop, new Scalar(128), 3);
             //rectUnCrop = new Rect(new Point(0,0) , new Point(319,239));
             //unCropped = new Mat(thresh, rectUnCrop);
