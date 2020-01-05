@@ -59,8 +59,11 @@ public class FieldCentricTeleOp extends LinearOpMode {
             }else{
                 Agobot.intake.runIntake(0);
             }
-            //TODO: shortcut buttons (automatic foundation pulling)
-            //TODO: snap 90 for driver 1
+
+            // automatic drag implemented?
+            //Agobot.drivetrain.autoDrag();
+            //snap 90 for driver 1 implemented?
+            //Agobot.drivetrain.snap90();
             //TODO: dpad stone heights
         }
     }

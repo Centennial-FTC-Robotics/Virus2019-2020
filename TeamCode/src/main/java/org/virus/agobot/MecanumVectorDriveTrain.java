@@ -425,7 +425,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         return goToPosition(newPosition,newHeading,maxSpeed,.75);
     }
 
-
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
         Vector2D deltaPos = new Vector2D(newPosition);
         deltaPos.sub(currentPosition);
@@ -455,5 +454,33 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             difference += 360.0;
         }
         return difference;
+    }
+
+    static Vector2D finalDragPos;
+
+    public boolean autoDrag() {
+
+        if (!Agobot.dragger.isDragging()) {
+            Agobot.dragger.drag(true);
+
+            Vector2D movementVector = new Vector2D(odometry.currentHeading(), 24);
+            movementVector.rotate(Math.PI);
+
+            finalDragPos = new Vector2D(odometry.currentPosition());
+            finalDragPos.add(movementVector);
+        }
+
+        if (!move(finalDragPos)) {
+            Agobot.dragger.drag(false);
+        }
+
+        return Agobot.dragger.isDragging();
+    }
+
+    public boolean snap90() {
+
+        double newHeading = Math.round(odometry.currentHeading() / 90) * 90;
+
+        return goToPosition(odometry.currentPosition(), newHeading, 0.6);
     }
 }

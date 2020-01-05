@@ -21,6 +21,11 @@ public class FoundationDragger extends Subsystem {
         dragger = opMode.hardwareMap.servo.get("dragger");
     }
 
+    public boolean isDragging() {
+
+        return (position == dragPosition);
+    }
+
     public void drag(boolean grab){
         if(grab){
             dragger.setPosition(dragPosition);

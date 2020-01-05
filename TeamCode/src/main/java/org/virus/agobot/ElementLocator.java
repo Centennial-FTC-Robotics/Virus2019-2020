@@ -385,10 +385,10 @@ public class ElementLocator extends Subsystem {
 
                         if (r.getLabel().equals(LABEL_SECOND_ELEMENT)) {
 
-                            VectorF robotPos = getRobotPos();
+                            Vector2D robotPos = getRobotPos();
 
                             double angle = r.estimateAngleToObject(AngleUnit.RADIANS);
-                            double distanceToStones = robotPos.getData()[1] - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
+                            double distanceToStones = robotPos.getComponent(1) - stoneY; // x direction is parallel to alliance walls, y is perpendicular to them
                             double specificStoneDist = distanceToStones / Math.cos(angle);
 
                             Vector2D relativeStonePos = new Vector2D(angle, specificStoneDist, true);
@@ -403,7 +403,7 @@ public class ElementLocator extends Subsystem {
         return skyStonePositions;
     }
 
-    public VectorF getRobotPos() {
+    public Vector2D getRobotPos() {
 
         updateRobotPositions();
 
@@ -466,7 +466,7 @@ public class ElementLocator extends Subsystem {
             robotPos.multiply( (float) (1.0 / maxWithinTolerance.size()));
         }
 
-        return robotPos;
+        return (new Vector2D(robotPos.getData()[0], robotPos.getData()[1]));
     }
 
     public void updateRobotPositions() {
