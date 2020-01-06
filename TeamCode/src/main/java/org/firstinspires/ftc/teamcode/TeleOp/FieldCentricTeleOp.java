@@ -60,6 +60,22 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 Agobot.intake.runIntake(0);
             }
 
+            if(gamepad2.x) {
+                Agobot.arm.armFlipIn(true);
+            }
+
+            if(gamepad2.y){
+                Agobot.arm.armFlipIn(false);
+            }
+
+            if(gamepad2.a) {
+                Agobot.grabber.grab(true);
+            }
+
+            if(gamepad2.b){
+                Agobot.grabber.grab(false);
+            }
+
             // automatic drag implemented?
             //Agobot.drivetrain.autoDrag();
             //snap 90 for driver 1 implemented?
