@@ -18,11 +18,11 @@ public class TestGrabber extends LinearOpMode {
 
         while(opModeIsActive()) {
 
-            if(gamepad2.a) {
+            if(gamepad2.b) {
                 Agobot.grabber.grab(true);
             }
 
-            if(gamepad2.b){
+            if(gamepad2.a){
                 Agobot.grabber.grab(false);
             }
 

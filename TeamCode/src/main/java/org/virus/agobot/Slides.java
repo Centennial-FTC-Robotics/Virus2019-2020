@@ -18,6 +18,7 @@ public class Slides extends Subsystem {
     public final int error = 50;
 
     public int position = 0;
+    public int holdSlidePos = 0;
 
     @Override
     public void initialize(LinearOpMode opMode) {
@@ -38,8 +39,7 @@ public class Slides extends Subsystem {
     }
     //position in encoder counts
     public boolean slides(int position){
-        slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
         //restrict slides to min and max values
         position = Range.clip(position, slideMin, slideMax);
@@ -47,32 +47,35 @@ public class Slides extends Subsystem {
         //set slides to position
         slideLeft.setTargetPosition(position);
         slideRight.setTargetPosition(position);
+
+        slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         //set speed of slides
         slideLeft.setPower(1);
         slideRight.setPower(1);
-        //wait until slides are within error
-        while (Math.abs(getPosition()-position) > error);
-        //stop slides
-        slideLeft.setPower(0);
-        slideRight.setPower(0);
-
-        slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        return true;
+        //slides done when within error
+        return !(Math.abs(getPosition()-position) > error);
     }
 
     //used with controllers
-    //TODO: might need to make method use slideLeft instead (adjust while testing)
     public void slidePower(double power){
-        //restrict slide movement between min and max values
-        int slidePos = getPosition();
-        if((slidePos <= 0 && power < 0)||(slidePos >= slideMax && power > 0)){
-            slideRight.setPower(0);
-            slideLeft.setPower(0);
-        }else{
-            slideRight.setPower(power);
-            slideLeft.setPower(power);
+        //if nothing is happening with controllers, hold current position
+        if(Math.abs(power) < 0.01){
+            slides(holdSlidePos);
+        }else {
+            slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //restrict slide movement between min and max values
+            int slidePos = getPosition();
+            if ((slidePos <= 0 && power < 0) || (slidePos >= slideMax && power > 0)) {
+                slideRight.setPower(0);
+                slideLeft.setPower(0);
+            } else {
+                slideRight.setPower(power);
+                slideLeft.setPower(power);
+            }
+            holdSlidePos = slideLeft.getCurrentPosition();
         }
     }
 }

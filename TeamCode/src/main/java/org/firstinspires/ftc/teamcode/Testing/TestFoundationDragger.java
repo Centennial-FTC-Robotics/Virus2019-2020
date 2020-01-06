@@ -18,17 +18,17 @@ public class TestFoundationDragger extends LinearOpMode {
 
         while(opModeIsActive()) {
 
-            if(gamepad2.dpad_up) {
+            if(gamepad2.x) {
                 Agobot.dragger.drag(false);
             }
 
-            if(gamepad2.dpad_down){
+            if(gamepad2.y){
                 Agobot.dragger.drag(true);
             }
 
             telemetry.addData("Foundation Dragger Position", Agobot.dragger.position);
-            telemetry.addData("Dpad Up", gamepad2.dpad_up);
-            telemetry.addData("Dpad Down", gamepad2.dpad_down);
+            telemetry.addData("Button X", gamepad2.x);
+            telemetry.addData("Button Y", gamepad2.y);
             telemetry.update();
         }
     }

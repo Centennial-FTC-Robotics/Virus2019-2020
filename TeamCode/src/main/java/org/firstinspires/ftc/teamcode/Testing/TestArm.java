@@ -17,18 +17,17 @@ public class TestArm extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            if(gamepad2.x) {
-                Agobot.arm.armFlipIn(true);
+            if(gamepad2.left_trigger > 0) {
+                Agobot.arm.armFlipOut(false);
+            }else if(gamepad2.right_trigger > 0){
+                Agobot.arm.armFlipOut(true);
             }
 
-            if(gamepad2.y){
-                Agobot.arm.armFlipIn(false);
-            }
-
+            telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
             telemetry.addData("Left Arm Position", Agobot.arm.leftPosition);
             telemetry.addData("Right Arm Position", Agobot.arm.rightPosition);
-            telemetry.addData("Button X", gamepad2.x);
-            telemetry.addData("Button Y", gamepad2.y);
+            telemetry.addData("Left Trigger", gamepad2.left_trigger);
+            telemetry.addData("Right Trigger", gamepad2.right_trigger);
             telemetry.update();
         }
     }
