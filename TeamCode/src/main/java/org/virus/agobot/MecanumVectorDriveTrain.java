@@ -6,6 +6,7 @@ import com.qualcomm.hardware.lynx.LynxEmbeddedIMU;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynchV1;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
@@ -83,10 +84,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
-        if(opMode.getClass()== LinearOpMode.class){
-            while (((LinearOpMode)opMode).opModeIsActive() && !imu.isGyroCalibrated()) ;
-        }
-        opMode.telemetry.addData("imu", imu.isSystemCalibrated());
+        //if(opMode.getClass()== LinearOpMode.class){
+            //while (((LinearOpMode)opMode).opModeIsActive() && !imu.isGyroCalibrated()) ;
+        //}
+        //opMode.telemetry.addData("imu", imu.isSystemCalibrated());
         /*try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -122,8 +123,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         heading = odometry.currentHeading();
         odoLoopCounter++;
         opMode.telemetry.addData("imuUpdates:", odoLoopCounter/IMUUPDATERATE);
+
         return odometry.currentPosition();
     }
+
     public double getHeading(){ //returns in degrees
         return heading;
         //return AngleUnit.normalizeDegrees(currentOrientation.firstAngle - initialHeading);
@@ -153,11 +156,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         setAllRunUsingEncoders();
 
          */
-        LynxModule module = opMode.hardwareMap.get(LynxModule.class, "Expansion Hub 1");
+        /*LynxModule module = opMode.hardwareMap.get(LynxModule.class, "Expansion Hub 1");
         I2cDeviceSynch idkWhatThisMeans = new BetterI2cDeviceSynchImplOnSimple(
-                new LynxI2cDeviceSynchV1(AppUtil.getDefContext(), module, 0), true);
-        imu = new LynxEmbeddedIMU(idkWhatThisMeans);
-
+                new LynxI2cDeviceSynchV1(AppUtil.getDefContext(), module, 0), true); */
+        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         //imu.initialize(new BNO055IMU.Parameters());
 
         currentOrientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);

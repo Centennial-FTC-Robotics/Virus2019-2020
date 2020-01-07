@@ -80,14 +80,14 @@ public class ElementLocator extends Subsystem {
         opModeReference = opMode;
 
         // Vuforia Initialization
-        initVuforia();
+//        initVuforia();
 
         // Tensorflow Initialization
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            opModeReference.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
+//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+//            initTfod();
+//        } else {
+//            opModeReference.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+//        }
 
         // Custom OpenCV initialization
         initOpenCV();
@@ -95,8 +95,8 @@ public class ElementLocator extends Subsystem {
 
     public void deactivate() {
 
-        tfod.deactivate();
-        targetsSkyStone.deactivate();
+        //tfod.deactivate();
+        //targetsSkyStone.deactivate();
     }
 
     private void initVuforia() {
@@ -314,19 +314,7 @@ public class ElementLocator extends Subsystem {
 
     public String relativeSkyStonePosOpenCV() {
 
-        double stripCenterDist = detector.getCurrentDist();
-
-        String relativePos = "Middle";
-
-        if (stripCenterDist < -400) {
-
-            relativePos = "Left";
-        } else if (stripCenterDist > 400) {
-
-            relativePos = "Right";
-        }
-
-        return relativePos;
+        return detector.relativePos();
     }
 
     public String[] relativeSkyStonePos() {

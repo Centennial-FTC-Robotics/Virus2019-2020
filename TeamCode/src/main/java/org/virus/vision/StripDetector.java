@@ -13,6 +13,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.Arrays;
+
 import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
 
 
@@ -21,6 +23,7 @@ public class StripDetector {
     OpMode opMode;
 
     private double distFromCenter = 0;
+    private int relativePosIndex = 1;
 
     public void initialize(OpMode opMode) {
         this.opMode=opMode;
@@ -71,6 +74,13 @@ public class StripDetector {
         return distFromCenter;
     }
 
+    public String relativePos() {
+
+        String[] relPos = {"Left", "Middle", "Right"};
+
+        return relPos[relativePosIndex];
+    }
+
     class SamplePipeline extends OpenCvPipeline {
         /*
          * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
@@ -93,10 +103,35 @@ public class StripDetector {
         {
             rectCrop = new Rect(new Point(150,375) , new Point(1050,525));
             //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
-            //cropped = new Mat(input, rectCrop);
-            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
-//            Mat croppedGrayScale = new Mat(gray, rectCrop);
+            cropped = new Mat(input, rectCrop);
 
+            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
+            Mat croppedGrayScale = new Mat(gray, rectCrop);
+
+            int index = -1;
+            double segAvgMin = Double.MAX_VALUE;
+
+            for (int s = 0; s < 3; s++) {
+
+                double segmentAverage = 0;
+
+                for (int i = (300 * s); i < (300 * s) + 300; i++) {
+                    for (int j = 0; j < croppedGrayScale.rows(); j++) {
+
+                        segmentAverage += croppedGrayScale.get(j,i)[0];
+                    }
+                }
+
+                double segAvg = segmentAverage / (300 * croppedGrayScale.cols());
+
+                if (segAvg < segAvgMin) {
+
+                    segAvgMin = segAvg;
+                    index = s;
+                }
+            }
+
+            relativePosIndex = index;
 //            double skystoneAverage = 0;
 //
 //            for (int i = 0; i < croppedGrayScale.rows(); i++) {
@@ -125,27 +160,28 @@ public class StripDetector {
 //            opMode.telemetry.addData("Skystone Strip Average", skystoneAverage);
 //            opMode.telemetry.addData("Stone, Strip Average", stoneAverage);
 
-            Imgproc.threshold(gray, thresh, 90, 255, THRESH_BINARY_INV);
-            cropped = new Mat(thresh, rectCrop);
+//            Imgproc.threshold(gray, thresh, segAvgMin, 255, THRESH_BINARY_INV);
+//            cropped = new Mat(thresh, rectCrop);
+//
+//            double sum = 0;
+//            double total = 0;
+//
+//            for(int i=0; i<cropped.rows(); i++){
+//                for(int j=0; j<cropped.cols(); j++){
+//                    if(cropped.get(i,j)[0]!=0){
+//                        sum+=(1*j-cropped.cols()/2);
+//                        total++;
+//                    }
+//                }
+//            }
+//
+//            double weightedAvg = sum/(double)(total);
+//            opMode.telemetry.addData("weighted skystone Average",weightedAvg);
+//            opMode.telemetry.update();
+//
+//            distFromCenter = weightedAvg;
 
-            double sum = 0;
-            double total = 0;
-
-            for(int i=0; i<cropped.rows(); i++){
-                for(int j=0; j<cropped.cols(); j++){
-                    if(cropped.get(i,j)[0]!=0){
-                        sum+=(1*j-cropped.cols()/2);
-                        total++;
-                    }
-                }
-            }
-            double weightedAvg = sum/(double)(total);
-            opMode.telemetry.addData("weighted skystone Average",weightedAvg);
-            opMode.telemetry.update();
-
-            distFromCenter = weightedAvg;
-
-            Imgproc.rectangle(thresh, rectCrop, new Scalar(128), 3);
+            Imgproc.rectangle(input, rectCrop, new Scalar(128), 3);
             //Imgproc.rectangle(thresh, regStoneCrop, new Scalar(128), 3);
             //rectUnCrop = new Rect(new Point(0,0) , new Point(319,239));
             //unCropped = new Mat(thresh, rectUnCrop);
@@ -172,7 +208,7 @@ public class StripDetector {
              * tapped, please see {@link PipelineStageSwitchingExample}
              */
 
-            return thresh;
+            return input;
         }
     }
 }

@@ -6,10 +6,24 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @TeleOp(group = "TeleOP", name = "FieldCentricTeleOp")
 public class FieldCentricTeleOp extends LinearOpMode {
+
+    //saved data
+    public String alliance;
+    public Vector2D position;
+    public double heading;
 
     public Vector2D leftStick;
     public Vector2D rightStick;
@@ -19,6 +33,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        ArrayList<String> autoData = readLines(new File("../Virus2019-2020 Master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Autodata.txt"));
+        telemetry.addLine(autoData.toString());
+        telemetry.update();
 
         Agobot.initialize(this);
         //inits all hardware
@@ -127,5 +145,50 @@ public class FieldCentricTeleOp extends LinearOpMode {
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
         motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
+    }
+
+    public void setData(ArrayList<String> readData) {
+
+
+    }
+
+    public static ArrayList<String> readLines(Path file) {
+
+        return readLines(new File(file.toString()));
+    }
+
+    public static ArrayList<String> readLines(File file) {
+
+        String thisLine = null;
+        ArrayList<String> fileText = null;
+        BufferedReader br = null;
+
+        try {
+
+            br = new BufferedReader(new FileReader(file));
+            fileText = new ArrayList<String>();
+
+            while ((thisLine = br.readLine()) != null) {
+                fileText.add(thisLine);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        } finally {
+
+            try {
+
+                br.close();
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            } finally {
+
+                br = null;
+                System.gc();
+            }
+        }
+
+        return fileText;
     }
 }
