@@ -13,7 +13,7 @@ public class Slides extends Subsystem {
 
     public ExpansionHubMotor slideLeft;
     public ExpansionHubMotor slideRight;
-    PIDController slidesController = new PIDController(.01f, 0f, 0f);
+    PIDController slidesController = new PIDController(.01f, 0f, 0f, .1f);
 
     //TODO: test for correct values
     public final int slideMin = 0;
