@@ -65,6 +65,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     Vector2D robotCentricMvmt;
     double minSpeed = 0.05;
 
+
 //    Odometry odometry = new Odometry();
     @Override
     public float encoderToInch(int encoder) {
@@ -122,7 +123,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         //currentOrientation.firstAngle = (float) odometry.relativeHeading();
         heading = odometry.currentHeading();
         odoLoopCounter++;
-        opMode.telemetry.addData("imuUpdates:", odoLoopCounter/IMUUPDATERATE);
 
         return odometry.currentPosition();
     }

@@ -7,15 +7,20 @@ import com.qualcomm.robotcore.util.Range;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
+import org.virus.util.PIDController;
 
 public class Slides extends Subsystem {
+
     public ExpansionHubMotor slideLeft;
     public ExpansionHubMotor slideRight;
+    PIDController slidesController = new PIDController(-.01f, 0f, 0f);
 
     //TODO: test for correct values
     public final int slideMin = 0;
     public final int slideMax = 900;
     public final int error = 50;
+
+    public static final double ENCODER_PER_INCH = 84.81f;
 
     public int position = 0;
     public int holdSlidePos = 0;
@@ -39,7 +44,7 @@ public class Slides extends Subsystem {
     }
     //position in encoder counts
     public boolean slides(int position){
-
+/*
 
         //restrict slides to min and max values
         position = Range.clip(position, slideMin, slideMax);
@@ -53,9 +58,12 @@ public class Slides extends Subsystem {
 
         //set speed of slides
         slideLeft.setPower(1);
-        slideRight.setPower(1);
+        slideRight.setPower(1);*/
         //slides done when within error
+        slideLeft.setPower(slidesController.getValue(position, this.getPosition()));
+        slideRight.setPower(slidesController.getValue(position, this.getPosition()));
         return !(Math.abs(getPosition()-position) > error);
+
     }
 
     //used with controllers

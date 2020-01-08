@@ -2,45 +2,52 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ReadWriteFile;
 
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @TeleOp(group = "TeleOP", name = "FieldCentricTeleOp")
 public class FieldCentricTeleOp extends LinearOpMode {
 
-    //saved data
-    public String alliance;
-    public Vector2D position;
-    public double heading;
-
     public Vector2D leftStick;
     public Vector2D rightStick;
     public Vector2D motorSpeeds;
+    double speedMultiplier = 1;
     double leftTriggerPrev = 0;
     double rightTriggerPrev = 0;
+    private File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
+    String importedAutoData;
+    String[] autoData = new String[4];
+    public Vector2D startPosition;
+    double startHeading;
+    double driverHeading;
 
     @Override
     public void runOpMode() throws InterruptedException {
-
-        ArrayList<String> autoData = readLines(new File("../Virus2019-2020 Master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Autodata.txt"));
-        telemetry.addLine(autoData.toString());
-        telemetry.update();
-
+        importedAutoData = ReadWriteFile.readFile(opModeData).trim();
+        if(importedAutoData.equals("")){
+            startPosition = new Vector2D(0,0);
+            startHeading = 90;
+            driverHeading = 90;
+        }else{
+            autoData = importedAutoData.split(",");
+            if(autoData[0] == "Red"){
+                driverHeading = 180;
+            }else{
+                driverHeading = 0;
+            }
+            startPosition = new Vector2D(Double.parseDouble(autoData[1]), Double.parseDouble(autoData[2]));
+            startHeading = Double.parseDouble(autoData[3]);
+        }
         Agobot.initialize(this);
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
+        Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
 
         leftStick = new Vector2D((double) gamepad1.left_stick_x, (double) -gamepad1.left_stick_y);
@@ -58,16 +65,16 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 telemetry.update();
             }
 
+            speedMultiplier = 1 - 0.7*gamepad1.left_trigger;
+
             if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
-                Agobot.drivetrain.runMotors(diagSpeed1, diagSpeed2, diagSpeed2, diagSpeed1, rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
+                Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
             } else {
                 Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
             }
 
-            //TODO: brake and throttle
-
             //slides
-            Agobot.slides.slidePower(-0.5*gamepad2.left_stick_y);
+            Agobot.slides.slidePower(-0.2*gamepad2.left_stick_y);
 
             //arm
             if(leftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
@@ -109,9 +116,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
             //TODO: snap 90 for driver 1
 
             //TODO: dpad stone heights
-            int startStoneHeight = 0;
+            int startStoneHeight = 24;
             //TODO: test for what encoder values mean 1 stone height
-            int stoneHeight = 500;
+            int stoneHeight = 340;
             int currentSlideHeight = Agobot.slides.getPosition();
             if(gamepad2.dpad_up){
                 Agobot.slides.slides(currentSlideHeight + stoneHeight);
@@ -121,74 +128,31 @@ public class FieldCentricTeleOp extends LinearOpMode {
             }
             leftTriggerPrev = gamepad2.left_trigger;
             rightTriggerPrev = gamepad2.right_trigger;
+
             telemetry.addData("leftStick: ", leftStick.toString());
             telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
-//            telemetry.addData("leftStick Rotated: ", leftStick.toString());
 
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
             telemetry.addData("Arm Number", Agobot.arm.armPosition);
             telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
             telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
             telemetry.addData("Current Slide Pos", Agobot.slides.getPosition());
+            telemetry.addData("Left Slide Pos", Agobot.slides.slideLeft.getCurrentPosition());
+            telemetry.addData("Right Slide Pos", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.update();
         }
     }
 
     public void updateControllerValues(){
         leftStick.setComponents(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y});
-        rightStick.setComponents(new double[] {gamepad1.right_stick_x, gamepad1.right_stick_y});
+        rightStick.setComponents(new double[] {gamepad1.right_stick_x, -gamepad1.right_stick_y});
         Agobot.drivetrain.updatePosition();
-        leftStick.rotate(-Math.toRadians(Agobot.drivetrain.getHeading()));
-        double leftx = -leftStick.getComponent(0);
+        leftStick.rotate(Math.toRadians(driverHeading - Agobot.drivetrain.getHeading()));
+        double leftx = leftStick.getComponent(0);
         double lefty = leftStick.getComponent(1);
         double scalar = Math.max(Math.abs(lefty-leftx), Math.abs(lefty+leftx)); //scalar and magnitude scale the motor powers based on distance from joystick origin
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
-        motorSpeeds = new Vector2D((lefty-leftx)*magnitude/scalar, (lefty+leftx)*magnitude/scalar);
-    }
-
-    public void setData(ArrayList<String> readData) {
-
-
-    }
-
-    public static ArrayList<String> readLines(Path file) {
-
-        return readLines(new File(file.toString()));
-    }
-
-    public static ArrayList<String> readLines(File file) {
-
-        String thisLine = null;
-        ArrayList<String> fileText = null;
-        BufferedReader br = null;
-
-        try {
-
-            br = new BufferedReader(new FileReader(file));
-            fileText = new ArrayList<String>();
-
-            while ((thisLine = br.readLine()) != null) {
-                fileText.add(thisLine);
-            }
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        } finally {
-
-            try {
-
-                br.close();
-            } catch (IOException e) {
-
-                e.printStackTrace();
-            } finally {
-
-                br = null;
-                System.gc();
-            }
-        }
-
-        return fileText;
+        motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
     }
 }
