@@ -18,7 +18,7 @@ public class Slides extends Subsystem {
     //TODO: test for correct values
     public final int slideMin = 0;
     public final int slideMax = 900;
-    public final int error = 50;
+    public final int tolerance = 50;
 
     public static final double ENCODER_PER_INCH = 84.81f;
 
@@ -62,7 +62,7 @@ public class Slides extends Subsystem {
         //slides done when within error
         slideLeft.setPower(slidesController.getValue(position, this.getPosition()));
         slideRight.setPower(slidesController.getValue(position, this.getPosition()));
-        return !(Math.abs(getPosition()-position) > error);
+        return !(Math.abs(getPosition()-position) > tolerance);
 
     }
 
