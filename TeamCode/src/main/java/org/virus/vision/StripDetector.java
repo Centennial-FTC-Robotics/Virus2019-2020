@@ -76,7 +76,7 @@ public class StripDetector {
 
     public String relativePos() {
 
-        String[] relPos = {"Left", "Middle", "Right"};
+        String[] relPos = {"Right", "Left", "Middle"};
 
         return relPos[relativePosIndex];
     }
@@ -101,7 +101,7 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input)
         {
-            rectCrop = new Rect(new Point(150,375) , new Point(1050,525));
+            rectCrop = new Rect(new Point(130,400) , new Point(1030,550));
             //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
             cropped = new Mat(input, rectCrop);
 

@@ -22,6 +22,11 @@ public class Grabber extends Subsystem {
         grabber = opMode.hardwareMap.servo.get("grabber");
     }
 
+    public boolean isGrabbing() {
+
+        return (position == grabPosition);
+    }
+
     //more methods TODO
     public void grab(boolean grab){
         if(grab){

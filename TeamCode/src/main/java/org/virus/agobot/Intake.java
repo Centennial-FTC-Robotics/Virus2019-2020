@@ -55,20 +55,22 @@ public class Intake extends Subsystem {
         runIntake(speed, speed);
     }
 
-    public boolean deployIntake(){
-        if (!intakeDeployed){
-            if (!intakeDeploying){
-                deployTimer.reset();
-            }
-            runIntake(1, 0);
-            intakeDeploying = true;
-            if (deployTimer.seconds() >= 0.3){
-                intakeDeploying = false;
-                intakeDeployed = true;
-                runIntake(0);
-            }
-        }
-        return !intakeDeployed; //so that it returns true until it's done, when it returns false
+    public void deployIntake(){
+//        if (!intakeDeployed){
+//            if (!intakeDeploying){
+//                deployTimer.reset();
+//            }
+//            runIntake(1, 0);
+//            intakeDeploying = true;
+//            if (deployTimer.seconds() >= 0.3){
+//                intakeDeploying = false;
+//                intakeDeployed = true;
+//                runIntake(0);
+//            }
+//        }
+//        return !intakeDeployed; //so that it returns true until it's done, when it returns false
+
+        runIntake(1, 0);
     }
 
     public boolean detectJam(DcMotorEx motor, double intendedPower){
