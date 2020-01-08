@@ -13,7 +13,7 @@ public class Slides extends Subsystem {
 
     public ExpansionHubMotor slideLeft;
     public ExpansionHubMotor slideRight;
-    PIDController slidesController = new PIDController(-.01f, 0f, 0f);
+    PIDController slidesController = new PIDController(.01f, 0f, 0f);
 
     //TODO: test for correct values
     public final int slideMin = 0;
@@ -22,7 +22,7 @@ public class Slides extends Subsystem {
 
     public static final double ENCODER_PER_INCH = 84.81f;
 
-    public int position = 0;
+    //public int position = 0;
     public int holdSlidePos = 0;
 
     @Override
@@ -72,8 +72,6 @@ public class Slides extends Subsystem {
         if(Math.abs(power) < 0.01){
             slides(holdSlidePos);
         }else {
-            slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             //restrict slide movement between min and max values
             int slidePos = getPosition();
             if ((slidePos <= 0 && power < 0) || (slidePos >= slideMax && power > 0)) {
