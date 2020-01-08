@@ -81,7 +81,7 @@ public class Slides extends Subsystem {
                 slideRight.setPower(power);
                 slideLeft.setPower(power);
             }
-            holdSlidePos = getPosition();
+            holdSlidePos = slidePos;
         }
     }
 }
