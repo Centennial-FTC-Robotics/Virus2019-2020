@@ -24,7 +24,7 @@ public class Arm extends Subsystem {
         //TODO
         leftArm = opMode.hardwareMap.servo.get("leftArm");
         rightArm = opMode.hardwareMap.servo.get("rightArm");
-        armPosition = 0;
+        armPosition = 2;
     }
 
     public void armFlipOut(boolean out){

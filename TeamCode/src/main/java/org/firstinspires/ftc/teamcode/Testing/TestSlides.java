@@ -26,7 +26,7 @@ public class TestSlides extends LinearOpMode {
             telemetry.addData("Right Slide", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.addData("Slide Min ", Agobot.slides.slideMin);
             telemetry.addData("Slide Max", Agobot.slides.slideMax);
-            telemetry.addData("Slide Error", Agobot.slides.error);
+            telemetry.addData("Slide Error", Agobot.slides.tolerance);
             telemetry.update();
         }
     }

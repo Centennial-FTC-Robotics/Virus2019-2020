@@ -2,7 +2,6 @@ package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.Range;
 
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.superclasses.Robot;
@@ -13,16 +12,17 @@ public class Slides extends Subsystem {
 
     public ExpansionHubMotor slideLeft;
     public ExpansionHubMotor slideRight;
-    PIDController slidesController = new PIDController(.01f, 0f, 0f, .1f);
+    PIDController slidesController = new PIDController(.004f, 0f, 0f, .1f);
 
     //TODO: test for correct values
     public final int slideMin = 0;
-    public final int slideMax = 900;
+    public final int slideMax = 1350;
     public final int tolerance = 50;
 
     public static final double ENCODER_PER_INCH = 84.81f;
 
     //public int position = 0;
+    double prevPower = 0;
     public int holdSlidePos = 0;
 
     @Override
@@ -60,16 +60,19 @@ public class Slides extends Subsystem {
         slideLeft.setPower(1);
         slideRight.setPower(1);*/
         //slides done when within error
-        int slidePos = this.getPosition();
-        slideLeft.setPower(slidesController.getValue(position, slidePos));
-        slideRight.setPower(slidesController.getValue(position, slidePos));
-        return !(Math.abs(slidePos-position) > tolerance);
+        slideLeft.setPower(slidesController.getValue(position, this.getPosition()));
+        slideRight.setPower(slidesController.getValue(position, this.getPosition()));
+        return !(Math.abs(getPosition() - position) > tolerance);
 
     }
+
     //used with controllers
     public void slidePower(double power){
         //if nothing is happening with controllers, hold current position
         if(Math.abs(power) < 0.01){
+            if(Math.abs(prevPower) > 0.01){
+                holdSlidePos = getPosition();
+            }
             slides(holdSlidePos);
         }else {
             //restrict slide movement between min and max values
@@ -81,7 +84,7 @@ public class Slides extends Subsystem {
                 slideRight.setPower(power);
                 slideLeft.setPower(power);
             }
-            holdSlidePos = slidePos;
         }
+        prevPower = power;
     }
 }

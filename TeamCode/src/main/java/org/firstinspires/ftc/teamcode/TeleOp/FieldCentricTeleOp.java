@@ -27,6 +27,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
     double startHeading;
     double driverHeading;
 
+    Double timePressed = null;
+
     @Override
     public void runOpMode() throws InterruptedException {
         importedAutoData = ReadWriteFile.readFile(opModeData).trim();
@@ -74,13 +76,28 @@ public class FieldCentricTeleOp extends LinearOpMode {
             }
 
             //slides
-            Agobot.slides.slidePower(-0.2*gamepad2.left_stick_y);
+            Agobot.slides.slidePower(-0.5 * gamepad2.left_stick_y);
 
             //arm
             if(leftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
-                Agobot.arm.armFlipOut(false);
+
+                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
+
+                    timePressed = Agobot.clock.milliseconds();
+                    Agobot.grabber.grab(false);
+                    Agobot.arm.armFlipOut(false);
+                }
             }else if(rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
                 Agobot.arm.armFlipOut(true);
+            }
+
+            if (timePressed != null) { // automatic actions for picking up a block
+
+                if (!Agobot.grabber.isGrabbing() && Agobot.clock.milliseconds() > (timePressed + 100)) {
+
+                    Agobot.grabber.grab(true);
+                    timePressed = null;
+                }
             }
 
             //grabber
@@ -93,13 +110,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             //intake
             if(gamepad2.right_bumper){
-                if(!Agobot.intake.deployIntake()){ //deployIntake returns true when the intake has been deployed and returns false otherwise and deploys the intake
-                    Agobot.intake.runIntake(1);
-                }
+                Agobot.intake.runIntake(1);
             }else if(gamepad2.left_bumper){
-                if(!Agobot.intake.deployIntake()){
-                    Agobot.intake.runIntake(-1);
-                }
+                Agobot.intake.runIntake(-1);
             }else{
                 Agobot.intake.runIntake(0);
             }
