@@ -60,12 +60,12 @@ public class Slides extends Subsystem {
         slideLeft.setPower(1);
         slideRight.setPower(1);*/
         //slides done when within error
-        slideLeft.setPower(slidesController.getValue(position, this.getPosition()));
-        slideRight.setPower(slidesController.getValue(position, this.getPosition()));
-        return !(Math.abs(getPosition()-position) > tolerance);
+        int slidePos = this.getPosition();
+        slideLeft.setPower(slidesController.getValue(position, slidePos));
+        slideRight.setPower(slidesController.getValue(position, slidePos));
+        return !(Math.abs(slidePos-position) > tolerance);
 
     }
-
     //used with controllers
     public void slidePower(double power){
         //if nothing is happening with controllers, hold current position
