@@ -22,8 +22,7 @@ public class StripDetector {
     OpenCvCamera phoneCam;
     OpMode opMode;
 
-    private double distFromCenter = 0;
-    private int relativePosIndex = 1;
+    private int relativePosIndex = 2;
 
     public void initialize(OpMode opMode) {
         this.opMode=opMode;
@@ -67,11 +66,6 @@ public class StripDetector {
     public void deactivate() {
 
         phoneCam.stopStreaming();
-    }
-
-    public double getCurrentDist() {
-
-        return distFromCenter;
     }
 
     public String relativePos() {

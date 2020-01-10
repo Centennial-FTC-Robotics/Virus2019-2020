@@ -31,12 +31,14 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        // import the file data and integrate it
         importedAutoData = ReadWriteFile.readFile(opModeData).trim();
-        if(importedAutoData.equals("")){
+        if(importedAutoData.equals("")){ // in case there is no data
             startPosition = new Vector2D(0,0);
             startHeading = 90;
             driverHeading = 90;
-        }else{
+        }else{ // if there is data, assume it's properly formatted I guess. Thanks Keertik...
             autoData = importedAutoData.split(",");
             if(autoData[0] == "Red"){
                 driverHeading = 180;
@@ -46,6 +48,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
             startPosition = new Vector2D(Double.parseDouble(autoData[1]), Double.parseDouble(autoData[2]));
             startHeading = Double.parseDouble(autoData[3]);
         }
+
+        // actual initialization time
         Agobot.initialize(this);
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
@@ -56,6 +60,12 @@ public class FieldCentricTeleOp extends LinearOpMode {
         rightStick = new Vector2D((double) gamepad1.right_stick_x, (double) gamepad1.right_stick_y);
 
         while(opModeIsActive()) {
+
+            if (gamepad1.a && gamepad1.b && gamepad1.dpad_left && gamepad1.dpad_up) {
+
+                driverHeading = Agobot.drivetrain.odometry.currentHeading();
+            }
+
             updateControllerValues();
             double diagSpeed1 = motorSpeeds.getComponent(0);
             double diagSpeed2 = motorSpeeds.getComponent(1);
@@ -67,7 +77,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 telemetry.update();
             }
 
-            speedMultiplier = 1 - 0.7*gamepad1.left_trigger;
+            speedMultiplier = 1 - (0.7 * gamepad1.left_trigger);
 
             if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
                 Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
@@ -81,24 +91,25 @@ public class FieldCentricTeleOp extends LinearOpMode {
             //arm
             if(leftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
 
-                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
+//                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
+//
+//                    timePressed = Agobot.clock.milliseconds();
+//                    Agobot.grabber.grab(false);
+//                }
 
-                    timePressed = Agobot.clock.milliseconds();
-                    Agobot.grabber.grab(false);
-                    Agobot.arm.armFlipOut(false);
-                }
+                Agobot.arm.armFlipOut(false);
             }else if(rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
                 Agobot.arm.armFlipOut(true);
             }
 
-            if (timePressed != null) { // automatic actions for picking up a block
-
-                if (!Agobot.grabber.isGrabbing() && Agobot.clock.milliseconds() > (timePressed + 100)) {
-
-                    Agobot.grabber.grab(true);
-                    timePressed = null;
-                }
-            }
+//            if (timePressed != null) { // automatic actions for picking up a block
+//
+//                if (!Agobot.grabber.isGrabbing() && Agobot.clock.milliseconds() > (timePressed + 100)) {
+//
+//                    Agobot.grabber.grab(true);
+//                    timePressed = null;
+//                }
+//            }
 
             //grabber
             if(gamepad2.b) {

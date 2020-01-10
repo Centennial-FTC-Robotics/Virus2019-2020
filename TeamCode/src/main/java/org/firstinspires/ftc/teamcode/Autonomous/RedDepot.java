@@ -2,13 +2,10 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
-import org.virus.agobot.ElementLocator;
-import org.virus.util.Pair;
 import org.virus.util.Vector2D;
 
 import java.io.File;
@@ -19,7 +16,7 @@ public class RedDepot extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
     private double startHeading = 270; //straight left
-    private String skyStoneLocation;
+    private String skyStoneLocation = "Middle";
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
 
     @Override
@@ -79,10 +76,15 @@ public class RedDepot extends LinearOpMode {
 
         Agobot.intake.runIntake(0);
         Agobot.arm.armFlipOut(false); //go from standby to in
+        double grab = Agobot.clock.milliseconds();
+        while(Agobot.clock.milliseconds() < (grab + 100)) {};
         Agobot.grabber.grab(true);
 
+        telemetry.addData("Arm State", Agobot.arm.armPositions[Agobot.arm.armPosition]);
+        telemetry.update();
+
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
-        while(Agobot.clock.milliseconds() < (startGrab + 100)) {};
+        while(Agobot.clock.milliseconds() < (startGrab + 300)) {};
 
         Agobot.arm.armFlipOut(true);
 
@@ -125,5 +127,6 @@ public class RedDepot extends LinearOpMode {
 
         //Red,39,0,270
         ReadWriteFile.writeFile(opModeData, "Red," + Agobot.drivetrain.odometry.currentPosition().getComponent(0) + "," + Agobot.drivetrain.odometry.currentPosition().getComponent(1) + "," + Agobot.drivetrain.odometry.currentHeading());
+
     }
 }

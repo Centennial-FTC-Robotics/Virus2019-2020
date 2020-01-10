@@ -97,6 +97,7 @@ public class ElementLocator extends Subsystem {
 
         //tfod.deactivate();
         //targetsSkyStone.deactivate();
+        detector.deactivate();
     }
 
     private void initVuforia() {
