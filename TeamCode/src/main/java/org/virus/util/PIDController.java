@@ -37,6 +37,12 @@ public class PIDController {
         prevError = 0;
         float i = 0;
     }
+    public void changeConstants(float kP, float kI, float kD, float antiWind){
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.antiWind = antiWind;
+    }
     //ideally called every loop, don't wait too long between calls unless running p loop
     public float getValue (float target, float actual) {
         return getValue(target - actual);
