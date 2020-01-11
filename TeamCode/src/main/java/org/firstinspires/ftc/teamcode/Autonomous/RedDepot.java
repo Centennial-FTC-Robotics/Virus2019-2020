@@ -49,7 +49,7 @@ public class RedDepot extends LinearOpMode {
 
         //get ready to pick up skystone
 
-        int yOffset = -34;
+        int yOffset = -32;
 
         if (skyStoneLocation.equals("Right")) {
 
@@ -68,6 +68,10 @@ public class RedDepot extends LinearOpMode {
 
         //TODO: grab skystone
         Agobot.intake.runIntake(1);
+
+        while(Agobot.drivetrain.goToPosition(new Vector2D(50, yOffset), startHeading, 0.6)){
+
+        }
 
         while(Agobot.drivetrain.goToPosition(new Vector2D(24, yOffset), startHeading, 0.6)){
 
@@ -94,7 +98,7 @@ public class RedDepot extends LinearOpMode {
         Agobot.arm.armFlipOut(true);
 
         // move back out of the way
-        while(Agobot.drivetrain.goToPosition(new Vector2D(48, yOffset), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, yOffset), 0, 0.6,1.3)){
 
         }
 
@@ -104,7 +108,7 @@ public class RedDepot extends LinearOpMode {
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 48), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(31, 48), 0, 0.6, 1)){
             //TODO: place skystone
 
             Agobot.arm.armFlipOut(true);
@@ -118,23 +122,24 @@ public class RedDepot extends LinearOpMode {
         while(Agobot.clock.milliseconds() < (startGrab + 300)) {};
         Agobot.arm.armFlipOut(false);
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 38), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 38), 0, 0.6,1.5)){
 
         }
 
         Agobot.dragger.drag(true);
         startGrab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (startGrab + 700)) {};
-        PIDControllers.headingController.changeConstants(-.15f, -.015f,-.001f, .2f);
-        PIDControllers.xController.changeConstants(.09f,.25f ,0.001f,0.2f);
-        PIDControllers.yController.changeConstants(.09f,.25f ,0.001f,0.2f);
+        PIDControllers.xController.changeConstants(.09f,.3f ,0.001f,0.3f);
+        PIDControllers.yController.changeConstants(.09f,.3f ,0.001f,0.3f);
 
         //drag foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 38), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 38), 0, 0.6,1.5)){
 
         }
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 38), 270, 0.6)){
+        PIDControllers.headingController.changeConstants(-.5f, -.04f,-.001f, .7f);
+
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 30), 270, 0.6,1.5)){
 
         }
 
@@ -142,8 +147,10 @@ public class RedDepot extends LinearOpMode {
         startGrab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (startGrab + 300)) {};
 
+        PIDControllers.headingController.changeConstants(-.09f, -.012f,-.001f, .2f);
+
         //push against wall
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 44), 270, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 42), 270, 0.6)){
 
         }
         PIDControllers.headingController.changeConstants(-.065f, -.009f,-.001f, .1f);
