@@ -45,13 +45,13 @@ public class Arm extends Subsystem {
                 break;
             case 1:
                 //standby
-                left = 0.15;
-                right = 0.85;
+                left = 0.13;
+                right = 0.87;
                 break;
             case 2:
                 //in
-                left = 0.1;
-                right = 0.9;
+                left = 0.08;
+                right = 0.92;
                 break;
         }
 

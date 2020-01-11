@@ -18,8 +18,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
     public Vector2D rightStick;
     public Vector2D motorSpeeds;
     double speedMultiplier = 1;
-    double leftTriggerPrev = 0;
-    double rightTriggerPrev = 0;
+    double gp1RightTriggerPrev = 0;
+    double gp2LeftTriggerPrev = 0;
+    double gp2rightTriggerPrev = 0;
     private File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
     String importedAutoData;
     String[] autoData = new String[4];
@@ -55,7 +56,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         waitForStart();
-
+        ReadWriteFile.writeFile(opModeData, "");
         leftStick = new Vector2D((double) gamepad1.left_stick_x, (double) -gamepad1.left_stick_y);
         rightStick = new Vector2D((double) gamepad1.right_stick_x, (double) gamepad1.right_stick_y);
 
@@ -89,7 +90,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             Agobot.slides.slidePower(-0.5 * gamepad2.left_stick_y);
 
             //arm
-            if(leftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
+            if(gp2LeftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
 
 //                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
 //
@@ -98,7 +99,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 //                }
 
                 Agobot.arm.armFlipOut(false);
-            }else if(rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
+            }else if(gp2rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
                 Agobot.arm.armFlipOut(true);
             }
 
@@ -139,6 +140,11 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             //TODO: snap 90 for driver 1
 
+            if (gp1RightTriggerPrev < 0.001 && gamepad1.right_trigger > 0.001) {
+
+                Agobot.drivetrain.snap90();
+            }
+
             //TODO: dpad stone heights
             int startStoneHeight = 24;
             //TODO: test for what encoder values mean 1 stone height
@@ -150,8 +156,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
             if(gamepad2.dpad_down){
                 Agobot.slides.slides(currentSlideHeight - stoneHeight);
             }
-            leftTriggerPrev = gamepad2.left_trigger;
-            rightTriggerPrev = gamepad2.right_trigger;
+
+            gp1RightTriggerPrev = gamepad1.right_trigger;
+            gp2LeftTriggerPrev = gamepad2.left_trigger;
+            gp2rightTriggerPrev = gamepad2.right_trigger;
 
             telemetry.addData("leftStick: ", leftStick.toString());
             telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());

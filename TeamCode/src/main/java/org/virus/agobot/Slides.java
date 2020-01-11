@@ -16,7 +16,7 @@ public class Slides extends Subsystem {
 
     //TODO: test for correct values
     public final int slideMin = 0;
-    public final int slideMax = 1350;
+    public final int slideMax = 1500;
     public final int tolerance = 50;
 
     public static final double ENCODER_PER_INCH = 84.81f;

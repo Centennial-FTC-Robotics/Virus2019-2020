@@ -17,6 +17,7 @@ public class RedDepot extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
     private double startHeading = 270; //straight left
     private String skyStoneLocation = "Middle";
+
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
 
     @Override
@@ -47,7 +48,7 @@ public class RedDepot extends LinearOpMode {
 
         //get ready to pick up skystone
 
-        int yOffset = -40;
+        int yOffset = -39;
 
         if (skyStoneLocation.equals("Right")) {
 
@@ -77,7 +78,7 @@ public class RedDepot extends LinearOpMode {
         Agobot.intake.runIntake(0);
         Agobot.arm.armFlipOut(false); //go from standby to in
         double grab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (grab + 100)) {};
+        while(Agobot.clock.milliseconds() < (grab + 300)) {};
         Agobot.grabber.grab(true);
 
         telemetry.addData("Arm State", Agobot.arm.armPositions[Agobot.arm.armPosition]);
@@ -94,34 +95,47 @@ public class RedDepot extends LinearOpMode {
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(39, 40), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(39, 48), 0, 0.6)){
 
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 38), 0, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(33, 48), 0, 0.6)){
             //TODO: place skystone, get closer
 
             Agobot.arm.armFlipOut(true);
         }
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(36, 32), 0, 0.6)){
-            Agobot.dragger.drag(true);
-        }
+        Agobot.grabber.grab(false);
+        startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
+        while(Agobot.clock.milliseconds() < (startGrab + 200)) {};
+        Agobot.arm.armFlipOut(false);
 
+        while(Agobot.drivetrain.goToPosition(new Vector2D(33, 38), 0, 0.6)){
+
+        }
+        Agobot.dragger.drag(true);
+        startGrab = Agobot.clock.milliseconds(); // wait a little before reversing
+        while(Agobot.clock.milliseconds() < (startGrab + 200)) {};
         //drag and rotate foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 40), 270, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(44, 38), 0, 0.6)){
 
         }
 
         //push against wall
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 44.5), 270, 0.6)){
-            //TODO: retract foundation grabber
-            Agobot.dragger.drag(false);
+        while(Agobot.drivetrain.goToPosition(new Vector2D(44, 38), 270, 0.6)){
+
+        }
+
+        Agobot.dragger.drag(false);
+
+        while(Agobot.drivetrain.goToPosition(new Vector2D(44, 45), 270, 0.6)){
+
         }
 
         //park on red tape, closer to left side
         while(Agobot.drivetrain.goToPosition(new Vector2D(39, 0), 270, 0.6)){
+
 
         }
 
