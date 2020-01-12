@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOp", name = "Slide Tester")
+//@TeleOp(group = "TeleOp", name = "Slide Tester")
 public class TestSlides extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

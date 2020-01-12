@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.virus.vision.StripDetector;
 
-@TeleOp
+@TeleOp(group = "TeleOp", name = "OpenCV Test")
 public class OCVTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

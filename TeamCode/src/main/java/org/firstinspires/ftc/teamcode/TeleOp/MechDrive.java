@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOP", name = "MechDrive")
+//@TeleOp(group = "TeleOP", name = "MechDrive")
 public class MechDrive extends LinearOpMode {
 
     Vector2D leftStick;

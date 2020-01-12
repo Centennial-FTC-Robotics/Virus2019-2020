@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 import java.io.File;
-@TeleOp
+//@TeleOp
 public class FileAccessing extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

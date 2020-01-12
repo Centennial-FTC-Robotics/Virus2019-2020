@@ -14,7 +14,7 @@ import org.virus.util.Vector2D;
 
 import java.util.ArrayList;
 
-@Autonomous(name="PID Tester", group="TeleOp")
+//@Autonomous(name="PID Tester", group="TeleOp")
 
 public class PIDTester extends LinearOpMode {
 

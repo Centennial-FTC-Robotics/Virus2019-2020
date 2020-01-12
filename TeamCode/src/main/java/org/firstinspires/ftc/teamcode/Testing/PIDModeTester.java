@@ -14,7 +14,7 @@ import org.virus.util.PIDController;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-@TeleOp(name="PID Mode Tester", group="TeleOp")
+//@TeleOp(name="PID Mode Tester", group="TeleOp")
 
 public class PIDModeTester extends LinearOpMode {
 

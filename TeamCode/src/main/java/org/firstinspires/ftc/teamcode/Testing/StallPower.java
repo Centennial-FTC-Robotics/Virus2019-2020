@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.virus.agobot.Agobot;
 
-@TeleOp
+//@TeleOp
 public class StallPower extends LinearOpMode {
     double speed = 0;
     double stallMin;

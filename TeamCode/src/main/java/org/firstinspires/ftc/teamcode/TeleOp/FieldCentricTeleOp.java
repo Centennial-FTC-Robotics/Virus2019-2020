@@ -28,7 +28,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
     double startHeading;
     double driverHeading;
 
-    Double timePressed = null;
+    boolean is90 = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -92,25 +92,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
             //arm
             if(gp2LeftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
 
-//                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
-//
-//                    timePressed = Agobot.clock.milliseconds();
-//                    Agobot.grabber.grab(false);
-//                }
-
                 Agobot.arm.armFlipOut(false);
             }else if(gp2rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
                 Agobot.arm.armFlipOut(true);
             }
-
-//            if (timePressed != null) { // automatic actions for picking up a block
-//
-//                if (!Agobot.grabber.isGrabbing() && Agobot.clock.milliseconds() > (timePressed + 100)) {
-//
-//                    Agobot.grabber.grab(true);
-//                    timePressed = null;
-//                }
-//            }
 
             //grabber
             if(gamepad2.b) {
@@ -138,11 +123,21 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 Agobot.dragger.drag(true);
             }
 
-            //TODO: snap 90 for driver 1
+            //snap 90 for driver 1
 
-            if (gp1RightTriggerPrev < 0.001 && gamepad1.right_trigger > 0.001) {
+            if (Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)) > 0.01) {
 
-                Agobot.drivetrain.snap90();
+                is90 = false;
+            }
+
+            if (gamepad1.right_trigger > 0.001 && !is90) {
+
+                if (Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)) >= 0.01) {
+
+                    Agobot.drivetrain.snap90();
+                } else {
+                    is90 = true;
+                }
             }
 
             //TODO: dpad stone heights
@@ -161,21 +156,27 @@ public class FieldCentricTeleOp extends LinearOpMode {
             gp2LeftTriggerPrev = gamepad2.left_trigger;
             gp2rightTriggerPrev = gamepad2.right_trigger;
 
-            telemetry.addData("leftStick: ", leftStick.toString());
-            telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
+//            telemetry.addData("cool if statement", Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)));
+//            telemetry.addData("Right Trigger gp1", gamepad1.right_trigger);
+//            telemetry.addData("Right Stick gp1", Math.abs(gamepad1.right_stick_x));
+//            telemetry.addData("is90", is90);
 
+//            telemetry.addData("leftStick: ", leftStick.toString());
+            telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
+//
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
-            telemetry.addData("Arm Number", Agobot.arm.armPosition);
-            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
-            telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
+//            telemetry.addData("Arm Number", Agobot.arm.armPosition);
+//            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
+//            telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
             telemetry.addData("Current Slide Pos", Agobot.slides.getPosition());
-            telemetry.addData("Left Slide Pos", Agobot.slides.slideLeft.getCurrentPosition());
-            telemetry.addData("Right Slide Pos", Agobot.slides.slideRight.getCurrentPosition());
+//            telemetry.addData("Left Slide Pos", Agobot.slides.slideLeft.getCurrentPosition());
+//            telemetry.addData("Right Slide Pos", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.update();
         }
     }
 
-    public void updateControllerValues(){
+    public void updateControllerValues() {
+
         leftStick.setComponents(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y});
         rightStick.setComponents(new double[] {gamepad1.right_stick_x, -gamepad1.right_stick_y});
         Agobot.drivetrain.updatePosition();

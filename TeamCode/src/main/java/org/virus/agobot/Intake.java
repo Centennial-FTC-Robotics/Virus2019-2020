@@ -36,6 +36,16 @@ public class Intake extends Subsystem {
         intakeDeployed = false;
     }
 
+    public ExpansionHubMotor getLeft() {
+
+        return  leftIntake;
+    }
+
+    public ExpansionHubMotor getRight() {
+
+        return  rightIntake;
+    }
+
     public void runIntake(double leftSpeed, double rightSpeed){
         leftSpeed = Range.clip(leftSpeed, -1, 1);
         rightSpeed = Range.clip(rightSpeed, -1, 1);

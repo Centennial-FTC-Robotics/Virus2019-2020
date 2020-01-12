@@ -9,7 +9,7 @@ import org.virus.agobot.ElementLocator;
 
 import java.util.Arrays;
 
-@Autonomous(group = "Autonomous", name = "VuforiaTest")
+//@Autonomous(group = "Autonomous", name = "VuforiaTest")
 public class VuforiaTesting extends LinearOpMode {
 
     ElementLocator tracker = new ElementLocator();
