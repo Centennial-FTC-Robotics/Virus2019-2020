@@ -279,7 +279,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         );
 
         //opMode.telemetry.addData("Heading", currentOrientation.firstAngle - initialHeading);
-        if(Math.abs(position-path.getDistance())<10 && Math.abs(normalizeDegrees(currentOrientation.firstAngle - initialHeading - targetHeading))<.5){
+        if(Math.abs(position - path.getDistance())<10 && Math.abs(normalizeDegrees(currentOrientation.firstAngle - initialHeading - targetHeading))<.5){
             runMotors(0,0);
             return true;
         } else {
@@ -381,6 +381,26 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("Back Odometry Encoder", odometry.bEncoder.getCurrentPosition());
 //        opMode.telemetry.addData("Odometry Position",odometry.position);
 //        opMode.telemetry.addData("Odometry Heading",odometry.heading);
+    }
+
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed) {
+
+        gtpLoop(newPosition, newHeading, maxSpeed, 0.75);
+    }
+
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance) {
+
+        gtpLoop(newPosition, newHeading, maxSpeed, tolerance, 1);
+    }
+
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance, double headingTolerance) {
+
+        if (opMode.isStarted()) {
+
+            while(Agobot.drivetrain.goToPosition(newPosition, newHeading, maxSpeed, tolerance, headingTolerance) && opMode.opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+
+            }
+        }
     }
 
     public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
@@ -496,5 +516,25 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double newHeading = Math.round(odometry.currentHeading() / 90) * 90;
 
         return goToPosition(odometry.currentPosition(), newHeading, 0.8);
+    }
+
+    public boolean willHitBridge() {
+
+        int slidesMaxSpeed = 203; // TODO: find the load to find the actual speed under the weight of the slides
+        double minSlidePos = Agobot.slides.ENCODER_PER_INCH * 13; // the position the slide has to be at to avoid the bridge
+
+        if (odometry.fieldCentricDelta.getComponent(1) * odometry.currentPosition().getComponent(1) < 0) {
+            // basically a dot product between the y component vectors of the position and velocity, only return negative if the robot is moving towards the bridge
+
+            double timeToIntercept = Math.abs(odometry.currentPosition().getComponent(1)) / odometry.fieldCentricDelta.getComponent(1);
+            // the bridge position is 0 in the coordinate system  so the current y pos is the distance from the bridge
+
+            if (timeToIntercept < ((Agobot.slides.getPosition() - minSlidePos) / slidesMaxSpeed)) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

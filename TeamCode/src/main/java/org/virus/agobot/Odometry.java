@@ -38,7 +38,6 @@ public class Odometry extends Subsystem {
     public int deltalEncoder;
     public int deltarEncoder;
     public int deltabEncoder;
-    public double deltaHorizontal;
     public double deltaHeading;
     public double deltax;
     public double deltay;
