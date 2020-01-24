@@ -115,26 +115,14 @@ public class RedDepot extends LinearOpMode {
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(42, 48), 0, 0.8, 1.5, 3) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(42, 40), 0, 0.8, 1.5, 3) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
 
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 48), 0, 0.6, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 40), 0, 0.6, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
             // place skystone
             Agobot.arm.armFlipOut(true);
-        }
-
-        startGrab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))) {};
-        Agobot.grabber.grab(false);
-
-        startGrab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))) {};
-        Agobot.arm.armFlipOut(false);
-
-        while(Agobot.drivetrain.goToPosition(new Vector2D(32, 40), 0, 0.6,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
-
         }
 
         Agobot.dragger.drag(true);
@@ -143,11 +131,14 @@ public class RedDepot extends LinearOpMode {
         PIDControllers.xController.changeConstants(.09f,.3f ,0.001f,0.3f);
         PIDControllers.yController.changeConstants(.09f,.3f ,0.001f,0.3f);
 
+        double startDrag = Agobot.clock.milliseconds();
         //drag foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 40), 0, 0.6,1.5)){
-
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 40), 0, 0.6,1.5) && Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000)){
+            if(Agobot.clock.milliseconds() > startDrag + 300){
+                Agobot.grabber.grab(false);
+            }
         }
-
+        Agobot.arm.armFlipOut(false);
         PIDControllers.headingController.changeConstants(-.5f, -.15f,-.001f, 1.5f);
 
         while(Agobot.drivetrain.goToPosition(new Vector2D(40, 30), 270, 0.8,3, 7) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 24000 )) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){

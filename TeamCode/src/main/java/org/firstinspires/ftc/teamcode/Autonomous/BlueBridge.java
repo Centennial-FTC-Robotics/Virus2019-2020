@@ -103,26 +103,14 @@ public class BlueBridge extends LinearOpMode {
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-39, 48), 180, 0.8, 1.5, 3) && opModeIsActive()) {
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-39, 40), 180, 0.8, 1.5, 3) && opModeIsActive()) {
 
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-30, 48), 180, 0.6, 1.5) && opModeIsActive()) {
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-30, 40), 180, 0.6, 1.5) && opModeIsActive()) {
             // place skystone
             Agobot.arm.armFlipOut(true);
-        }
-
-        startGrab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive()) {}
-        Agobot.grabber.grab(false);
-
-        startGrab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive()) {}
-        Agobot.arm.armFlipOut(false);
-
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-30, 40), 180, 0.6,1.5) && opModeIsActive()) {
-
         }
 
         Agobot.dragger.drag(true);
@@ -131,11 +119,14 @@ public class BlueBridge extends LinearOpMode {
         PIDControllers.xController.changeConstants(.09f,.3f ,0.001f,0.3f);
         PIDControllers.yController.changeConstants(.09f,.3f ,0.001f,0.3f);
 
+        double startDrag = Agobot.clock.milliseconds();
         //drag foundation
         while(Agobot.drivetrain.goToPosition(new Vector2D(-40, 40), 180, 0.6,1.5) && opModeIsActive()) {
-
+            if(Agobot.clock.milliseconds() > startDrag + 300){
+                Agobot.grabber.grab(false);
+            }
         }
-
+        Agobot.arm.armFlipOut(false);
         PIDControllers.headingController.changeConstants(-.5f, -.15f,-.001f, .9f);
 
         while(Agobot.drivetrain.goToPosition(new Vector2D(-40, 30), 270, 0.8,1.5) && opModeIsActive()) {
