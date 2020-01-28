@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "TeleOP", name = "Odometry Information")
+//@TeleOp(group = "TeleOP", name = "Odometry Information")
 public class OdoInfo extends LinearOpMode {
 
     Vector2D leftStick;

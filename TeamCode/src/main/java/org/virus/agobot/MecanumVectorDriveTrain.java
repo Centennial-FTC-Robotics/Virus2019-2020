@@ -133,6 +133,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void initialize(LinearOpMode opMode) {
+
+        // set the controllers to reset from autonomous stuffs
+        xController.changeConstants(.07f,.16f ,0.002f,0.15f);
+        yController.changeConstants(.07f,.16f ,0.002f,0.15f);
+        headingController.changeConstants(-.07f, -.009f,-.001f, .1f);
+
         lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
         rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
         lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");
@@ -222,7 +228,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         //correction = 0;
         opMode.telemetry.addData("heading", currentOrientation.firstAngle - initialHeading);
         opMode.telemetry.addData("leftEncoder", getLeftPos());
-        opMode.telemetry.addData("righttEncoder",getRightPos());
+        opMode.telemetry.addData("rightEncoder",getRightPos());
         opMode.telemetry.addData("error", normalizeDegrees(currentOrientation.firstAngle - initialHeading - targetHeading));
         opMode.telemetry.addData("correction", correction);
         opMode.telemetry.update();
@@ -273,7 +279,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         );
 
         //opMode.telemetry.addData("Heading", currentOrientation.firstAngle - initialHeading);
-        if(Math.abs(position-path.getDistance())<10 && Math.abs(normalizeDegrees(currentOrientation.firstAngle - initialHeading - targetHeading))<.5){
+        if(Math.abs(position - path.getDistance())<10 && Math.abs(normalizeDegrees(currentOrientation.firstAngle - initialHeading - targetHeading))<.5){
             runMotors(0,0);
             return true;
         } else {
@@ -377,7 +383,36 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 //        opMode.telemetry.addData("Odometry Heading",odometry.heading);
     }
 
-    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance){
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed) {
+
+        gtpLoop(newPosition, newHeading, maxSpeed, 0.75);
+    }
+
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance) {
+
+        gtpLoop(newPosition, newHeading, maxSpeed, tolerance, 1);
+    }
+
+    public void gtpLoop(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance, double headingTolerance) {
+
+        if (opMode.isStarted()) {
+
+            while(Agobot.drivetrain.goToPosition(newPosition, newHeading, maxSpeed, tolerance, headingTolerance) && opMode.opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+
+            }
+        }
+    }
+
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
+        return goToPosition(newPosition, newHeading, maxSpeed, 0.75);
+    }
+
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance) {
+
+        return goToPosition(newPosition, newHeading, maxSpeed, tolerance, 1);
+    }
+
+    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed, double tolerance, double headingTolerance){
 
         currentPosition = updatePosition();
 //        opMode.telemetry.addData("Position:", currentPosition);
@@ -414,7 +449,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         double yDiff = currentPosition.getComponent(1) - newPosition.getComponent(1);
         double headingDiff = angleDifference(newHeading, getHeading());
         //opMode.telemetry.addData("Heading Difference: ", headingDiff);
-        if (Math.abs(xDiff) < tolerance && Math.abs(yDiff) < tolerance && Math.abs(headingDiff) < 1) {
+        if (Math.abs(xDiff) < tolerance && Math.abs(yDiff) < tolerance && Math.abs(headingDiff) < headingTolerance) {
             runMotors(0,0,0,0,0);
             xController.clear();
             yController.clear();
@@ -422,9 +457,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             return false;
         }
         return true;
-    }
-    public boolean goToPosition(Vector2D newPosition, double newHeading, double maxSpeed){
-        return goToPosition(newPosition,newHeading,maxSpeed,.75);
     }
 
     public void updateMotorPowers(Vector2D newPosition, double newHeading){
@@ -483,6 +515,26 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         double newHeading = Math.round(odometry.currentHeading() / 90) * 90;
 
-        return goToPosition(odometry.currentPosition(), newHeading, 0.6);
+        return goToPosition(odometry.currentPosition(), newHeading, 0.8);
+    }
+
+    public boolean willHitBridge() {
+
+        int slidesMaxSpeed = 203; // TODO: find the load to find the actual speed under the weight of the slides
+        double minSlidePos = Agobot.slides.ENCODER_PER_INCH * 13; // the position the slide has to be at to avoid the bridge
+
+        if (odometry.fieldCentricDelta.getComponent(1) * odometry.currentPosition().getComponent(1) < 0) {
+            // basically a dot product between the y component vectors of the position and velocity, only return negative if the robot is moving towards the bridge
+
+            double timeToIntercept = Math.abs(odometry.currentPosition().getComponent(1)) / odometry.fieldCentricDelta.getComponent(1);
+            // the bridge position is 0 in the coordinate system  so the current y pos is the distance from the bridge
+
+            if (timeToIntercept < ((Agobot.slides.getPosition() - minSlidePos) / slidesMaxSpeed)) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -8,6 +8,8 @@ import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
 
 public class Agobot extends Robot {
+
+    // Robot Components
     public static MecanumVectorDriveTrain drivetrain = new MecanumVectorDriveTrain();
     public static ElementLocator tracker = new ElementLocator();
     public static Slides slides = new Slides();
@@ -18,6 +20,9 @@ public class Agobot extends Robot {
 
     public static ElapsedTime clock = new ElapsedTime();
     static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger,tracker};
+
+    // robot variables
+    public static double autoStarted = 0;
 
     public static void initialize(LinearOpMode opMode){
 
@@ -30,8 +35,14 @@ public class Agobot extends Robot {
             subsystems[i].initialize(opMode);
         }
     }
+
     public static void initializeWithVision(LinearOpMode opMode){
         initialize(opMode);
         tracker.initialize(opMode);
+    }
+
+    public static void autoStart() {
+
+        autoStarted = clock.milliseconds();
     }
 }

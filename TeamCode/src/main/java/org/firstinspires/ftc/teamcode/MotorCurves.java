@@ -7,12 +7,12 @@ import org.virus.Advanced_Paths.ParametricPath;
 
 import java.util.ArrayList;
 
-public class ParametricAuto extends LinearOpMode {
+public class MotorCurves extends LinearOpMode {
 
     ParametricPath testPath;
 
     public void runOpMode() throws InterruptedException {
 
-        ArrayList<Function> pathComponents = new ArrayList<Function>();
+        ArrayList<Double> pathComponents = new ArrayList<Double>();
     }
 }

@@ -8,7 +8,7 @@ import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
 
-@Autonomous(group = "Autonomous", name = "Odometry Demo")
+//@Autonomous(group = "Autonomous", name = "Odometry Demo")
 
 public class OdoDemo extends LinearOpMode {
     double maxSpeed = 1;

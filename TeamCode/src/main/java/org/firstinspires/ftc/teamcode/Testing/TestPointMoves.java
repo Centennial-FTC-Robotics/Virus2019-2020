@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@Autonomous(name="TestPointMoves", group="Autonomous")
+//@Autonomous(name="TestPointMoves", group="Autonomous")
 
 public class TestPointMoves extends LinearOpMode {
     @Override

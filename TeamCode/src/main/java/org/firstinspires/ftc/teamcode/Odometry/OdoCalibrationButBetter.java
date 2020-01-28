@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.virus.agobot.Agobot;
 
-@TeleOp(name = "Odometry Calibration 2.0", group = "Calibration")
+//@TeleOp(name = "Odometry Calibration 2.0", group = "Calibration")
 
 public class OdoCalibrationButBetter extends LinearOpMode {
     @Override

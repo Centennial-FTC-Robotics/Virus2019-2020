@@ -19,7 +19,8 @@ public class Slides extends Subsystem {
     public final int slideMax = 1500;
     public final int tolerance = 50;
 
-    public static final double ENCODER_PER_INCH = 84.81f;
+
+    public static final double ENCODER_PER_INCH = 28 * 13.7 * (30f / 48f) * (1 / (2 * Math.PI * 1.476377953)); // should be 25.86279504 encoder counts/inch
 
     //public int position = 0;
     double prevPower = 0;

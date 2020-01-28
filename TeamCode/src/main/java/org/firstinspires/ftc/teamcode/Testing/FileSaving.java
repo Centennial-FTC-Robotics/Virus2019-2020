@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
 
 import java.io.File;
-@TeleOp
+//@TeleOp
 public class FileSaving extends LinearOpMode {
     File test = AppUtil.getInstance().getSettingsFile("test.txt");
 
