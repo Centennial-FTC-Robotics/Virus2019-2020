@@ -90,7 +90,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             Agobot.slides.slidePower(-0.5 * gamepad2.left_stick_y);
 
             //arm
-            if(gp2LeftTriggerPrev < 0.001 && gamepad2.left_trigger > 0.001) { //only calls if trigger is pressed and on previous loop iteration it wasn't
+            if(gp2LeftTriggerPrev < 0.1 && gamepad2.left_trigger > 0.1) { //only calls if trigger is pressed and on previous loop iteration it wasn't
 
 //                if (timePressed == null && Agobot.arm.getArmPosition().equals("standby")) {
 //
@@ -99,7 +99,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 //                }
 
                 Agobot.arm.armFlipOut(false);
-            }else if(gp2rightTriggerPrev < 0.001 && gamepad2.right_trigger > 0.001){
+            }else if(gp2rightTriggerPrev < 0.1 && gamepad2.right_trigger > 0.1){
                 Agobot.arm.armFlipOut(true);
             }
 
