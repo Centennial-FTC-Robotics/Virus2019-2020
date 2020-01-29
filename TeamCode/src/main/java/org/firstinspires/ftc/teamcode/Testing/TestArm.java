@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-//@TeleOp(group = "TeleOp", name = "Arm Tester")
+@TeleOp(group = "TeleOp", name = "Arm Tester")
 public class TestArm extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -17,10 +17,12 @@ public class TestArm extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            if(gamepad2.left_trigger > 0) {
-                Agobot.arm.armFlipOut(false);
-            }else if(gamepad2.right_trigger > 0){
-                Agobot.arm.armFlipOut(true);
+            if(gamepad2.left_trigger > 0) { // in
+                Agobot.arm.leftArm.setPosition(1);
+                Agobot.arm.rightArm.setPosition(0);
+            }else if(gamepad2.right_trigger > 0){ // out
+                Agobot.arm.leftArm.setPosition(0.1);
+                Agobot.arm.rightArm.setPosition(0.9);
             }
 
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
