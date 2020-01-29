@@ -144,13 +144,13 @@ public class FieldCentricTeleOp extends LinearOpMode {
             int startStoneHeight = 24;
             //TODO: test for what encoder values mean 1 stone height
             int stoneHeight = 340;
-            int currentSlideHeight = Agobot.slides.getPosition();
+            /*int currentSlideHeight = Agobot.slides.getPosition();
             if(gamepad2.dpad_up){
                 Agobot.slides.slides(currentSlideHeight + stoneHeight);
             }
             if(gamepad2.dpad_down){
                 Agobot.slides.slides(currentSlideHeight - stoneHeight);
-            }
+            }*/
 
             gp1RightTriggerPrev = gamepad1.right_trigger;
             gp2LeftTriggerPrev = gamepad2.left_trigger;
@@ -162,13 +162,13 @@ public class FieldCentricTeleOp extends LinearOpMode {
 //            telemetry.addData("is90", is90);
 
 //            telemetry.addData("leftStick: ", leftStick.toString());
-            telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
+           // telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
 //
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
 //            telemetry.addData("Arm Number", Agobot.arm.armPosition);
 //            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
 //            telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
-            telemetry.addData("Current Slide Pos", Agobot.slides.getPosition());
+            //telemetry.addData("Current Slide Pos", Agobot.slides.getPosition());
 //            telemetry.addData("Left Slide Pos", Agobot.slides.slideLeft.getCurrentPosition());
 //            telemetry.addData("Right Slide Pos", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.update();
