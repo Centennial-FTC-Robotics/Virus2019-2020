@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.superclasses.Robot;
@@ -10,8 +11,8 @@ import org.virus.util.PIDController;
 
 public class Slides extends Subsystem {
 
-    public ExpansionHubMotor slideLeft;
-    public ExpansionHubMotor slideRight;
+    public DcMotorEx slideLeft;
+    public DcMotorEx slideRight;
     PIDController slidesController = new PIDController(.004f, 0f, 0f, .1f);
 
     //TODO: test for correct values
@@ -28,8 +29,8 @@ public class Slides extends Subsystem {
 
     @Override
     public void initialize(LinearOpMode opMode) {
-        slideLeft = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "slideLeft");
-        slideRight = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "slideRight");
+        slideLeft = opMode.hardwareMap.get(DcMotorEx.class, "slideLeft");
+        slideRight = opMode.hardwareMap.get(DcMotorEx.class, "slideRight");
 
         slideLeft.setDirection(DcMotor.Direction.REVERSE);
 
@@ -40,8 +41,7 @@ public class Slides extends Subsystem {
         slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public int getPosition(){
-        Agobot.updateHub2Data();
-        return (Agobot.getHub2Data().getMotorCurrentPosition(slideLeft) + Agobot.getHub2Data().getMotorCurrentPosition(slideRight))/2;
+        return (slideLeft.getCurrentPosition() + slideRight.getCurrentPosition())/2;
     }
     //position in encoder counts
     public boolean slides(int position){
@@ -64,7 +64,6 @@ public class Slides extends Subsystem {
         slideLeft.setPower(slidesController.getValue(position, this.getPosition()));
         slideRight.setPower(slidesController.getValue(position, this.getPosition()));
         return !(Math.abs(getPosition() - position) > tolerance);
-
     }
 
     //used with controllers

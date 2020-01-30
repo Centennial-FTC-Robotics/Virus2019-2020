@@ -8,6 +8,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.Range;
 
@@ -34,10 +35,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     //standard 4 motor drivetrain
     private int IMUUPDATERATE=50;
     private int odoLoopCounter=0;
-    private ExpansionHubMotor lFront;
-    private ExpansionHubMotor rFront;
-    private ExpansionHubMotor lBack;
-    private ExpansionHubMotor rBack;
+    private DcMotorEx lFront;
+    private DcMotorEx rFront;
+    private DcMotorEx lBack;
+    private DcMotorEx rBack;
     private BNO055IMU imu;
     float initialHeading;
     float initialPitch;
@@ -140,10 +141,10 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         yController.changeConstants(.07f,.16f ,0.002f,0.15f);
         headingController.changeConstants(-.07f, -.009f,-.001f, .1f);
 
-        lFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lFront");
-        rFront = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rFront");
-        lBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "lBack");
-        rBack = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rBack");
+        lFront = opMode.hardwareMap.get(DcMotorEx.class, "lFront");
+        rFront = opMode.hardwareMap.get(DcMotorEx.class, "rFront");
+        lBack = opMode.hardwareMap.get(DcMotorEx.class, "lBack");
+        rBack = opMode.hardwareMap.get(DcMotorEx.class, "rBack");
         rFront.setDirection(DcMotor.Direction.REVERSE);
         rBack.setDirection(DcMotor.Direction.REVERSE);
 
@@ -176,12 +177,13 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         rBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
+
     public int getRightPos(){
-        return (Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rFront)+ Robot.getHub1().getBulkInputData().getMotorCurrentPosition(rBack))/2;
+        return (rFront.getCurrentPosition()+ rBack.getCurrentPosition())/2;
     }
 
     public int getLeftPos(){
-        return (Robot.getHub1().getBulkInputData().getMotorCurrentPosition(lFront)+ Robot.getHub1().getBulkInputData().getMotorCurrentPosition(lBack))/2;
+        return (lFront.getCurrentPosition()+ lBack.getCurrentPosition())/2;
     }
 
     public void resetAllEncoders(){

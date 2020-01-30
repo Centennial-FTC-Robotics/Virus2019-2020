@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -16,9 +17,9 @@ import org.virus.util.Vector2D;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
 
 public class Odometry extends Subsystem {
-    public ExpansionHubMotor lEncoder;
-    public ExpansionHubMotor rEncoder;
-    public ExpansionHubMotor bEncoder;
+    public DcMotorEx lEncoder;
+    public DcMotorEx rEncoder;
+    public DcMotorEx bEncoder;
     public Vector2D position; // this has to be in inches
     public double heading = 0;
     double startHeading = 0;
@@ -51,7 +52,7 @@ public class Odometry extends Subsystem {
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
 
-    Odometry(ExpansionHubMotor lEncoder, ExpansionHubMotor rEncoder, ExpansionHubMotor bEncoder){
+    Odometry(DcMotorEx lEncoder, DcMotorEx rEncoder, DcMotorEx bEncoder){
         this.lEncoder=lEncoder;
         this.rEncoder=rEncoder;
         this.bEncoder=bEncoder;
@@ -89,10 +90,9 @@ public class Odometry extends Subsystem {
 
     //lrb
     public void updateEncoders(){
-        Agobot.updateHub1Data();
-        lEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(lEncoder);
-        rEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(rEncoder);
-        bEncoderCounts = Agobot.getHub1Data().getMotorCurrentPosition(bEncoder);
+        lEncoderCounts = lEncoder.getCurrentPosition();
+        rEncoderCounts = rEncoder.getCurrentPosition();
+        bEncoderCounts = bEncoder.getCurrentPosition();
     }
 
     public int getlEncoderCounts() {
