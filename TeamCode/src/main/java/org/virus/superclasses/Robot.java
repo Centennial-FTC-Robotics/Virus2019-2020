@@ -4,6 +4,7 @@ import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
 public abstract class Robot {
+    /*
     static RevBulkData hub1Data;
     static RevBulkData hub2Data;
     static ExpansionHubEx hub1;
@@ -37,8 +38,5 @@ public abstract class Robot {
     }
     public static ExpansionHubEx getHub2(){
         return hub2;
-    }
-
-
-
+    }*/
 }

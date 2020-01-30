@@ -1,11 +1,14 @@
 package org.virus.agobot;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.virus.superclasses.Robot;
 import org.virus.superclasses.Subsystem;
+
+import java.util.List;
 
 public class Agobot extends Robot {
 
@@ -20,16 +23,15 @@ public class Agobot extends Robot {
 
     public static ElapsedTime clock = new ElapsedTime();
     static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger,tracker};
-
+    static List<LynxModule> revHubs;
     // robot variables
     public static double autoStarted = 0;
 
     public static void initialize(LinearOpMode opMode){
-
-        setHub1(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"));
-        setHub2(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
-        updateHub1Data();
-        updateHub2Data();
+        revHubs = opMode.hardwareMap.getAll(LynxModule.class);
+        for (LynxModule module : revHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
         for(int i=0; i < subsystems.length-1; i++){
             subsystems[i].initialize(opMode);
