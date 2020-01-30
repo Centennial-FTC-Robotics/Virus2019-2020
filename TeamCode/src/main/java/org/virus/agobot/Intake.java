@@ -29,8 +29,8 @@ public class Intake extends Subsystem {
         leftIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        leftIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         intakeDeploying = false;
         intakeDeployed = false;
