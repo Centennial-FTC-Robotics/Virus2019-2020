@@ -3,16 +3,25 @@ package org.virus.superclasses;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
+import java.lang.reflect.Constructor;
+
 public abstract class Robot {
     /*
     static RevBulkData hub1Data;
     static RevBulkData hub2Data;
     static ExpansionHubEx hub1;
     static ExpansionHubEx hub2;
+
     public static void updateHub1Data(){
         RevBulkData tempData = hub1.getBulkInputData() ;
-        if (tempData!=null){
+
+        if (tempData != null){
             hub1Data = tempData;
+        } else {
+
+            Constructor robot = RevBulkData.class.getConstructors()[0];
+            robot.setAccessible(true);
+
         }
     }
     public static void updateHub2Data(){
@@ -21,6 +30,7 @@ public abstract class Robot {
             hub2Data = tempData;
         }
     }
+
     public static RevBulkData getHub1Data(){
         return hub1Data;
     }
