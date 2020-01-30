@@ -59,7 +59,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
         ReadWriteFile.writeFile(opModeData, "");
         leftStick = new Vector2D((double) gamepad1.left_stick_x, (double) -gamepad1.left_stick_y);
         rightStick = new Vector2D((double) gamepad1.right_stick_x, (double) gamepad1.right_stick_y);
-
         while(opModeIsActive()) {
 
             if (gamepad1.a && gamepad1.b && gamepad1.dpad_left && gamepad1.dpad_up) {
@@ -129,6 +128,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
                 is90 = false;
             }
+            /*
 
             if (gamepad1.right_trigger > 0.001 && !is90) {
 
@@ -138,7 +138,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 } else {
                     is90 = true;
                 }
-            }
+            }*/
 
             //TODO: dpad stone heights
             int startStoneHeight = 24;

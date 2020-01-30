@@ -133,6 +133,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public void initialize(LinearOpMode opMode) {
+        this.opMode=opMode;
 
         // set the controllers to reset from autonomous stuffs
         xController.changeConstants(.07f,.16f ,0.002f,0.15f);
@@ -154,7 +155,6 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         lBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        this.opMode=opMode;
         //should be handled by odometry
         /*
         resetAllEncoders();
