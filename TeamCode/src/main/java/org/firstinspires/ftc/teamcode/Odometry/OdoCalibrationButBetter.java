@@ -20,9 +20,9 @@ public class OdoCalibrationButBetter extends LinearOpMode {
             //telemetry.update();
             Agobot.drivetrain.imuHeading();
         }
-        double leftRightDelta = (Agobot.drivetrain.odometry.lEncoder.getCurrentPosition() - Agobot.drivetrain.odometry.rEncoder.getCurrentPosition());
-        double diameter = (Agobot.drivetrain.odometry.lEncoder.getCurrentPosition() - Agobot.drivetrain.odometry.rEncoder.getCurrentPosition()) / (Math.toRadians(Agobot.drivetrain.imuHeading()));
-        double offset = (Agobot.drivetrain.odometry.bEncoder.getCurrentPosition()) / (Math.toRadians(Agobot.drivetrain.imuHeading()));
+        double leftRightDelta = (Agobot.getCurrentMotorPos(Agobot.drivetrain.odometry.lEncoder) - Agobot.getCurrentMotorPos(Agobot.drivetrain.odometry.rEncoder));
+        double diameter = (Agobot.getCurrentMotorPos(Agobot.drivetrain.odometry.lEncoder) - Agobot.getCurrentMotorPos(Agobot.drivetrain.odometry.rEncoder)) / (Math.toRadians(Agobot.drivetrain.imuHeading()));
+        double offset = (Agobot.getCurrentMotorPos(Agobot.drivetrain.odometry.bEncoder)) / (Math.toRadians(Agobot.drivetrain.imuHeading()));
         while (true) {
             telemetry.addData("diameter", diameter);
             telemetry.addData("offset", offset);

@@ -90,9 +90,9 @@ public class Odometry extends Subsystem {
 
     //lrb
     public void updateEncoders(){
-        lEncoderCounts = lEncoder.getCurrentPosition();
-        rEncoderCounts = rEncoder.getCurrentPosition();
-        bEncoderCounts = bEncoder.getCurrentPosition();
+        lEncoderCounts = Agobot.getCurrentMotorPos(lEncoder);
+        rEncoderCounts = Agobot.getCurrentMotorPos(rEncoder);
+        bEncoderCounts = Agobot.getCurrentMotorPos(bEncoder);
     }
 
     public int getlEncoderCounts() {

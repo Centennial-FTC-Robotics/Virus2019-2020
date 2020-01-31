@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.virus.agobot.Agobot;
 
 import java.io.File;
 
@@ -103,7 +104,7 @@ public class OdometryCalibration extends LinearOpMode {
         Since the left encoder is also mapped to a drive motor, the encoder value needs to be reversed with the negative sign in front
         THIS MAY NEED TO BE CHANGED FOR EACH ROBOT
        */
-        double encoderDifference = Math.abs(verticalLeft.getCurrentPosition()) + (Math.abs(verticalRight.getCurrentPosition()));
+        double encoderDifference = Math.abs(Agobot.getCurrentMotorPos(verticalLeft)) + (Math.abs(Agobot.getCurrentMotorPos(verticalRight)));
 
         double verticalEncoderTickOffsetPerDegree = encoderDifference/angle;
 
@@ -111,7 +112,7 @@ public class OdometryCalibration extends LinearOpMode {
         double wheelBaseSeparation = (2*90*verticalEncoderTickOffsetPerDegree)/(Math.PI*COUNTS_PER_INCH);
         //wheelBaseSeparation = (2.0*angle*verticalEncoderTickOffsetPerDegree)/(Math.PI*COUNTS_PER_INCH)
 
-        horizontalTickOffset = horizontal.getCurrentPosition()/Math.toRadians(getZAngle());
+        horizontalTickOffset = Agobot.getCurrentMotorPos(horizontal)/Math.toRadians(getZAngle());
 
         //Write the constants to text files
         ReadWriteFile.writeFile(wheelBaseSeparationFile, String.valueOf(wheelBaseSeparation));
@@ -125,9 +126,9 @@ public class OdometryCalibration extends LinearOpMode {
 
             //Display raw values
             telemetry.addData("IMU Angle", getZAngle());
-            telemetry.addData("Vertical Left Position", -verticalLeft.getCurrentPosition());
-            telemetry.addData("Vertical Right Position", verticalRight.getCurrentPosition());
-            telemetry.addData("Horizontal Position", horizontal.getCurrentPosition());
+            telemetry.addData("Vertical Left Position", -Agobot.getCurrentMotorPos(verticalLeft));
+            telemetry.addData("Vertical Right Position", Agobot.getCurrentMotorPos(verticalRight));
+            telemetry.addData("Horizontal Position", Agobot.getCurrentMotorPos(horizontal));
             telemetry.addData("Vertical Encoder Offset", verticalEncoderTickOffsetPerDegree);
 
             //Update values

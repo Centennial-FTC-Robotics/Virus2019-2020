@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.openftc.revextensions2.ExpansionHubEx;
@@ -46,4 +47,21 @@ public class Agobot extends Robot {
 
         autoStarted = clock.milliseconds();
     }
+
+    public static int getCurrentMotorPos(DcMotor motor) {
+
+        try {
+
+            return motor.getCurrentPosition();
+        } catch(NullPointerException e) {
+
+            for (LynxModule module : revHubs) {
+                module.setBulkCachingMode(LynxModule.BulkCachingMode.OFF);
+            }
+
+            return motor.getCurrentPosition();
+        }
+    }
+
+
 }

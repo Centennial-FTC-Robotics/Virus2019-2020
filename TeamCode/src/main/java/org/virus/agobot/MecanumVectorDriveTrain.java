@@ -179,11 +179,12 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     }
 
     public int getRightPos(){
-        return (rFront.getCurrentPosition()+ rBack.getCurrentPosition())/2;
+
+        return (Agobot.getCurrentMotorPos(rFront) + Agobot.getCurrentMotorPos(rBack))/2;
     }
 
     public int getLeftPos(){
-        return (lFront.getCurrentPosition()+ lBack.getCurrentPosition())/2;
+        return (Agobot.getCurrentMotorPos(lFront)+ Agobot.getCurrentMotorPos(lBack))/2;
     }
 
     public void resetAllEncoders(){
@@ -203,8 +204,8 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         rFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
+
     public boolean movePath(Path path){
         return movePath(path, moveController);
     }
