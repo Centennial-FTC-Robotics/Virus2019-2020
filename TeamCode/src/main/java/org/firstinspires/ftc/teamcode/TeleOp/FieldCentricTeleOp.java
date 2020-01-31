@@ -128,7 +128,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
                 is90 = false;
             }
-            /*
 
             if (gamepad1.right_trigger > 0.001 && !is90) {
 
@@ -138,7 +137,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 } else {
                     is90 = true;
                 }
-            }*/
+            }
 
             //TODO: dpad stone heights
             int startStoneHeight = 24;

@@ -59,7 +59,13 @@ public class Agobot extends Robot {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.OFF);
             }
 
-            return motor.getCurrentPosition();
+            int motorPos = motor.getCurrentPosition();
+
+            for (LynxModule module : revHubs) {
+                module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            }
+
+            return motorPos;
         }
     }
 

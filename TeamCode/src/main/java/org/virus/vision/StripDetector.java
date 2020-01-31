@@ -60,7 +60,7 @@ public class StripDetector {
 
     public void activate() {
 
-        phoneCam.startStreaming(1280, 720, OpenCvCameraRotation.SIDEWAYS_LEFT);
+        phoneCam.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
     }
 
     public void deactivate() {
@@ -95,7 +95,7 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input)
         {
-            rectCrop = new Rect(new Point(150,450) , new Point(1090,550));
+            rectCrop = new Rect(new Point(50, 255) , new Point(510,305));
             //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
             cropped = new Mat(input, rectCrop);
 
@@ -109,14 +109,14 @@ public class StripDetector {
 
                 double segmentAverage = 0;
 
-                for (int i = (300 * s); i < (320 * s) + 300; i++) {
+                for (int i = (150 * s); i < (153.3333 * s) + 150; i++) {
                     for (int j = 0; j < croppedGrayScale.rows(); j++) {
 
                         segmentAverage += croppedGrayScale.get(j,i)[0];
                     }
                 }
 
-                double segAvg = segmentAverage / (300 * croppedGrayScale.cols());
+                double segAvg = segmentAverage / (150 * croppedGrayScale.cols());
 
                 if (segAvg < segAvgMin) {
 
