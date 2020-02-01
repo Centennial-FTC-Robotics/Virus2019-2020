@@ -11,6 +11,8 @@ import org.virus.util.Vector2D;
 public class GetStoneMethodTester extends LinearOpMode {
 
     public static enum modes {FLAT, ANGLE};
+    private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
+    private double startHeading = 270; //straight left
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,6 +67,7 @@ public class GetStoneMethodTester extends LinearOpMode {
 
     //gets stone
     public void getStone(int stoneNum){
+        int xCoord = 36;
         switch(stoneNum){
             case 1:
                 break;
@@ -84,20 +87,64 @@ public class GetStoneMethodTester extends LinearOpMode {
 
     //gets stone at 45 degree angle
     public void getStoneAngle(int stoneNum){
+        int xCoord = 36;
+        int yCoord = 0;
+        int angle = 225;
         switch(stoneNum){
             case 1:
+                yCoord = 56;
                 break;
             case 2:
+                yCoord = 48;
                 break;
             case 3:
+                yCoord = 40;
                 break;
             case 4:
+                yCoord = 32;
                 break;
             case 5:
+                yCoord = 24;
                 break;
             default:
                 //6th stone
+                yCoord = 16;
                 break;
         }
+
+        // deploy intake as the very first action
+        Agobot.grabber.grab(false);
+        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.intake.deployIntake();
+
+        //go at angle to collect stone
+        while(Agobot.drivetrain.goToPosition(new Vector2D(xCoord, yCoord), angle, 0.6) && opModeIsActive()){
+
+        }
+
+        Agobot.intake.runIntake(1);
+        Agobot.intake.getLeft().setPower(1);
+        Agobot.intake.getRight().setPower(1);
+
+        //go collect stone
+        while(Agobot.drivetrain.goToPosition(new Vector2D(24, yCoord), angle, 0.6) && opModeIsActive()){
+
+        }
+
+
+        double startIntake = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
+        while(Agobot.clock.milliseconds() < (startIntake + 1000) && opModeIsActive()) {}
+
+        Agobot.intake.runIntake(0);
+        Agobot.arm.armFlipOut(false); //go from standby to in
+        double grab = Agobot.clock.milliseconds();
+        while(Agobot.clock.milliseconds() < (grab + 100) && opModeIsActive()) {}
+        Agobot.grabber.grab(true);
+
+
+        double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
+        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive()) {}
+
+        Agobot.arm.armFlipOut(true);
     }
 }
