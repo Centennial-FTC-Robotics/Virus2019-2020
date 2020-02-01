@@ -95,7 +95,7 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input)
         {
-            rectCrop = new Rect(new Point(50, 255) , new Point(510,305));
+            rectCrop = new Rect(new Point(30, 255) , new Point(430,305));
             //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
             cropped = new Mat(input, rectCrop);
 
@@ -109,7 +109,7 @@ public class StripDetector {
 
                 double segmentAverage = 0;
 
-                for (int i = (150 * s); i < (153.3333 * s) + 150; i++) {
+                for (int i = (140 * s); i < (140 * s) + 120; i++) {
                     for (int j = 0; j < croppedGrayScale.rows(); j++) {
 
                         segmentAverage += croppedGrayScale.get(j,i)[0];

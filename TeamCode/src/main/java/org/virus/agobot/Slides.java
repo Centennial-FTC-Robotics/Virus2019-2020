@@ -44,9 +44,9 @@ public class Slides extends Subsystem {
         return (Agobot.getCurrentMotorPos(slideLeft) + Agobot.getCurrentMotorPos(slideRight))/2;
     }
     //position in encoder counts
-    public boolean slides(int position){
-/*
+    public boolean slides(int position) {
 
+        /*
         //restrict slides to min and max values
         position = Range.clip(position, slideMin, slideMax);
 

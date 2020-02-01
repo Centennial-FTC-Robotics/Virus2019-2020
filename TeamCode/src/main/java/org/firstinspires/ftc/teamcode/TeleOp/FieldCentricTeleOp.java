@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.openftc.revextensions2.RevBulkData;
 import org.virus.agobot.Agobot;
+import org.virus.agobot.PIDControllers;
 import org.virus.util.Vector2D;
 
 import java.io.File;
@@ -28,8 +29,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
     public Vector2D startPosition;
     double startHeading;
     double driverHeading;
-
-    boolean is90 = false;
+    double snap90Correction = 0;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -80,9 +80,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
             speedMultiplier = 1 - (0.7 * gamepad1.left_trigger);
 
             if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
-                Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0)); //var1 and 2 are computed values found in theUpdateControllerValues method
+                Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0) + snap90Correction); //var1 and 2 are computed values found in theUpdateControllerValues method
             } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0));
+                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0) + snap90Correction);
             }
 
             //slides
@@ -108,7 +108,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             if(gamepad2.right_bumper){
                 Agobot.intake.runIntake(1);
             }else if(gamepad2.left_bumper){
-                Agobot.intake.runIntake(-1);
+                Agobot.intake.runIntake(-0.7);
             }else{
                 Agobot.intake.runIntake(0);
             }
@@ -124,19 +124,12 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             //snap 90 for driver 1
 
-            if (Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)) > 0.01) {
+            if (gamepad1.right_trigger > 0.001) {
 
-                is90 = false;
-            }
+                snap90Correction = PIDControllers.headingController.getValue((float) Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)));
+            } else {
 
-            if (gamepad1.right_trigger > 0.001 && !is90) {
-
-                if (Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)) >= 0.01) {
-
-                    Agobot.drivetrain.snap90();
-                } else {
-                    is90 = true;
-                }
+                snap90Correction = 0;
             }
 
             //TODO: dpad stone heights
@@ -162,7 +155,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
 //            telemetry.addData("leftStick: ", leftStick.toString());
            // telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
-//
+            telemetry.addData("Arm State Number", Agobot.arm.armPosition);
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
 //            telemetry.addData("Arm Number", Agobot.arm.armPosition);
 //            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);

@@ -39,7 +39,7 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        //SACN STONE-------------------------------------------------------------------------------------------------------------------
+        //SCAN STONE-------------------------------------------------------------------------------------------------------------------
         while(!isStarted()) {
             skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
             telemetry.addData("Sky stone position", skyStoneLocation);
@@ -59,11 +59,12 @@ public class RedDepot2Stones extends LinearOpMode {
 
         }
 
-        double startVision = Agobot.clock.milliseconds();
-        while (Agobot.clock.milliseconds() < (startVision + 700) && opModeIsActive()) {} // make the robot wait for one second before reading the stones to ensure stable position
-        skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
-        telemetry.addData("Sky stone position", skyStoneLocation);
-        telemetry.update();
+        //BRUH
+//        double startVision = Agobot.clock.milliseconds();
+//        while (Agobot.clock.milliseconds() < (startVision + 700) && opModeIsActive()) {} // make the robot wait for one second before reading the stones to ensure stable position
+//        skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
+//        telemetry.addData("Sky stone position", skyStoneLocation);
+//        telemetry.update();
 
         //COLLECT SKYSTONE #1 & DELIVER------------------------------------------------------------------------------------------------
         //get ready to pick up skystone
