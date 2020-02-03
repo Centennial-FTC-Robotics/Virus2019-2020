@@ -69,8 +69,8 @@ public class Arm extends Subsystem {
                     break;
                 case 1:
                     //intermediate 2
-                    left = 0.2;
-                    right = 0.8;
+                    left = 0.22;
+                    right = 0.78;
                     break;
                 case 2:
                     //standby // intermediate 1

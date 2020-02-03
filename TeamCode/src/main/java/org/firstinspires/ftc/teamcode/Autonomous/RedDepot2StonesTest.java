@@ -91,7 +91,7 @@ public class RedDepot2StonesTest extends LinearOpMode {
 
 
         //go at angle to collect inner set of stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(3, yOffset), diagonalAngle, 0.6) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(30, yOffset), diagonalAngle, 0.6) && opModeIsActive()){
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
             Agobot.intake.getRight().setPower(1);

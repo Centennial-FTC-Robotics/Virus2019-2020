@@ -39,7 +39,7 @@ public class RedBridge extends LinearOpMode {
         }
 
         double startVision = Agobot.clock.milliseconds();
-        while (Agobot.clock.milliseconds() < (startVision + 700) && opModeIsActive()) {} // make the robot wait for one second before reading the stones to ensure stable position
+        while (Agobot.clock.milliseconds() < (startVision + 500) && opModeIsActive()) {} // make the robot wait for one second before reading the stones to ensure stable position
         skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
         telemetry.addData("Sky stone position", skyStoneLocation);
         telemetry.update();
@@ -99,7 +99,7 @@ public class RedBridge extends LinearOpMode {
 //        telemetry.update();
 
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive()) {}
+        while(Agobot.clock.milliseconds() < (startGrab + 200) && opModeIsActive()) {}
 
         Agobot.arm.armFlipOut(true);
 

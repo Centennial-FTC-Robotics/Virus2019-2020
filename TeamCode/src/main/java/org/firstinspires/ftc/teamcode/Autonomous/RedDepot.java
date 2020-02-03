@@ -139,6 +139,8 @@ public class RedDepot extends LinearOpMode {
             }
         }
         Agobot.arm.armFlipOut(false);
+
+        //change heading constant to rotate foundation
         PIDControllers.headingController.changeConstants(-.5f, -.15f,-.001f, 1.5f);
 
         while(Agobot.drivetrain.goToPosition(new Vector2D(40, 30), 270, 0.8,3, 7) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 24000 )) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
@@ -149,6 +151,7 @@ public class RedDepot extends LinearOpMode {
         startGrab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (startGrab + 300)) {};
 
+        //make heading constant less aggressive for pushing
         PIDControllers.headingController.changeConstants(-.09f, -.012f,-.001f, .2f);
 
         //push against wall
