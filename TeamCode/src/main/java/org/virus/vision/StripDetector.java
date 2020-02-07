@@ -96,7 +96,7 @@ public class StripDetector {
         public Mat processFrame(Mat input)
         {
             rectCrop = new Rect(new Point(30, 255) , new Point(430,305));
-            //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
+            //Rect regStoneCrop = new Rect(new Waypoint(0, 300), new Waypoint(300, 600));
             cropped = new Mat(input, rectCrop);
 
             Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
@@ -177,7 +177,7 @@ public class StripDetector {
 
             Imgproc.rectangle(input, rectCrop, new Scalar(128), 3);
             //Imgproc.rectangle(thresh, regStoneCrop, new Scalar(128), 3);
-            //rectUnCrop = new Rect(new Point(0,0) , new Point(319,239));
+            //rectUnCrop = new Rect(new Waypoint(0,0) , new Waypoint(319,239));
             //unCropped = new Mat(thresh, rectUnCrop);
 
 
