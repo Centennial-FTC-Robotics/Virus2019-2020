@@ -21,14 +21,10 @@ public class PurePursuit extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
 
-        //add all the waypoints in
-        waypoints.add(new Waypoint(0,0,90));
-        waypoints.add(new Waypoint(24,24,90));
-        waypoints.add(new Waypoint(-24,24,90));
-        waypoints.add(new Waypoint(-24,-24,90));
-        waypoints.add(new Waypoint(24,-24,90));
-        waypoints.add(new Waypoint(24,24,90));
-        waypoints.add(new Waypoint(0,0,90));
+        //add all the waypoints in (this particular set is the path from the stones to the foundation)
+        waypoints.add(new Waypoint(42,-57,90));
+        waypoints.add(new Waypoint(42,40,90));
+        waypoints.add(new Waypoint(31,40,90));
 
         waitForStart();
 
