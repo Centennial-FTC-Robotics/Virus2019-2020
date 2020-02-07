@@ -21,12 +21,18 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 import org.virus.Advanced_Paths.ParametricPath;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
+import org.virus.purepursuit.Point;
+import org.virus.purepursuit.Waypoint;
 import org.virus.superclasses.Drivetrain;
 import org.virus.superclasses.Robot;
 import org.virus.util.BetterI2cDeviceSynchImplOnSimple;
 import org.virus.util.PIDController;
 import org.virus.Advanced_Paths.ParametricFunction2D;
 import org.virus.util.Vector2D;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
 
@@ -65,7 +71,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     Vector2D motorSpeeds;
     Vector2D robotCentricMvmt;
     double minSpeed = 0.05;
-
+    double lookaheadRadius = 15;
 
 //    Odometry odometry = new Odometry();
     @Override
@@ -539,5 +545,97 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
 
         return false;
+    }
+
+    public boolean followPath(ArrayList<Waypoint> waypoints){
+        Point approachPoint;
+        currentPosition = updatePosition();
+        ArrayList<Point> intersections = findIntersections(waypoints);
+        if(intersections.size() > 0){
+            approachPoint = intersections.get(intersections.size() - 1);
+        }else{
+            Point closestWaypoint = waypoints.get(0);
+            double closestWaypointDist = waypoints.get(0).getDistance(currentPosition);
+            for(int i = 1; i < waypoints.size(); i++){
+                if(waypoints.get(i).getDistance(currentPosition) < closestWaypointDist){
+                    closestWaypointDist = waypoints.get(i).getDistance(currentPosition);
+                    closestWaypoint = waypoints.get(i);
+                }
+            }
+            approachPoint = closestWaypoint; //shouldn't happen, but if it gets lost, go to the closest waypoint
+        }
+        return goToPosition(approachPoint.toVector(), getHeading(), 0.6);
+    }
+
+    public ArrayList<Point> findIntersections(ArrayList<Waypoint> waypoints){
+        ArrayList<Point> intersections = new ArrayList<Point>();
+        for (int i = 0; i < waypoints.size() - 1; i++){
+            Waypoint point1 = waypoints.get(i);
+            Waypoint point2 = waypoints.get(i + 1);
+            Point intersection1;
+            Point intersection2;
+            double[] xRange;
+            double[] yRange;
+            if(point1.getX() < point2.getX()){
+                xRange = new double[]{point1.getX(), point2.getX()};
+            }else{
+                xRange = new double[]{point2.getX(), point1.getX()};
+            }
+            if(point1.getY() < point2.getY()){
+                yRange = new double[]{point1.getY(), point2.getY()};
+            }else{
+                yRange = new double[]{point2.getY(), point1.getY()};
+            }
+            Set<Point> circleLineIntersect = new LinkedHashSet<>(); //this type of set takes out duplicates
+
+            if(point1.getX() == point2.getX()){ //undefined slope
+                double x = point1.getX();
+                double discriminant = -Math.pow(x, 2) + (2*currentPosition.getComponent(0)*x) - Math.pow(currentPosition.getComponent(0), 2) + Math.pow(lookaheadRadius, 2);
+                if(discriminant >= 0){
+                    //we clip the y values so that anything after the segment ends is brought down
+                    intersection1 = new Point(x, Range.clip(currentPosition.getComponent(1) + Math.sqrt(discriminant), yRange[0], yRange[1]));
+                    intersection2 = new Point(x, Range.clip(currentPosition.getComponent(1) - Math.sqrt(discriminant), yRange[0], yRange[1]));
+
+                    //ordering the intersections so that furthest along the path is last
+                    if(intersection1.getDistance(point2) < intersection2.getDistance(point2)){ //if intersection1 is closer to point2
+                        circleLineIntersect.add(intersection2);
+                        circleLineIntersect.add(intersection1);
+                    }else{
+                        circleLineIntersect.add(intersection1);
+                        circleLineIntersect.add(intersection2);
+                    }
+
+                }
+            }else{ //defined slope
+                //get info about line segment
+                double slope = (point2.getY() - point1.getY())/(point2.getX() - point1.getX());
+                double yint = point1.getY() - point1.getX()*slope;
+                //terms of the quadratic function
+                double a = Math.pow(slope, 2) + 1;
+                double b = 2*slope*yint - 2*slope*currentPosition.getComponent(1) - 2*currentPosition.getComponent(0);
+                double c = Math.pow(yint, 2) + Math.pow(currentPosition.getComponent(0), 2) + Math.pow(currentPosition.getComponent(1), 2) - Math.pow(lookaheadRadius, 2) - 2*yint*currentPosition.getComponent(1);
+
+                double discriminant = Math.pow(b, 2) - 4*a*c; //the usual
+                if(discriminant >= 0){
+                    //clipping the x values so that they don't extend beyond the line segment
+
+                    double x1 = Range.clip((-b + Math.sqrt(discriminant))/(2*a), xRange[0], xRange[1]);
+                    double x2 = Range.clip((-b - Math.sqrt(discriminant))/(2*a), xRange[0], xRange[1]);
+                    intersection1 = new Point(x1, slope*x1 + yint);
+                    intersection2 = new Point(x2, slope*x2 + yint);
+
+                    //ordering the intersections so that furthest along the path is last
+                    if(intersection1.getDistance(point2) < intersection2.getDistance(point2)){ //if intersection1 is closer to point2
+                        circleLineIntersect.add(intersection2);
+                        circleLineIntersect.add(intersection1);
+                    }else{
+                        circleLineIntersect.add(intersection1);
+                        circleLineIntersect.add(intersection2);
+                    }
+                }
+            }
+            intersections.addAll(circleLineIntersect);
+        }
+        return intersections;
     }
 }
