@@ -15,7 +15,6 @@ import java.util.Arrays;
 
 @Autonomous(name = "Blue Depot", group = "Auto")
 public class BlueDepot extends LinearOpMode {
-    //TODO
 
     private Vector2D startPosition = new Vector2D(-63, -36); //against wall to the right
     private double startHeading = 90; //straight left
