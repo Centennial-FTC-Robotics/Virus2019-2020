@@ -78,8 +78,14 @@ public class RedDepot2Stones extends LinearOpMode {
         Agobot.intake.runIntake(1);
 
 
-        //go at angle to collect inner set of stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 14), diagonalAngle1, 0.6) && opModeIsActive()){
+//        //go at angle to collect inner set of stones
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 6), diagonalAngle1, 0.6) && opModeIsActive()){
+//            Agobot.intake.runIntake(1);
+//            Agobot.intake.getLeft().setPower(1);
+//            Agobot.intake.getRight().setPower(1);
+//        }
+
+        while(Agobot.drivetrain.goToPosition(new Vector2D(28, yOffset + 6), diagonalAngle1, 0.5) && opModeIsActive()){
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
             Agobot.intake.getRight().setPower(1);
@@ -115,7 +121,7 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(42, 40), 0, 0.6) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(42, 40), 0, 1) && opModeIsActive()){
 
         }
 
@@ -180,14 +186,20 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //go at angle to collect inner set of stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset - 14), diagonalAngle2, 0.6) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset - 6), diagonalAngle2, 0.6) && opModeIsActive()){
+            Agobot.intake.runIntake(1);
+            Agobot.intake.getLeft().setPower(1);
+            Agobot.intake.getRight().setPower(1);
+        }
+
+        while(Agobot.drivetrain.goToPosition(new Vector2D(28, yOffset - 6), diagonalAngle2, 0.6) && opModeIsActive()){
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
             Agobot.intake.getRight().setPower(1);
         }
 
         //run diagonal at stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(24, yOffset), diagonalAngle2, 0.6) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(24, yOffset), diagonalAngle2, 0.5) && opModeIsActive()){
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -214,7 +226,7 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //Deliver
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 30), 270, 0.6,1.5) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 30), 270, 1,1.5) && opModeIsActive()){
 
         }
 
@@ -236,13 +248,15 @@ public class RedDepot2Stones extends LinearOpMode {
 
         }
 
+        Agobot.arm.armFlipOut(false);
+
         //Revert PID constants back to normal
         PIDControllers.headingController.changeConstants(-.065f, -.009f,-.001f, .1f);
         PIDControllers.xController.changeConstants(.07f,.16f ,0.001f,0.15f);
         PIDControllers.yController.changeConstants(.07f,.16f ,0.001f,0.15f);
 
         //PARK------------------------------------------------------------------------------------------------
-        while(Agobot.drivetrain.goToPosition(new Vector2D(39, 0), 270, 0.6) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 0), 270, 0.6) && opModeIsActive() /*&& (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))*/){
 
         }
 

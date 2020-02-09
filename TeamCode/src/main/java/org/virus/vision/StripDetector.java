@@ -93,39 +93,9 @@ public class StripDetector {
         Mat rectThresh = new Mat();
 
         @Override
-        public Mat processFrame(Mat input)
-        {
-            rectCrop = new Rect(new Point(30, 255) , new Point(430,305));
-            //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
-            cropped = new Mat(input, rectCrop);
+        public Mat processFrame(Mat input) {
 
-            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
-            Mat croppedGrayScale = new Mat(gray, rectCrop);
-
-            int index = -1;
-            double segAvgMin = Double.MAX_VALUE;
-
-            for (int s = 0; s < 3; s++) {
-
-                double segmentAverage = 0;
-
-                for (int i = (140 * s); i < (140 * s) + 120; i++) {
-                    for (int j = 0; j < croppedGrayScale.rows(); j++) {
-
-                        segmentAverage += croppedGrayScale.get(j,i)[0];
-                    }
-                }
-
-                double segAvg = segmentAverage / (150 * croppedGrayScale.cols());
-
-                if (segAvg < segAvgMin) {
-
-                    segAvgMin = segAvg;
-                    index = s;
-                }
-            }
-
-            relativePosIndex = index;
+            relativePosIndex = threeStoneAlgorithm(input);
 //            double skystoneAverage = 0;
 //
 //            for (int i = 0; i < croppedGrayScale.rows(); i++) {
@@ -203,6 +173,86 @@ public class StripDetector {
              */
 
             return input;
+        }
+
+        private int threeStoneAlgorithm(Mat input) {
+
+            rectCrop = new Rect(new Point(30, 255) , new Point(430,305));
+            //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
+            cropped = new Mat(input, rectCrop);
+
+            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
+            Mat croppedGrayScale = new Mat(gray, rectCrop);
+
+            int index = -1;
+            double segAvgMin = Double.MAX_VALUE;
+
+            for (int s = 0; s < 3; s++) {
+
+                double segmentAverage = 0;
+
+                for (int i = (140 * s); i < (140 * s) + 120; i++) {
+                    for (int j = 0; j < croppedGrayScale.rows(); j++) {
+
+                        segmentAverage += croppedGrayScale.get(j,i)[0];
+                    }
+                }
+
+                double segAvg = segmentAverage / (120 * croppedGrayScale.cols());
+
+                if (segAvg < segAvgMin) {
+
+                    segAvgMin = segAvg;
+                    index = s;
+                }
+            }
+
+            return index;
+        }
+
+        public int twoStoneAlgorithm(Mat input) {
+
+            rectCrop = new Rect(new Point(170, 255) , new Point(430,305));
+            //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
+            cropped = new Mat(input, rectCrop);
+
+            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
+            Mat croppedGrayScale = new Mat(gray, rectCrop);
+
+            int index = -1;
+            double segAvgMin = Double.MAX_VALUE;
+            double[] segAvgs = new double[2];
+
+            for (int s = 0; s < 2; s++) {
+
+                double segmentAverage = 0;
+
+                for (int i = (140 * s); i < (140 * s) + 120; i++) {
+                    for (int j = 0; j < croppedGrayScale.rows(); j++) {
+
+                        segmentAverage += croppedGrayScale.get(j,i)[0];
+                    }
+                }
+
+                double segAvg = segmentAverage / (120 * croppedGrayScale.cols());
+                segAvgs[s] = segAvg;
+
+                if (segAvg < segAvgMin) {
+
+                    segAvgMin = segAvg;
+                    index = s;
+                }
+            }
+
+            index++; // set the index to index 1 and 2, or left and middle respectively as I cut off the right stone
+
+            //TODO: refine this value!
+            if (Math.abs(segAvgs[1] - segAvgs[0]) < 15) { // if the two averages are too similar then they are the same
+
+                index = 0;
+            }
+
+            return index;
         }
     }
 }

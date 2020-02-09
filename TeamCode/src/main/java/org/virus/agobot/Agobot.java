@@ -23,7 +23,7 @@ public class Agobot extends Robot {
     public static FoundationDragger dragger = new FoundationDragger();
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger,tracker};
+    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger, tracker};
     // robot variables
     public static double autoStarted = 0;
 

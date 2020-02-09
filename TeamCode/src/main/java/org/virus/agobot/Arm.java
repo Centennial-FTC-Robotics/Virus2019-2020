@@ -32,7 +32,7 @@ public class Arm extends Subsystem {
 
     public void armFlipOut(boolean out){
 
-        topStone = Agobot.slides.getPosition() > (6 * 4 * Agobot.slides.ENCODER_PER_INCH);
+        topStone = Agobot.slides.getPosition() > (6 * 4 * Slides.ENCODER_PER_INCH);
 
         if (topStone && !prevTopStone) {
 
@@ -74,8 +74,8 @@ public class Arm extends Subsystem {
                     break;
                 case 2:
                     //standby // intermediate 1
-                    left = 0.93;
-                    right = 0.07;
+                    left = 0.94;
+                    right = 0.06;
                     break;
                 case 3:
                     //in
