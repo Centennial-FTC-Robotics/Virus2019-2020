@@ -9,6 +9,7 @@ import org.virus.agobot.Agobot;
 import org.virus.agobot.PIDControllers;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
+import org.virus.vision.StripDetector;
 
 import java.io.File;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class BlueDepot2Stones extends LinearOpMode {
     private String skyStoneLocation = "Middle";
     //TODO: test diagonal angle for colecting stones
     private int diagonalAngle1 = 45;
-    private int diagonalAngle2 = 315;
+    private int diagonalAngle2 = 305;
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
 
     /*Autonomous has 6 Stages
@@ -38,11 +39,11 @@ public class BlueDepot2Stones extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Agobot.initializeWithVision(this);
 
+        Agobot.alliance = "blue";
+        Agobot.initializeWithVision(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        Agobot.alliance = "blue";
 
         while(!isStarted()) {
             skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
@@ -112,7 +113,7 @@ public class BlueDepot2Stones extends LinearOpMode {
         }
 
         //run diagonal at stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-23, yOffset - 2.5), diagonalAngle1, 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-23, yOffset - 2.5), diagonalAngle1, 0.4) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -136,12 +137,12 @@ public class BlueDepot2Stones extends LinearOpMode {
 
         //Deliver skystone 1 to foundation
         // move back out of the way
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-42, yOffset + 2), 180, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-38, yOffset + 2), 180, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
 
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-42, 40), 180, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-38, 40), 180, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
             Agobot.grabber.grab(true);
 
         }
@@ -175,7 +176,7 @@ public class BlueDepot2Stones extends LinearOpMode {
         //change heading constant for rotating foundation
         PIDControllers.headingController.changeConstants(-.5f, -.15f,-.001f, 1.5f);
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-40, 36), 270, 1,1.5,2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-38, 36), 270, 1,1.5,2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
 
         }
 
@@ -210,12 +211,12 @@ public class BlueDepot2Stones extends LinearOpMode {
         }
 
         // grab skystone
-        Agobot.intake.runIntake(1);
-        Agobot.intake.runIntake(1);
+        Agobot.intake.runIntake(-1);
+        Agobot.intake.runIntake(-1);
 
 
         //go at angle to collect inner set of stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-38, yOffset + 6), diagonalAngle2, 0.6) && opModeIsActive()){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-38, yOffset + 10), 270, 0.6) && opModeIsActive()){
             Agobot.intake.runIntake(-1);
             Agobot.intake.getLeft().setPower(-1);
             Agobot.intake.getRight().setPower(-1);
@@ -232,7 +233,7 @@ public class BlueDepot2Stones extends LinearOpMode {
         Agobot.intake.getRight().setPower(1);
 
         //run diagonal at stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-24, yOffset + 2), diagonalAngle2, 0.5,1.1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-24, yOffset + 2), diagonalAngle2, 0.4,1.1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))){
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);

@@ -23,11 +23,11 @@ public class BlueDepot extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Agobot.initializeWithVision(this);
 
+        Agobot.alliance = "blue";
+        Agobot.initializeWithVision(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        Agobot.alliance = "blue";
 
         waitForStart();
         Agobot.autoStart();

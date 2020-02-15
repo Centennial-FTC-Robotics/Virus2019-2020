@@ -24,11 +24,10 @@ public class RedDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        Agobot.alliance = "red";
         Agobot.initializeWithVision(this);
-
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        Agobot.alliance = "red";
 
         while(!isStarted()) {
             skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();

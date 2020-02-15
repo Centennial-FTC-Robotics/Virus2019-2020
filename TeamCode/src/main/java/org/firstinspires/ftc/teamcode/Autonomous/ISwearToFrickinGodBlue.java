@@ -14,10 +14,10 @@ public class ISwearToFrickinGodBlue extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
 
+        Agobot.alliance = "blue";
         Agobot.initialize(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        Agobot.alliance = "blue";
 
         waitForStart();
 

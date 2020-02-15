@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.ExpansionHubServo;
 import org.virus.superclasses.Subsystem;
 
 public class Intake extends Subsystem {
@@ -21,8 +22,8 @@ public class Intake extends Subsystem {
 
     @Override
     public void initialize(LinearOpMode opMode) {
-        leftIntake = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "leftIntake");
-        rightIntake = (ExpansionHubMotor)opMode.hardwareMap.get(DcMotor.class, "rightIntake");
+        leftIntake = (ExpansionHubMotor)opMode.hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
+        rightIntake = (ExpansionHubMotor)opMode.hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
 
         rightIntake.setDirection(DcMotor.Direction.REVERSE);
 

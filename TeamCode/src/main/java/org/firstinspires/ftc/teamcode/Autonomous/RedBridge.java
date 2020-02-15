@@ -20,11 +20,11 @@ public class RedBridge extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Agobot.initializeWithVision(this);
 
+        Agobot.alliance = "red";
+        Agobot.initializeWithVision(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
-        Agobot.alliance = "red";
 
         waitForStart();
         Agobot.autoStart();

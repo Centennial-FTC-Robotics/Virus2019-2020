@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
+import org.virus.agobot.Agobot;
 
 import java.util.Arrays;
 
@@ -23,7 +24,6 @@ public class StripDetector {
     OpMode opMode;
     public double[] brightnesses;
     public boolean read = false;
-
     private int relativePosIndex = 2;
 
     public void initialize(OpMode opMode) {
@@ -71,8 +71,12 @@ public class StripDetector {
     }
 
     public String relativePos() {
-
         String[] relPos = {"Right", "Left", "Middle"};
+
+        if (Agobot.alliance.equals("blue")) {
+
+            relPos = new String[] {"Left", "Middle", "Right"};
+        }
 
         return relPos[relativePosIndex];
     }
@@ -99,7 +103,7 @@ public class StripDetector {
         public Mat processFrame(Mat input) {
 
             read = false;
-            relativePosIndex = twoStoneAlgorithm(input);
+            relativePosIndex = threeStoneAlgorithm(input);
             read = true;
 //            double skystoneAverage = 0;
 //
@@ -185,6 +189,11 @@ public class StripDetector {
         private int threeStoneAlgorithm(Mat input) {
 
             rectCrop = new Rect(new Point(30, 255) , new Point(430,305));
+
+            if(Agobot.alliance.equals("blue")) {
+                rectCrop = new Rect(new Point(170, 255) , new Point(570,305));
+            }
+
             //Rect regStoneCrop = new Rect(new Point(0, 300), new Point(300, 600));
             cropped = new Mat(input, rectCrop);
 
