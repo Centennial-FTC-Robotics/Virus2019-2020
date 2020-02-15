@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.virus.vision.StripDetector;
 
+import java.util.Arrays;
+
 @TeleOp(group = "TeleOp", name = "OpenCV Test")
 public class OCVTest extends LinearOpMode {
     @Override
@@ -14,7 +16,8 @@ public class OCVTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            telemetry.addData("relative skystone pos", detector.relativePos());
+            telemetry.addData("relative skystone pos", detector.relativePos("red"));
+            telemetry.addData("Brightness Values", Arrays.toString(detector.brightnesses));
             telemetry.update();
         }
     }

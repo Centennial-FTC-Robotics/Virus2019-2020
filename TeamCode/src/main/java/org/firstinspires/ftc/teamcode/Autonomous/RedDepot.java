@@ -28,6 +28,7 @@ public class RedDepot extends LinearOpMode {
 
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.alliance = "red";
 
         while(!isStarted()) {
             skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();

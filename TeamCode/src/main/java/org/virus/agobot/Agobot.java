@@ -21,10 +21,12 @@ public class Agobot extends Robot {
     public static Grabber grabber = new Grabber();
     public static Arm arm = new Arm();
     public static FoundationDragger dragger = new FoundationDragger();
+    public static Capstone capstone = new Capstone();
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger, tracker};
+    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger, capstone, tracker};
     // robot variables
+    public static String alliance;
     public static double autoStarted = 0;
 
     public static void initialize(LinearOpMode opMode){

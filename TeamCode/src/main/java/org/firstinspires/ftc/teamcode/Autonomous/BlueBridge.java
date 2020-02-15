@@ -25,6 +25,7 @@ public class BlueBridge extends LinearOpMode {
         Agobot.initialize(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.alliance = "blue";
 
         waitForStart();
         Agobot.autoStart();

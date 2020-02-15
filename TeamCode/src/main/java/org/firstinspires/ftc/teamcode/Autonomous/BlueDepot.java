@@ -27,6 +27,7 @@ public class BlueDepot extends LinearOpMode {
 
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.alliance = "blue";
 
         waitForStart();
         Agobot.autoStart();

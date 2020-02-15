@@ -21,6 +21,7 @@ import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
 public class StripDetector {
     OpenCvCamera phoneCam;
     OpMode opMode;
+    public double[] brightnesses;
 
     private int relativePosIndex = 2;
 
@@ -68,9 +69,14 @@ public class StripDetector {
         phoneCam.stopStreaming();
     }
 
-    public String relativePos() {
+    public String relativePos(String alliance) {
 
         String[] relPos = {"Right", "Left", "Middle"};
+
+        if (alliance.toLowerCase().equals("blue")) {
+
+            relPos = new String[] {"Left, Right, Middle"};
+        }
 
         return relPos[relativePosIndex];
     }
@@ -95,7 +101,7 @@ public class StripDetector {
         @Override
         public Mat processFrame(Mat input) {
 
-            relativePosIndex = threeStoneAlgorithm(input);
+            relativePosIndex = twoStoneAlgorithm(input);
 //            double skystoneAverage = 0;
 //
 //            for (int i = 0; i < croppedGrayScale.rows(); i++) {
@@ -187,6 +193,8 @@ public class StripDetector {
             int index = -1;
             double segAvgMin = Double.MAX_VALUE;
 
+            brightnesses = new double[3];
+
             for (int s = 0; s < 3; s++) {
 
                 double segmentAverage = 0;
@@ -199,6 +207,7 @@ public class StripDetector {
                 }
 
                 double segAvg = segmentAverage / (120 * croppedGrayScale.cols());
+                brightnesses[s] = segAvg;
 
                 if (segAvg < segAvgMin) {
 
@@ -221,7 +230,7 @@ public class StripDetector {
 
             int index = -1;
             double segAvgMin = Double.MAX_VALUE;
-            double[] segAvgs = new double[2];
+            brightnesses = new double[2];
 
             for (int s = 0; s < 2; s++) {
 
@@ -235,7 +244,7 @@ public class StripDetector {
                 }
 
                 double segAvg = segmentAverage / (120 * croppedGrayScale.cols());
-                segAvgs[s] = segAvg;
+                brightnesses[s] = segAvg;
 
                 if (segAvg < segAvgMin) {
 
@@ -247,7 +256,7 @@ public class StripDetector {
             index++; // set the index to index 1 and 2, or left and middle respectively as I cut off the right stone
 
             //TODO: refine this value!
-            if (Math.abs(segAvgs[1] - segAvgs[0]) < 15) { // if the two averages are too similar then they are the same
+            if (Math.abs(brightnesses[1] - brightnesses[0]) < 15) { // if the two averages are too similar then they are the same
 
                 index = 0;
             }

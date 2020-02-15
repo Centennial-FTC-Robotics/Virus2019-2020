@@ -108,7 +108,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             if(gamepad2.right_bumper){
                 Agobot.intake.runIntake(1);
             }else if(gamepad2.left_bumper){
-                Agobot.intake.runIntake(-0.7);
+                Agobot.intake.runIntake(-0.3);
             }else{
                 Agobot.intake.runIntake(0);
             }
@@ -120,6 +120,13 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             if(gamepad2.y){
                 Agobot.dragger.drag(true);
+            }
+
+            //capstone dropper
+            if(gamepad2.back) {
+                Agobot.capstone.drop(true);
+            }else{
+                Agobot.capstone.drop(false);
             }
 
             //snap 90 for driver 1

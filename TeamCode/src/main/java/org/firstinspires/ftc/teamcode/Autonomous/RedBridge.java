@@ -24,6 +24,7 @@ public class RedBridge extends LinearOpMode {
 
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.alliance = "red";
 
         waitForStart();
         Agobot.autoStart();

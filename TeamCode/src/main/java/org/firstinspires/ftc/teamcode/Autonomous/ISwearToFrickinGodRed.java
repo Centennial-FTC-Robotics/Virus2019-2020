@@ -17,6 +17,7 @@ public class ISwearToFrickinGodRed extends LinearOpMode {
         Agobot.initialize(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
+        Agobot.alliance = "red";
 
         waitForStart();
 
