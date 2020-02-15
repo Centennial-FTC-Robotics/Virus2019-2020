@@ -315,7 +315,7 @@ public class ElementLocator extends Subsystem {
 
     public String relativeSkyStonePosOpenCV() {
 
-        return detector.relativePos(Agobot.alliance);
+        return detector.relativePos();
     }
 
     public String[] relativeSkyStonePos() {

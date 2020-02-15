@@ -42,7 +42,7 @@ public class RedDepot2Stones extends LinearOpMode {
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
         Agobot.alliance = "red";
 
-        //SACN STONE-------------------------------------------------------------------------------------------------------------------
+        //SCAN STONE-------------------------------------------------------------------------------------------------------------------
         while(!isStarted()) {
             skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
             telemetry.addData("Sky stone position", skyStoneLocation);
@@ -64,13 +64,13 @@ public class RedDepot2Stones extends LinearOpMode {
 
         if (skyStoneLocation.equals("Right")) {
 
-            yOffset -= 4;
+            yOffset -= 19;
         } else if (skyStoneLocation.equals("Middle")) {
 
             yOffset -= 12;
         } else if (skyStoneLocation.equals("Left")) {
 
-            yOffset -= 19;
+            yOffset -= 4;
         }
 
         // grab skystone
@@ -184,13 +184,13 @@ public class RedDepot2Stones extends LinearOpMode {
 
         if (skyStoneLocation.equals("Right")) {
 
-            yOffset += 20;
+            yOffset += 4;
         } else if (skyStoneLocation.equals("Middle")) {
 
             yOffset += 12;
         } else if (skyStoneLocation.equals("Left")) {
 
-            yOffset += 4;
+            yOffset += 20;
         }
 
         //go at angle to collect inner set of stones
@@ -229,12 +229,12 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.arm.armFlipOut(true);
 
-        while (Agobot.drivetrain.goToPosition(new Vector2D(40, yOffset), 180, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))) {
+        while (Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset), 180, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))) {
 
         }
 
         //Deliver
-        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 28), 270, 1,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))) {
+        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 28), 270, 1,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29500))) {
 
         }
 

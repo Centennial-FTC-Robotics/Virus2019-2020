@@ -22,6 +22,7 @@ public class StripDetector {
     OpenCvCamera phoneCam;
     OpMode opMode;
     public double[] brightnesses;
+    public boolean read = false;
 
     private int relativePosIndex = 2;
 
@@ -69,14 +70,9 @@ public class StripDetector {
         phoneCam.stopStreaming();
     }
 
-    public String relativePos(String alliance) {
+    public String relativePos() {
 
         String[] relPos = {"Right", "Left", "Middle"};
-
-        if (alliance.toLowerCase().equals("blue")) {
-
-            relPos = new String[] {"Left, Right, Middle"};
-        }
 
         return relPos[relativePosIndex];
     }
@@ -94,14 +90,17 @@ public class StripDetector {
         Rect rectUnCrop;
         Mat cropped = new Mat();
         Mat unCropped = new Mat();
-        Mat gray=new Mat();
+        Mat gray = new Mat();
+        Mat graySharp = new Mat();
         Mat thresh = new Mat();
         Mat rectThresh = new Mat();
 
         @Override
         public Mat processFrame(Mat input) {
 
+            read = false;
             relativePosIndex = twoStoneAlgorithm(input);
+            read = true;
 //            double skystoneAverage = 0;
 //
 //            for (int i = 0; i < croppedGrayScale.rows(); i++) {
@@ -151,7 +150,9 @@ public class StripDetector {
 //
 //            distFromCenter = weightedAvg;
 
-            Imgproc.rectangle(input, rectCrop, new Scalar(128), 3);
+            Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
+            gray.convertTo(graySharp, -1, 2.2, 20);
+            Imgproc.rectangle(graySharp, rectCrop, new Scalar(128), 3);
             //Imgproc.rectangle(thresh, regStoneCrop, new Scalar(128), 3);
             //rectUnCrop = new Rect(new Point(0,0) , new Point(319,239));
             //unCropped = new Mat(thresh, rectUnCrop);
@@ -178,7 +179,7 @@ public class StripDetector {
              * tapped, please see {@link PipelineStageSwitchingExample}
              */
 
-            return input;
+            return graySharp;
         }
 
         private int threeStoneAlgorithm(Mat input) {
@@ -256,7 +257,7 @@ public class StripDetector {
             index++; // set the index to index 1 and 2, or left and middle respectively as I cut off the right stone
 
             //TODO: refine this value!
-            if (Math.abs(brightnesses[1] - brightnesses[0]) < 15) { // if the two averages are too similar then they are the same
+            if (Math.abs(brightnesses[1] - brightnesses[0]) < 3) { // if the two averages are too similar then they are the same
 
                 index = 0;
             }

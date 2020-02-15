@@ -14,10 +14,14 @@ public class OCVTest extends LinearOpMode {
         StripDetector detector = new StripDetector();
         detector.initialize(this);
         waitForStart();
+
         while (opModeIsActive()) {
 
-            telemetry.addData("relative skystone pos", detector.relativePos("red"));
-            telemetry.addData("Brightness Values", Arrays.toString(detector.brightnesses));
+            if (detector.read) {
+
+                telemetry.addData("relative skystone pos", detector.relativePos());
+                telemetry.addData("Brightness Values", Arrays.toString(detector.brightnesses));
+            }
             telemetry.update();
         }
     }
