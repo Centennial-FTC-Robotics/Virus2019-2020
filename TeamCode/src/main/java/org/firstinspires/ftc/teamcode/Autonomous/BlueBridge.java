@@ -30,7 +30,7 @@ public class BlueBridge extends LinearOpMode {
         waitForStart();
         Agobot.autoStart();
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-63, -52), startHeading, 0.6) && opModeIsActive()) {
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-63, -36), startHeading, 0.6) && opModeIsActive()) {
 
         }
 

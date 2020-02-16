@@ -14,7 +14,7 @@ public class FoundationDragger extends Subsystem {
     public Servo dragger;
     public double position = 0.0;
     private final double dragPosition = 0.0;
-    private final double upPosition = 1.0;
+    private final double upPosition = 0.55;
 
     @Override
     public void initialize(LinearOpMode opMode) {

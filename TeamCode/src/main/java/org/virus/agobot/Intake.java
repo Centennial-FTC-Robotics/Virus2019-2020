@@ -11,6 +11,8 @@ import org.openftc.revextensions2.ExpansionHubServo;
 import org.virus.superclasses.Subsystem;
 
 public class Intake extends Subsystem {
+
+    private LinearOpMode opModeRef;
     private ExpansionHubMotor leftIntake;
     private ExpansionHubMotor rightIntake;
     private ElapsedTime deployTimer = new ElapsedTime();
@@ -82,6 +84,11 @@ public class Intake extends Subsystem {
 //        return !intakeDeployed; //so that it returns true until it's done, when it returns false
 
         runIntake(1, 0);
+
+//        double startDeploy = Agobot.clock.milliseconds();
+//        while (Agobot.clock.milliseconds() < (startDeploy + 300) && opModeRef.opModeIsActive()) {}
+//
+//        runIntake(0, 0);
     }
 
     public boolean detectJam(DcMotorEx motor, double intendedPower){

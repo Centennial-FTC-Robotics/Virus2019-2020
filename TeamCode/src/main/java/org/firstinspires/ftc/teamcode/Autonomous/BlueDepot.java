@@ -29,6 +29,12 @@ public class BlueDepot extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
 
+        while(!isStarted()) {
+            skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
+            telemetry.addData("Sky stone position", skyStoneLocation);
+            telemetry.update();
+        }
+
         waitForStart();
         Agobot.autoStart();
 
@@ -36,17 +42,17 @@ public class BlueDepot extends LinearOpMode {
         Agobot.grabber.grab(false);
         Agobot.arm.armFlipOut(true); //go from in to standby
         Agobot.intake.deployIntake();
-
-
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-63, -54), startHeading, 0.6) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
-
-        }
-
-        double startVision = Agobot.clock.milliseconds();
-        while (Agobot.clock.milliseconds() < (startVision + 1000) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))) {} // make the robot wait for one second before reading the stones to ensure stable position
-        skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
-        telemetry.addData("Sky stone position", skyStoneLocation);
-        telemetry.update();
+//
+//
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(-63, -54), startHeading, 0.6) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))){
+//
+//        }
+//
+//        double startVision = Agobot.clock.milliseconds();
+//        while (Agobot.clock.milliseconds() < (startVision + 1000) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + 29000))) {} // make the robot wait for one second before reading the stones to ensure stable position
+//        skyStoneLocation = Agobot.tracker.relativeSkyStonePosOpenCV();
+//        telemetry.addData("Sky stone position", skyStoneLocation);
+//        telemetry.update();
 
         int yOffset = -33;
 
