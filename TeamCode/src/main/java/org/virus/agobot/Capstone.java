@@ -17,6 +17,8 @@ public class Capstone extends Subsystem {
     @Override
     public void initialize(LinearOpMode opMode) {
         capstoneServo = opMode.hardwareMap.servo.get("capstone");
+        capstoneServo.setPosition(0.6);
+        //capstoneServo.setPosition(.5);
     }
 
     public void drop(boolean grab){

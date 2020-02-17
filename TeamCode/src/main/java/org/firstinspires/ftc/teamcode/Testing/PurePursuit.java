@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.virus.agobot.Agobot;
@@ -8,11 +9,12 @@ import org.virus.util.Vector2D;
 
 import java.util.ArrayList;
 
+@Autonomous(group = "Autonomous", name = "Pure Pursuit Auto")
 public class PurePursuit extends LinearOpMode {
 
     ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
     private Vector2D startPosition = new Vector2D(42, -57); //right after picking up middle stone
-    private double startHeading = 0;
+    private double startHeading = 90;
 
     @Override
     public void runOpMode() throws InterruptedException {

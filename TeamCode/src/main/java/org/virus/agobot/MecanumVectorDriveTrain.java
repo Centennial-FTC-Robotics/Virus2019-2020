@@ -564,7 +564,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             }
             approachPoint = closestWaypoint; //shouldn't happen, but if it gets lost, go to the closest waypoint
         }
-        return goToPosition(approachPoint.toVector(), getHeading(), 0.6);
+        return goToPosition(approachPoint.toVector(), getHeading(), 0.7);
     }
 
     public ArrayList<Point> findIntersections(ArrayList<Waypoint> waypoints){

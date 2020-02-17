@@ -21,7 +21,7 @@ public class RedDepot2Stones extends LinearOpMode {
     private double startHeading = 270; //straight left
     private String skyStoneLocation = "Middle";
     //TODO: test diagonal angle for colecting stones
-    private int resetTime = 29800;
+    private int resetTime = 29500;
     private int diagonalAngle1 = 235;
     private int diagonalAngle2 = 120;
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
@@ -98,7 +98,8 @@ public class RedDepot2Stones extends LinearOpMode {
         Agobot.intake.getRight().setPower(1);
 
         //run diagonal at stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(23, yOffset + 1), diagonalAngle1, 0.4,1.1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        double timeCondition = Agobot.clock.milliseconds();
+        while((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(new Vector2D(24, yOffset + 2.5), diagonalAngle1, 0.4,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -106,17 +107,17 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         double startIntake = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
-        while(Agobot.clock.milliseconds() < (startIntake + 100) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        while(Agobot.clock.milliseconds() < (startIntake + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
         Agobot.intake.runIntake(0);
         Agobot.arm.armFlipOut(false); //go from standby to in
-//        double grab = Agobot.clock.milliseconds();
-//        while(Agobot.clock.milliseconds() < (grab + 100) && opModeIsActive()) {}
-//        Agobot.grabber.grab(true);
+        double grab = Agobot.clock.milliseconds();
+        while(Agobot.clock.milliseconds() < (grab + 500) && opModeIsActive()) {}
+        Agobot.grabber.grab(true);
 
 
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
         Agobot.arm.armFlipOut(false);
 
@@ -127,13 +128,15 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 40), 0, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 44), 0, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
             Agobot.grabber.grab(true);
 
         }
 
         //get closer to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(31, 40), 0, 0.3, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        PIDControllers.xController.changeConstants(.1f,.6f ,0.001f,0.3f);
+        PIDControllers.yController.changeConstants(.1f,.6f ,0.001f,0.3f);
+        while(Agobot.drivetrain.goToPosition(new Vector2D(31.5, 44), 0, 0.3, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
         }
         Agobot.arm.armFlipOut(true);
@@ -150,7 +153,7 @@ public class RedDepot2Stones extends LinearOpMode {
 
         double startDrag = Agobot.clock.milliseconds();
         //drag foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 40), 0, 1,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(45, 44), 0, .8,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
             if(Agobot.clock.milliseconds() > startDrag + 300){
                 Agobot.grabber.grab(false);
             }
@@ -167,7 +170,7 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.dragger.drag(false);
         startGrab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (startGrab + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
         //Revert PID constants back to normal
         PIDControllers.headingController.changeConstants(-.065f, -.009f,-.001f, .1f);
@@ -209,7 +212,8 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //run diagonal at stones
-        while(Agobot.drivetrain.goToPosition(new Vector2D(23, yOffset - 1.5), diagonalAngle2, 0.4) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        timeCondition = Agobot.clock.milliseconds();
+        while((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(new Vector2D(23, yOffset - 1.5), diagonalAngle2, 0.4) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -221,13 +225,13 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.intake.runIntake(0);
         Agobot.arm.armFlipOut(false); //go from standby to in
-        double grab = Agobot.clock.milliseconds();
-        while(Agobot.clock.milliseconds() < (grab + 100) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        grab = Agobot.clock.milliseconds();
+        while(Agobot.clock.milliseconds() < (grab + 500) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
         Agobot.grabber.grab(true);
 
 
         startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
-        while(Agobot.clock.milliseconds() < (startGrab + 200) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
         Agobot.arm.armFlipOut(true);
 
@@ -236,7 +240,7 @@ public class RedDepot2Stones extends LinearOpMode {
         }
 
         //Deliver
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 28), 270, 1,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 41), 270, 1,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
         }
 
@@ -249,7 +253,7 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.grabber.grab(false);
         startGrab = Agobot.clock.milliseconds();
-        while (Agobot.clock.milliseconds() < startGrab + 200 && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        while (Agobot.clock.milliseconds() < startGrab + 300 && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
         Agobot.arm.armFlipOut(false);
         double startRetract = Agobot.clock.milliseconds();

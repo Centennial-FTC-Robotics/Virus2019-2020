@@ -19,9 +19,9 @@ public class TestIntake extends LinearOpMode {
         while(opModeIsActive()) {
             //TODO: keertik write this
             if(gamepad2.right_bumper){
-                Agobot.intake.runIntake(1);
+                Agobot.intake.runIntake(.8);
             }else if(gamepad2.left_bumper){
-                Agobot.intake.runIntake(-1);
+                Agobot.intake.runIntake(-.8);
             }else{
                 Agobot.intake.runIntake(0);
             }

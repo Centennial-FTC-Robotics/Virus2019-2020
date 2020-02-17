@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.virus.superclasses.Subsystem;
 
@@ -18,6 +19,7 @@ public class Arm extends Subsystem {
     public double rightPosition = 1.0;
     public boolean topStone = false;
     public boolean prevTopStone = false;
+    private final double offset=.05;
     //in: left = 0.0, right = 1.0
     //standby: left = 0.2, right = 0.8
     //drop: left: 1.0, right = 0.0
@@ -74,8 +76,8 @@ public class Arm extends Subsystem {
                     break;
                 case 2:
                     //standby // intermediate 1
-                    left = 0.94;
-                    right = 0.06;
+                    left = 0.89;
+                    right = 0.11;
                     break;
                 case 3:
                     //in
@@ -93,8 +95,8 @@ public class Arm extends Subsystem {
                     break;
                 case 1:
                     //standby
-                    left = 0.93;
-                    right = 0.07;
+                    left = 0.89;
+                    right = 0.11;
                     break;
                 case 2:
                     //in
