@@ -82,7 +82,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
                 Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0) + snap90Correction); //var1 and 2 are computed values found in theUpdateControllerValues method
             } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, rightStick.getComponent(0) + snap90Correction);
+                Agobot.drivetrain.runMotors(0, 0, 0, 0, speedMultiplier*rightStick.getComponent(0) + snap90Correction);
             }
 
             //slides
