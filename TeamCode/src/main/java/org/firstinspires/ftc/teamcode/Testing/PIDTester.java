@@ -28,7 +28,7 @@ public class PIDTester extends LinearOpMode {
 
         PathComponent[] pathComponents=
                 {
-//                        new Line(30, Path.INCH),
+//                        new Line(30, PurePursuitPath.INCH),
                         new Arc(40, 180, Path.INCH),
                 };
         Path path = new Path(pathComponents, .05f, .0006f, .35f, .05f);

@@ -22,6 +22,7 @@ import org.virus.Advanced_Paths.ParametricPath;
 import org.virus.paths.Arc;
 import org.virus.paths.Path;
 import org.virus.purepursuit.Point;
+import org.virus.purepursuit.PurePursuitPath;
 import org.virus.purepursuit.Waypoint;
 import org.virus.superclasses.Drivetrain;
 import org.virus.superclasses.Robot;
@@ -545,6 +546,26 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         }
 
         return false;
+    }
+
+    public boolean followPath(PurePursuitPath path){
+        Waypoint approachPoint;
+        currentPosition = updatePosition();
+        ArrayList<Waypoint> intersections = path.findIntersections(currentPosition, lookaheadRadius);
+        if(intersections.size() > 0){
+            approachPoint = intersections.get(intersections.size() - 1);
+        }else{
+            Waypoint closestWaypoint = path.waypoints.get(0);
+            double closestWaypointDist = path.waypoints.get(0).getDistance(currentPosition);
+            for(int i = 1; i < path.waypoints.size(); i++){
+                if(path.waypoints.get(i).getDistance(currentPosition) < closestWaypointDist){
+                    closestWaypointDist = path.waypoints.get(i).getDistance(currentPosition);
+                    closestWaypoint = path.waypoints.get(i);
+                }
+            }
+            approachPoint = closestWaypoint; //shouldn't happen, but if it gets lost, go to the closest waypoint
+        }
+        return goToPosition(approachPoint.toVector(), getHeading(), 0.7);
     }
 
     public boolean followPath(ArrayList<Waypoint> waypoints){

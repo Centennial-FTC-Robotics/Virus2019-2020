@@ -42,7 +42,7 @@ public class ParametricPath {
                 && (newTranslations.length == orderedFunctions.length);
 
         if (!checkDefinedRanges(newDefRanges) || !allPositive(newRanges) || !matching || !checkTranslations()) {
-            throw new FunctionFormatException("Functions in new Path incorrectly defined!", (new Exception()).getCause());
+            throw new FunctionFormatException("Functions in new PurePursuitPath incorrectly defined!", (new Exception()).getCause());
         }
     }
 

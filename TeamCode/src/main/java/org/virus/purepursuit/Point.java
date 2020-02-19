@@ -35,4 +35,21 @@ public class Point {
         return new Vector2D(x, y);
     }
 
+    public boolean equals(Object obj) {
+        if(obj == this){
+            return true;
+        }
+
+        if (!(obj instanceof Waypoint)) {
+            return false;
+        }
+
+        Waypoint other = (Waypoint)obj;
+        return (getX() == other.getX() && getY() == other.getY());
+    }
+
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
 }
