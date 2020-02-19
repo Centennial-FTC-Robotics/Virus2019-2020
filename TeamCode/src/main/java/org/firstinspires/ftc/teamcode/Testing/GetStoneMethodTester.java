@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@TeleOp(group = "Autonomous", name = "Get Stone Method Tester")
+//@TeleOp(group = "Autonomous", name = "Get Stone Method Tester")
 public class GetStoneMethodTester extends LinearOpMode {
 
     public static enum modes {FLAT, ANGLE};

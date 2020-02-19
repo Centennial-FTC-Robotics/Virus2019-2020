@@ -1,9 +1,12 @@
 package org.virus.agobot;
 
+import android.graphics.Color;
+
+import com.qualcomm.hardware.lynx.LynxI2cColorRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.virus.superclasses.Subsystem;
 
 public class Arm extends Subsystem {
@@ -11,6 +14,7 @@ public class Arm extends Subsystem {
 
     public Servo leftArm;
     public Servo rightArm;
+    public LynxI2cColorRangeSensor stoneSensor;
     // drop = 0, standby = 1, in = 2
     public String[] armPositions = {"drop", "standby", "in"};
     public String[] extendPositions = {"drop", "topstone", "standby", "in"};
@@ -29,6 +33,8 @@ public class Arm extends Subsystem {
         //TODO
         leftArm = opMode.hardwareMap.servo.get("leftArm");
         rightArm = opMode.hardwareMap.servo.get("rightArm");
+        stoneSensor = opMode.hardwareMap.get(LynxI2cColorRangeSensor.class, "stoneSensor");
+        stoneSensor.initialize();
         armPosition = 2;
     }
 
@@ -133,5 +139,46 @@ public class Arm extends Subsystem {
         }
 
         return armPos;
+    }
+
+    public double getStonePosition() {
+
+        return stoneSensor.getDistance(DistanceUnit.MM);
+    }
+
+    public boolean isStoneIn() {
+
+        // this tries to check if the stone is within 5cm and tries to compare its color to a manually computed RGB value
+        return (getStonePosition() < 60 && isColor(stoneSensor.red(), stoneSensor.green(), stoneSensor.blue(), 16389122));
+    }
+
+    public boolean isColor(int red, int green, int blue, int rgbRef) {
+
+        double redDeviance = Math.abs(red - getRed(rgbRef));
+        double greenDeviance = Math.abs(green - getGreen(rgbRef));
+        double blueDeviance = Math.abs(blue - getBlue(rgbRef));
+
+        return (redDeviance < 10 && greenDeviance < 10 && blueDeviance < 10);
+    }
+
+    public static int getRGB(int red, int green, int blue, int alpha) {
+        return ((alpha << 24) + (red << 16) + (green << 8) + blue);
+    }
+
+    public static int getRed(int rgb) {
+        return (rgb >> 16) & 0xff;
+    }
+
+    public static int getGreen(int rgb) {
+        return (rgb >> 8) & 0xff;
+    }
+
+    public static int getBlue(int rgb) {
+        return rgb & 0xff;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(getRGB(250, 20, 2, 0));
     }
 }

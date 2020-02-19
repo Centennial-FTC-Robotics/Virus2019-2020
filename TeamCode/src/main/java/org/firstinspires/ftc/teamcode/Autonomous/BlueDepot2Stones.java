@@ -201,8 +201,6 @@ public class BlueDepot2Stones extends LinearOpMode {
         Agobot.intake.runIntake(-1);
         Agobot.intake.runIntake(-1);
 
-
-        //TODO: need to test values for second skystone
         yOffset = -45;
 
         if (skyStoneLocation.equals("Right")) {
