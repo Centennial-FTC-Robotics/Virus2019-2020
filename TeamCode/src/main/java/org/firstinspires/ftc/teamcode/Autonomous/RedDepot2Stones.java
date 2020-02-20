@@ -7,11 +7,14 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
 import org.virus.agobot.PIDControllers;
+import org.virus.purepursuit.PurePursuitPath;
+import org.virus.purepursuit.Waypoint;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
 import org.virus.vision.StripDetector;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @Autonomous(name = "Red Depot 2 Stones", group = "Auto")
@@ -121,17 +124,27 @@ public class RedDepot2Stones extends LinearOpMode {
 
         Agobot.arm.armFlipOut(false);
 
-        //Deliver skystone 1 to foundation
-        // move back out of the way
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 2), 0, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+        ArrayList<Waypoint> oneToFoundation = new ArrayList<>();
+        oneToFoundation.add(new Waypoint(24, yOffset + 2.5, diagonalAngle1));
+        oneToFoundation.add(new Waypoint(38, yOffset + 2, 90));
+        oneToFoundation.add(new Waypoint(38, 12, 90));
+        oneToFoundation.add(new Waypoint(38, 44, 0));
+        PurePursuitPath firstToFoundation = new PurePursuitPath(oneToFoundation);
 
+        while(Agobot.drivetrain.followPath(firstToFoundation) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+            Agobot.grabber.grab(true);
         }
+
+        // move back out of the way
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 2), 0, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+//
+//        }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 44), 0, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-            Agobot.grabber.grab(true);
-
-        }
+//        while(Agobot.drivetrain.goToPosition(new Vector2D(38, 44), 0, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+//            Agobot.grabber.grab(true);
+//
+//        }
 
         //get closer to foundation
         PIDControllers.xController.changeConstants(.1f,.6f ,0.001f,0.3f);

@@ -7,6 +7,8 @@ import org.virus.agobot.Agobot;
 import org.virus.agobot.Arm;
 import org.virus.util.Vector2D;
 
+import java.util.Arrays;
+
 @TeleOp(group = "TeleOp", name = "Arm Tester")
 public class TestArm extends LinearOpMode {
 
@@ -40,7 +42,7 @@ public class TestArm extends LinearOpMode {
 
 
 
-            telemetry.addData("Rev color", new double[] {Arm.getRed(Agobot.arm.stoneSensor.argb()), Arm.getGreen(Agobot.arm.stoneSensor.argb()), Arm.getBlue(Agobot.arm.stoneSensor.argb())});
+            telemetry.addData("Rev color", Arrays.toString(new double[] {Arm.getRed(Agobot.arm.stoneSensor.argb()), Arm.getGreen(Agobot.arm.stoneSensor.argb()), Arm.getBlue(Agobot.arm.stoneSensor.argb())}));
             telemetry.addData("Color RGB int output", Agobot.arm.stoneSensor.argb());
             telemetry.addData("Distance", Agobot.arm.getStonePosition());
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());

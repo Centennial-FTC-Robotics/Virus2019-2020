@@ -11,7 +11,7 @@ import org.virus.util.Vector2D;
 public class ServoTester extends LinearOpMode {
 
     private Servo[] servos;
-    private String[] servoNames = {"dragger", "leftArm", "rightArm", "grabber"};
+    private String[] servoNames = {"left dragger", "right dragger", "leftArm", "rightArm", "grabber"};
     private double servoPos;
     private double refinementInterval = 0.05;
     private int servoIndex = 0;
@@ -21,7 +21,7 @@ public class ServoTester extends LinearOpMode {
         Agobot.initialize(this);
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(new Vector2D(63, -36), 179);
-        servos = new Servo[] {Agobot.dragger.dragger, Agobot.arm.leftArm, Agobot.arm.rightArm, Agobot.grabber.grabber};
+        servos = new Servo[] {Agobot.dragger.leftDragger, Agobot.dragger.rightDragger, Agobot.arm.leftArm, Agobot.arm.rightArm, Agobot.grabber.grabber};
         servoPos = servos[servoIndex].getPosition();
 
         waitForStart();

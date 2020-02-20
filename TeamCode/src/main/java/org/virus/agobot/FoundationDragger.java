@@ -11,14 +11,16 @@ public class FoundationDragger extends Subsystem {
     //includes 1 servo
     //states include: grab & release
 
-    public Servo dragger;
+    public Servo leftDragger;
+    public Servo rightDragger;
     public double position = 0.0;
     private final double dragPosition = 0.0;
-    private final double upPosition = 0.55;
+    private final double upPosition = 1.0;
 
     @Override
     public void initialize(LinearOpMode opMode) {
-        dragger = opMode.hardwareMap.servo.get("dragger");
+        rightDragger = opMode.hardwareMap.servo.get("rightdragger");
+        leftDragger = opMode.hardwareMap.servo.get("leftdragger");
     }
 
     public boolean isDragging() {
@@ -28,10 +30,12 @@ public class FoundationDragger extends Subsystem {
 
     public void drag(boolean grab){
         if(grab){
-            dragger.setPosition(dragPosition);
+            rightDragger.setPosition(dragPosition);
+            leftDragger.setPosition(1 - dragPosition);
             position = dragPosition;
         }else{
-            dragger.setPosition(upPosition);
+            rightDragger.setPosition(upPosition);
+            leftDragger.setPosition(1 - upPosition);
             position = upPosition;
         }
     }

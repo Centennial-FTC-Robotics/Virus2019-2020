@@ -26,6 +26,7 @@ public class PurePursuit extends LinearOpMode {
 
         //add all the waypoints in (this particular set is the path from the stones to the foundation)
         waypoints.add(new Waypoint(42,-57,180));
+        waypoints.add(new Waypoint(42, -21, 90));
         waypoints.add(new Waypoint(42,40,90));
         waypoints.add(new Waypoint(31,40,0));
 
