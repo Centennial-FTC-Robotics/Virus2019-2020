@@ -165,7 +165,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
             telemetry.addData("Arm State Number", Agobot.arm.armPosition);
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
-            telemetry.addData("Slide Position", Agobot.slides.getPosition());
+            telemetry.addData("Slide right Pos", Agobot.slides.slideRight.getCurrentPosition());
+            telemetry.addData("Slide left Pos", Agobot.slides.slideLeft.getCurrentPosition());
 //            telemetry.addData("Arm Number", Agobot.arm.armPosition);
 //            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
 //            telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
