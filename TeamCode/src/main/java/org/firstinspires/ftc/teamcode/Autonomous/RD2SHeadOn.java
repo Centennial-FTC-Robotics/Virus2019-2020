@@ -23,7 +23,6 @@ public class RD2SHeadOn extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
     private double startHeading = 270; //straight left
     private String skyStoneLocation = "Middle";
-    //TODO: test diagonal angle for colecting stones
     private int resetTime = 29500;
     private int diagonalAngle = 180;
     private int stone1Offset = 0;
@@ -65,7 +64,7 @@ public class RD2SHeadOn extends LinearOpMode {
 
         //COLLECT SKYSTONE #1 & DELIVER------------------------------------------------------------------------------------------------
         //get ready to pick up skystone
-        //TODO: test values for y offset for diagonal getting stones
+
         int yOffset = -45;
 
         if (skyStoneLocation.equals("Right")) {
@@ -84,7 +83,7 @@ public class RD2SHeadOn extends LinearOpMode {
         Agobot.intake.runIntake(1);
 
 
-//        //go at angle to collect inner set of stones
+//        //go at angle to collect outer set of stones
 //        while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 10), diagonalAngle1, 0.6) && opModeIsActive()){
 //            Agobot.intake.runIntake(1);
 //            Agobot.intake.getLeft().setPower(1);
@@ -146,18 +145,7 @@ public class RD2SHeadOn extends LinearOpMode {
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(false);
-
-//        ArrayList<Waypoint> oneToFoundation = new ArrayList<>();
-//        oneToFoundation.add(new Waypoint(24, yOffset + 2.5, diagonalAngle1));
-//        oneToFoundation.add(new Waypoint(38, yOffset + 2, 90));
-//        oneToFoundation.add(new Waypoint(38, 12, 90));
-//        oneToFoundation.add(new Waypoint(38, 44, 0));
-//        PurePursuitPath firstToFoundation = new PurePursuitPath(oneToFoundation);
-//
-//        while(Agobot.drivetrain.followPath(firstToFoundation) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-//            Agobot.grabber.grab(true);
-//        }
+        Agobot.arm.armFlipOut(true); //go from in to standby
 
         // move back out of the way
         while(Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset + 2), 0, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
@@ -166,8 +154,6 @@ public class RD2SHeadOn extends LinearOpMode {
 
         //go to foundation
         while(Agobot.drivetrain.goToPosition(new Vector2D(38, 44), 0, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-            Agobot.grabber.grab(true);
-
         }
 
         //get closer to foundation
@@ -176,7 +162,6 @@ public class RD2SHeadOn extends LinearOpMode {
         while(Agobot.drivetrain.goToPosition(new Vector2D(31.5, 44), 0, 0.3, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
         }
-        Agobot.arm.armFlipOut(true);
         Agobot.arm.armFlipOut(true);
 
         //DRAG FOUNDATION CLOSE------------------------------------------------------------------------------------------------
@@ -216,12 +201,9 @@ public class RD2SHeadOn extends LinearOpMode {
 
         //COLLECT SKYSTONE #2 & DELIVER------------------------------------------------------------------------------------------------
         // grab skystone
-        // grab skystone
         Agobot.intake.runIntake(1);
         Agobot.intake.runIntake(1);
 
-
-        //TODO: need to test values for second skystone
         yOffset = -43;
 
         if (skyStoneLocation.equals("Right")) {
@@ -270,7 +252,7 @@ public class RD2SHeadOn extends LinearOpMode {
         startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(true);
+        Agobot.arm.armFlipOut(true); //go from in to standby
 
         while (Agobot.drivetrain.goToPosition(new Vector2D(38, yOffset), 180, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 

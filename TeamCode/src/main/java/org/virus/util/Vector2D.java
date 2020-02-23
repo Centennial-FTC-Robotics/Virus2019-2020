@@ -168,6 +168,14 @@ public class Vector2D {
         return iTwo;
     }
 
+    public static Vector2D scale(Vector2D term_one, double newScalar) {
+
+        double angle = term_one.getTheta();
+        double scalar = term_one.getMag();
+
+        return new Vector2D(angle, scalar * newScalar);
+    }
+
     public void zero() {
 
         this.scale(0);

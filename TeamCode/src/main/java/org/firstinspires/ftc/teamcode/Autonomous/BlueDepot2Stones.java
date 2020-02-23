@@ -22,7 +22,6 @@ public class BlueDepot2Stones extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(-63, -36); //against wall to the right
     private double startHeading = 90; //straight left
     private String skyStoneLocation = "Middle";
-    //TODO: test diagonal angle for colecting stones
     private int resetTime = 29500;
     private int diagonalAngle1 = 45;
     private int diagonalAngle2 = 305;
@@ -135,7 +134,7 @@ public class BlueDepot2Stones extends LinearOpMode {
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(false);
+        Agobot.arm.armFlipOut(true); //go from in to standby
 
         //Deliver skystone 1 to foundation
         // move back out of the way
@@ -145,8 +144,6 @@ public class BlueDepot2Stones extends LinearOpMode {
 
         //go to foundation
         while(Agobot.drivetrain.goToPosition(new Vector2D(-37.5, 44), 180, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-            Agobot.grabber.grab(true);
-
         }
 
         //get closer to foundation
@@ -155,7 +152,6 @@ public class BlueDepot2Stones extends LinearOpMode {
         while(Agobot.drivetrain.goToPosition(new Vector2D(-31.5, 44), 180, 0.4, 1.2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
         }
-        Agobot.arm.armFlipOut(true);
         Agobot.arm.armFlipOut(true);
 
         //DRAG FOUNDATION CLOSE------------------------------------------------------------------------------------------------
@@ -196,7 +192,6 @@ public class BlueDepot2Stones extends LinearOpMode {
         PIDControllers.yController.changeConstants(.07f,.16f ,0.001f,0.15f);
 
         //COLLECT SKYSTONE #2 & DELIVER------------------------------------------------------------------------------------------------
-        // grab skystone
         // grab skystone
         Agobot.intake.runIntake(-1);
         Agobot.intake.runIntake(-1);
@@ -249,7 +244,7 @@ public class BlueDepot2Stones extends LinearOpMode {
         startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startGrab + 500) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(true);
+        Agobot.arm.armFlipOut(true); //go from in to standby
 
         while (Agobot.drivetrain.goToPosition(new Vector2D(-37.5, yOffset), 0, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 

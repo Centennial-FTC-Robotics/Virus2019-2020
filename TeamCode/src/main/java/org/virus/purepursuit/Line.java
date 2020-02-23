@@ -14,10 +14,16 @@ public class Line extends PathComponent{
     double ySlope;
     double headingSlope;
 
-    public Line(ArrayList<Waypoint> waypoints){
+
+    public Line(ArrayList<Waypoint> waypoints, double index){
         startPoint = waypoints.get(0);
         endPoint = waypoints.get(1);
         generateSlopes(waypoints);
+        this.index = index;
+    }
+
+    public double index(){
+        return index;
     }
 
     public void generateSlopes(ArrayList<Waypoint> waypoints){

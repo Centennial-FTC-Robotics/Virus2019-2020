@@ -34,7 +34,7 @@ public class PurePursuit extends LinearOpMode {
 
         waitForStart();
 
-        while(Agobot.drivetrain.followPath(stonesToFoundation)){
+        while(Agobot.drivetrain.followPath(stonesToFoundation, 0.7)){
 
         }
     }
