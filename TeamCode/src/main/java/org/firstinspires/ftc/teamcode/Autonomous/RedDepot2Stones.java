@@ -131,7 +131,7 @@ public class RedDepot2Stones extends LinearOpMode {
 //        oneToFoundation.add(new Waypoint(38, 44, 0));
 //        PurePursuitPath firstToFoundation = new PurePursuitPath(oneToFoundation);
 //
-//        while(Agobot.drivetrain.followPath(firstToFoundation) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+//        while(Agobot.drivetrain.followPath(firstToFoundation, 0.7) && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 //            Agobot.grabber.grab(true);
 //        }
 

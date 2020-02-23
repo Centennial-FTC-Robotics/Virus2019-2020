@@ -548,7 +548,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         return false;
     }
 
-    public boolean followPath(PurePursuitPath path){
+    public boolean followPath(PurePursuitPath path, double maxSpeed){
         Waypoint approachPoint;
         currentPosition = updatePosition();
         ArrayList<Waypoint> intersections = path.findIntersections(currentPosition, lookaheadRadius);
@@ -565,7 +565,29 @@ public class MecanumVectorDriveTrain extends Drivetrain {
             }
             approachPoint = closestWaypoint; //shouldn't happen, but if it gets lost, go to the closest waypoint
         }
-        return goToPosition(approachPoint.toVector(), approachPoint.getHeading(), 0.7);
+        Vector2D approach = new Vector2D(Vector2D.sub(approachPoint.toVector(), currentPosition));
+        return goToPosition(approachPoint.toVector(), approachPoint.getHeading(), maxSpeed);
+    }
+
+    public boolean followPathFacingForward(PurePursuitPath path, double maxSpeed){
+        Waypoint approachPoint;
+        currentPosition = updatePosition();
+        ArrayList<Waypoint> intersections = path.findIntersections(currentPosition, lookaheadRadius);
+        if(intersections.size() > 0){
+            approachPoint = intersections.get(intersections.size() - 1);
+        }else{
+            Waypoint closestWaypoint = path.waypoints.get(0);
+            double closestWaypointDist = path.waypoints.get(0).getDistance(currentPosition);
+            for(int i = 1; i < path.waypoints.size(); i++){
+                if(path.waypoints.get(i).getDistance(currentPosition) < closestWaypointDist){
+                    closestWaypointDist = path.waypoints.get(i).getDistance(currentPosition);
+                    closestWaypoint = path.waypoints.get(i);
+                }
+            }
+            approachPoint = closestWaypoint; //shouldn't happen, but if it gets lost, go to the closest waypoint
+        }
+        Vector2D approach = new Vector2D(Vector2D.sub(approachPoint.toVector(), currentPosition));
+        return goToPosition(approachPoint.toVector(), approach.getTheta(), maxSpeed); //always facing in direction of approach vector
     }
 
     public boolean followPath(ArrayList<Waypoint> waypoints){
