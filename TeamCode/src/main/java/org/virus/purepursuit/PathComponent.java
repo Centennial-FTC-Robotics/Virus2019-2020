@@ -7,6 +7,7 @@ import java.util.Set;
 public abstract class PathComponent {
     Waypoint startPoint;
     Waypoint endPoint;
-    double index;
-    public abstract Set<Waypoint> findIntersections(Vector2D robotPosition, double lookaheadRadius);
+    int index;
+    public abstract Set<IntersectionPoint> findIntersections(Vector2D robotPosition, double lookaheadRadius);
+    public abstract double length();
 }

@@ -11,6 +11,11 @@ public class Point {
         this.y = y;
     }
 
+    public Point(Vector2D vector){
+        x = vector.getComponent(0);
+        y = vector.getComponent(1);
+    }
+
     public double getX(){
         return x;
     }
