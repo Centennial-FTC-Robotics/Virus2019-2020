@@ -107,9 +107,14 @@ public class FieldCentricTeleOp extends LinearOpMode {
             //intake
             if(gamepad2.right_bumper){
                 Agobot.intake.runIntake(1);
+                if(gamepad2.left_bumper){
+                    Agobot.intake.deployIntake();
+
+                }
             }else if(gamepad2.left_bumper){
                 Agobot.intake.runIntake(-0.3);
-            }else{
+            }
+            else{
                 Agobot.intake.runIntake(0);
             }
 
