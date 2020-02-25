@@ -73,44 +73,42 @@ public class FieldCentricTeleOp extends LinearOpMode {
 //            telemetry.addData("lBack:", diagSpeed2);
 //            telemetry.addData("rFront:", diagSpeed2);
 //            telemetry.addData("rBack:", diagSpeed1);
-            if (!Arrays.equals(leftStick.getComponents(), new double[] {0, 0}) || !Arrays.equals(rightStick.getComponents(), new double[] {0, 0})) {
+            if (!Arrays.equals(leftStick.getComponents(), new double[]{0, 0}) || !Arrays.equals(rightStick.getComponents(), new double[]{0, 0})) {
                 telemetry.update();
             }
 
             speedMultiplier = 1 - (0.7 * gamepad1.left_trigger);
 
-            if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)){
-                Agobot.drivetrain.runMotors(speedMultiplier*diagSpeed1, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed2, speedMultiplier*diagSpeed1, speedMultiplier*rightStick.getComponent(0) + snap90Correction); //var1 and 2 are computed values found in theUpdateControllerValues method
+            if ((leftStick.getComponent(0) != 0) || (leftStick.getComponent(1) != 0)) {
+                Agobot.drivetrain.runMotors(speedMultiplier * diagSpeed1, speedMultiplier * diagSpeed2, speedMultiplier * diagSpeed2, speedMultiplier * diagSpeed1, speedMultiplier * rightStick.getComponent(0) + snap90Correction); //var1 and 2 are computed values found in theUpdateControllerValues method
             } else {
-                Agobot.drivetrain.runMotors(0, 0, 0, 0, speedMultiplier*rightStick.getComponent(0) + snap90Correction);
+                Agobot.drivetrain.runMotors(0, 0, 0, 0, speedMultiplier * rightStick.getComponent(0) + snap90Correction);
             }
 
             //slides
             Agobot.slides.slidePower(-0.5 * gamepad2.left_stick_y + -0.2 * gamepad2.right_stick_y);
 
             //arm
-            if(gp2LeftTriggerPrev < 0.1 && gamepad2.left_trigger > 0.1) { //only calls if trigger is pressed and on previous loop iteration it wasn't
+            if (gp2LeftTriggerPrev < 0.1 && gamepad2.left_trigger > 0.1) { //only calls if trigger is pressed and on previous loop iteration it wasn't
 
                 Agobot.arm.armFlipOut(false);
-            }else if(gp2rightTriggerPrev < 0.1 && gamepad2.right_trigger > 0.1){
+            } else if (gp2rightTriggerPrev < 0.1 && gamepad2.right_trigger > 0.1) {
                 Agobot.arm.armFlipOut(true);
             }
 
             //grabber
-            if(gamepad2.b) {
+            if (gamepad2.b) {
                 Agobot.grabber.grab(true);
             }
-            if(gamepad2.a){
+            if (gamepad2.a) {
                 Agobot.grabber.grab(false);
             }
 
             //intake
-            if(gamepad2.right_bumper){
+            if(gamepad2.left_bumper && gamepad2.right_bumper){
+                Agobot.intake.deployIntake();
+            }else if(gamepad2.right_bumper){
                 Agobot.intake.runIntake(1);
-                if(gamepad2.left_bumper){
-                    Agobot.intake.deployIntake();
-
-                }
             }else if(gamepad2.left_bumper){
                 Agobot.intake.runIntake(-0.3);
             }
