@@ -17,7 +17,7 @@ public class BlueStraight2S extends LinearOpMode {
     private double startHeading = 90; //straight up
     private String skyStoneLocation;
     private int resetTime = 29500;
-    private Vector2D stone1Offset = new Vector2D(-2, 0);
+    private Vector2D stone1Offset = new Vector2D(-2, 4);
     private Vector2D stone2Offset = new Vector2D(-2, 0);
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
     private Vector2D[] skystonePositions = new Vector2D[6];
@@ -67,11 +67,11 @@ public class BlueStraight2S extends LinearOpMode {
             angle = relativeSkystonePos[5].getTheta();
         }
 
-        goToPos.sub(new Vector2D(angle, 6.0, true));
+        goToPos.sub(new Vector2D(angle, 4.0, true));
 
         //run diagonal at stones
         double timeCondition = Agobot.clock.milliseconds();
-        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, angle, 0.4, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(angle), 0.4, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -159,10 +159,11 @@ public class BlueStraight2S extends LinearOpMode {
             goToPos = Vector2D.add(skystonePositions[2], stone2Offset);
         }
 
-        Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(16, 16));
-        goToPos.add(new Vector2D(135, 6.0, false)); // center of robot is 8 inches away from stone
+        Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(-16, 16));
+        goToPos.sub(new Vector2D(-45, 6.0, false)); // center of robot is 8 inches away from stone
 
-        while (Agobot.drivetrain.goToPosition(afterDeliverVector, -45, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        timeCondition = Agobot.clock.milliseconds();
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(afterDeliverVector, -45, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.intake.runIntake(-1);
             Agobot.intake.getLeft().setPower(-1);
             Agobot.intake.getRight().setPower(-1);
