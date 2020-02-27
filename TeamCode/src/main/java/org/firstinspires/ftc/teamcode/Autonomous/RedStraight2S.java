@@ -20,8 +20,8 @@ public class RedStraight2S extends LinearOpMode {
     private double startHeading = 270; //straight left
     private String skyStoneLocation;
     private int resetTime = 29500;
-    private Vector2D stone1Offset = new Vector2D(7, 6);
-    private Vector2D stone2Offset = new Vector2D(5.5, 1);
+    private Vector2D stone1Offset = new Vector2D(4, 8);
+    private Vector2D stone2Offset = new Vector2D(5.5, 7);
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
     private Vector2D[] skystonePositions = new Vector2D[6];
     private Vector2D[] relativeSkystonePos = new Vector2D[6];
@@ -137,7 +137,7 @@ public class RedStraight2S extends LinearOpMode {
         Agobot.arm.armFlipOut(false);
 
         //change heading constant for rotating foundation
-        PIDControllers.headingController.changeConstants(-.5f, -.15f, -.001f, 1.5f);
+        PIDControllers.headingController.changeConstants(-.5f, -.13f, -.001f, 1.4f);
 
         while (Agobot.drivetrain.goToPosition(new Vector2D(42, 30), 270, 1, 1.5, 2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
@@ -168,8 +168,8 @@ public class RedStraight2S extends LinearOpMode {
             goToPos = Vector2D.add(skystonePositions[3], stone2Offset);
         }
 
-        Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(16.5, 16));
-        goToPos.add(new Vector2D(45, 6.0, false)); // center of robot is 8 inches away from stone
+        Vector2D afterDeliverVector = Vector2D.add(goToPos, Vector2D.scale(new Vector2D(16.5, 16), 0.95));
+        goToPos.add(new Vector2D(45, 3.5, false)); // center of robot is 8 inches away from stone
 
         while (Agobot.drivetrain.goToPosition(afterDeliverVector, 225, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.intake.runIntake(-1);
