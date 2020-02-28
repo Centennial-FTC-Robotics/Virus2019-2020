@@ -96,13 +96,13 @@ public class Arm extends Subsystem {
             switch(armPosition){
                 case 0:
                     //drop
-                    left = 0.1;
-                    right = 0.9;
+                    left = 0.05;
+                    right = 0.95;
                     break;
                 case 1:
                     //standby
-                    left = 0.89;
-                    right = 0.11;
+                    left = 0.92;
+                    right = 0.08;
                     break;
                 case 2:
                     //in
