@@ -13,13 +13,15 @@ import java.io.File;
 @Autonomous(group = "Autonomous", name = "Blue Straight")
 public class BlueStraight2S extends LinearOpMode {
 
-    private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
-    private double startHeading = 270; //straight left
+    private Vector2D startPosition = new Vector2D(-63, -36); //against wall to the right
+    private double startHeading = 90; //straight up
     private String skyStoneLocation;
     private int resetTime = 29500;
+    private Vector2D stone1Offset = new Vector2D(-2, 4);
+    private Vector2D stone2Offset = new Vector2D(-2, 0);
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
-    Vector2D[] skystonePositions = new Vector2D[6];
-    Vector2D[] relativeSkystonePos = new Vector2D[6];
+    private Vector2D[] skystonePositions = new Vector2D[6];
+    private Vector2D[] relativeSkystonePos = new Vector2D[6];
 
     public void runOpMode() throws InterruptedException {
 
@@ -52,24 +54,24 @@ public class BlueStraight2S extends LinearOpMode {
         Agobot.arm.armFlipOut(true); //go from in to standby
         Agobot.intake.deployIntake();
 
-        Vector2D goToPos = skystonePositions[4];
+        Vector2D goToPos = Vector2D.add(skystonePositions[4], stone1Offset);
         double angle = relativeSkystonePos[4].getTheta();
 
         if (skyStoneLocation.equals("Right")) {
 
-            goToPos = skystonePositions[3];
+            goToPos = Vector2D.add(skystonePositions[3], stone1Offset);
             angle = relativeSkystonePos[3].getTheta();
         } else if (skyStoneLocation.equals("Left")) {
 
-            goToPos = skystonePositions[5];
+            goToPos = Vector2D.add(skystonePositions[5], stone1Offset);
             angle = relativeSkystonePos[5].getTheta();
         }
 
-        goToPos.sub(new Vector2D(angle, 8.0, true));
+        goToPos.sub(new Vector2D(angle, 4.0, true));
 
         //run diagonal at stones
         double timeCondition = Agobot.clock.milliseconds();
-        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, angle, 0.4, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(angle), 0.4, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);
@@ -82,25 +84,20 @@ public class BlueStraight2S extends LinearOpMode {
         Agobot.arm.armFlipOut(false); //go from standby to in
         double grab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (grab + 400) && opModeIsActive()) {}
-        Agobot.intake.runIntake(0);
-        Agobot.grabber.grab(true);
 
+        Agobot.grabber.grab(true);
         double startGrab = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
+        Agobot.intake.runIntake(0);
 
         Agobot.arm.armFlipOut(true); //go from in to standby
 
         //Deliver skystone 1 to foundation
         // move back out of the way
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-37.5, goToPos.getComponent(1)), 180, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-
-        }
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-37.5, goToPos.getComponent(1)), 180, 1,1.3,1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){ }
 
         //go to foundation
-        while(Agobot.drivetrain.goToPosition(new Vector2D(-37.5, 44), 180, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
-            Agobot.grabber.grab(true);
-
-        }
+        while(Agobot.drivetrain.goToPosition(new Vector2D(-37.5, 44), 180, 1,1.5,1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){ }
 
         //get closer to foundation
         PIDControllers.xController.changeConstants(.1f,.6f ,0.001f,0.3f);
@@ -152,20 +149,21 @@ public class BlueStraight2S extends LinearOpMode {
         Agobot.intake.runIntake(1);
         Agobot.intake.runIntake(1);
 
-        goToPos = skystonePositions[1];
+        goToPos = Vector2D.add(skystonePositions[1], stone2Offset);
 
         if (skyStoneLocation.equals("Right")) {
 
-            goToPos = skystonePositions[0];
+            goToPos = Vector2D.add(skystonePositions[0], stone2Offset);
         } else if (skyStoneLocation.equals("Left")) {
 
-            goToPos = skystonePositions[2];
+            goToPos = Vector2D.add(skystonePositions[2], stone2Offset);
         }
 
-        Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(16, 16));
-        goToPos.add(new Vector2D(135, 8.0, false)); // center of robot is 8 inches away from stone
+        Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(-16, 16));
+        goToPos.sub(new Vector2D(-45, 6.0, false)); // center of robot is 8 inches away from stone
 
-        while (Agobot.drivetrain.goToPosition(afterDeliverVector, -45, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        timeCondition = Agobot.clock.milliseconds();
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(afterDeliverVector, -45, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.intake.runIntake(-1);
             Agobot.intake.getLeft().setPower(-1);
             Agobot.intake.getRight().setPower(-1);

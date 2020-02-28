@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class PurePursuit extends LinearOpMode {
 
     ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
-    private Vector2D startPosition = new Vector2D(42, -57); //right after picking up middle stone
-    private double startHeading = 180;
+    private Vector2D startPosition = new Vector2D(63, -36); //right after picking up middle stone
+    private double startHeading = 270;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -25,9 +25,8 @@ public class PurePursuit extends LinearOpMode {
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
 
         //add all the waypoints in (this particular set is the path from the stones to the foundation)
-        waypoints.add(new Waypoint(42,-57,180));
-        waypoints.add(new Waypoint(42, -21, 90));
-        waypoints.add(new Waypoint(42,40,90));
+        waypoints.add(new Waypoint(63,-36,270));
+        waypoints.add(new Waypoint(42, 40, 90));
         waypoints.add(new Waypoint(31,40,0));
 
         PurePursuitPath stonesToFoundation = new PurePursuitPath(waypoints);
