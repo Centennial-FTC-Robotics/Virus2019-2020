@@ -9,6 +9,7 @@ public class PurePursuitPath {
     ArrayList<PathComponent> components = new ArrayList<>();
     public ArrayList<Waypoint> waypoints = new ArrayList<>();
     int currentIndex = 0;
+    public IntersectionPoint approachPoint;
 
     public PurePursuitPath(ArrayList<Waypoint> waypoints){
         for(int i = 0; i < waypoints.size() - 1; i++){
@@ -32,7 +33,6 @@ public class PurePursuitPath {
 
     public IntersectionPoint findApproachPoint(Vector2D robotPosition, double lookaheadRadius){
         ArrayList<IntersectionPoint> intersections = findIntersections(robotPosition, lookaheadRadius);
-        IntersectionPoint approachPoint;
         if(intersections.size() > 0){
             approachPoint = intersections.get(intersections.size() - 1);
         }else{

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
+import org.virus.agobot.Arm;
 import org.virus.agobot.PIDControllers;
 import org.virus.util.Vector2D;
 import java.io.File;
@@ -15,7 +16,7 @@ public class BlueStraight2S extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(-63, -36); //against wall to the right
     private double startHeading = 90; //straight up
-    private String skyStoneLocation;
+    private String skyStoneLocation = "Middle";
     private int resetTime = 29500;
     private Vector2D stone1Offset = new Vector2D(-2, 4);
     private Vector2D stone2Offset = new Vector2D(-2, 0);
@@ -51,7 +52,7 @@ public class BlueStraight2S extends LinearOpMode {
 
         // deploy intake as the very first action
         Agobot.grabber.grab(false);
-        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
         Agobot.intake.deployIntake();
 
         Vector2D goToPos = Vector2D.add(skystonePositions[4], stone1Offset);
@@ -81,7 +82,7 @@ public class BlueStraight2S extends LinearOpMode {
         double startIntake = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while(Agobot.clock.milliseconds() < (startIntake + 300) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(false); //go from standby to in
+        Agobot.arm.setArmPos(Arm.armPosition.in); //go from standby to in
         double grab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (grab + 400) && opModeIsActive()) {}
 
@@ -90,7 +91,7 @@ public class BlueStraight2S extends LinearOpMode {
         while(Agobot.clock.milliseconds() < (startGrab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
         Agobot.intake.runIntake(0);
 
-        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
 
         //Deliver skystone 1 to foundation
         // move back out of the way
@@ -105,7 +106,7 @@ public class BlueStraight2S extends LinearOpMode {
         while(Agobot.drivetrain.goToPosition(new Vector2D(-31.5, 44), 180, 0.4, 1.2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
 
         }
-        Agobot.arm.armFlipOut(true);
+        Agobot.arm.setArmPos(Arm.armPosition.drop);
 
         //DRAG FOUNDATION CLOSE------------------------------------------------------------------------------------------------
         Agobot.dragger.drag(true);
@@ -125,7 +126,7 @@ public class BlueStraight2S extends LinearOpMode {
             Agobot.intake.runIntake(-1);
         }
 
-        Agobot.arm.armFlipOut(false);
+        Agobot.arm.setArmPos(Arm.armPosition.standby);
         Agobot.intake.runIntake(0);
 
         //change heading constant for rotating foundation
@@ -179,7 +180,7 @@ public class BlueStraight2S extends LinearOpMode {
         }
 
         Agobot.intake.runIntake(0);
-        Agobot.arm.armFlipOut(false); //go from standby to in
+        Agobot.arm.setArmPos(Arm.armPosition.in); //go from standby to in
         grab = Agobot.clock.milliseconds();
         while(Agobot.clock.milliseconds() < (grab + 400) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
         Agobot.grabber.grab(true);
@@ -187,7 +188,7 @@ public class BlueStraight2S extends LinearOpMode {
 
         while(Agobot.clock.milliseconds() < (startGrab + 500) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
 
         while (Agobot.drivetrain.goToPosition(new Vector2D(-37.5, goToPos.getComponent(1)), 0, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
@@ -198,7 +199,7 @@ public class BlueStraight2S extends LinearOpMode {
 
         }
 
-        Agobot.arm.armFlipOut(true);
+        Agobot.arm.setArmPos(Arm.armPosition.drop);
         double startDeliver = Agobot.clock.milliseconds();
         while (startDeliver + 1000 > Agobot.clock.milliseconds() && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.slides.slides(400);
@@ -209,7 +210,7 @@ public class BlueStraight2S extends LinearOpMode {
         startGrab = Agobot.clock.milliseconds();
         while (Agobot.clock.milliseconds() < startGrab + 200 && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 
-        Agobot.arm.armFlipOut(false);
+        Agobot.arm.setArmPos(Arm.armPosition.standby);
         double startRetract = Agobot.clock.milliseconds();
         while (Agobot.clock.milliseconds() < startRetract + 400 && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {}
 

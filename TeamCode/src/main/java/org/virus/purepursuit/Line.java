@@ -13,6 +13,7 @@ public class Line extends PathComponent{
     double xSlope;
     double ySlope;
     double headingSlope;
+    double radiusSlope;
 
 
     public Line(ArrayList<Waypoint> waypoints, int index){
@@ -30,6 +31,7 @@ public class Line extends PathComponent{
         xSlope = waypoints.get(1).getX() - waypoints.get(0).getX();
         ySlope = waypoints.get(1).getY() - waypoints.get(0).getY();
         headingSlope = angleDifference(waypoints.get(1).getHeading(), waypoints.get(0).getHeading());
+        radiusSlope = waypoints.get(1).getLookaheadRadius() - waypoints.get(0).getLookaheadRadius();
     }
 
     public double angleDifference(double target, double current){

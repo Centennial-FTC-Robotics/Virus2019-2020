@@ -4,10 +4,17 @@ import org.virus.util.Vector2D;
 
 public class Waypoint extends Point{
     private double heading;
+    double lookaheadRadius = 10; //default lookahead radius of 10 inches
 
     public Waypoint(double x, double y, double heading){
         super(x, y);
         this.heading = heading;
+    }
+
+    public Waypoint(double x, double y, double heading, double lookaheadRadius){
+        super(x, y);
+        this.heading = heading;
+        this.lookaheadRadius = lookaheadRadius;
     }
 
     public Waypoint(Vector2D position, double heading){
@@ -17,6 +24,10 @@ public class Waypoint extends Point{
 
     public double getHeading(){
         return heading;
+    }
+
+    public double getLookaheadRadius(){
+        return lookaheadRadius;
     }
 
     public String toString() {

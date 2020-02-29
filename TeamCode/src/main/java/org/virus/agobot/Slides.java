@@ -41,7 +41,9 @@ public class Slides extends Subsystem {
         slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public int getPosition(){
-        return (Agobot.getCurrentMotorPos(slideLeft) + Agobot.getCurrentMotorPos(slideRight))/2;
+        return Agobot.getCurrentMotorPos(slideRight);
+
+        //return (Agobot.getCurrentMotorPos(slideLeft) + Agobot.getCurrentMotorPos(slideRight))/2;
     }
     //position in encoder counts
     public boolean slides(int position) {
