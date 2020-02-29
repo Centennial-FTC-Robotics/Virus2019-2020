@@ -1,7 +1,5 @@
 package org.virus.agobot;
 
-import android.graphics.Color;
-
 import com.qualcomm.hardware.lynx.LynxI2cColorRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,14 +14,14 @@ public class Arm extends Subsystem {
     public Servo rightArm;
     public LynxI2cColorRangeSensor stoneSensor;
     // drop = 0, standby = 1, in = 2
-    public String[] armPositions = {"drop", "standby", "in"};
-    public String[] extendPositions = {"drop", "topstone", "standby", "in"};
-    public int armPosition;
+//    public String[] armPositions = {"drop", "standby", "in"};
+    public static enum armPosition {drop, topstone, standby, in};
+    public int armPos;
     public double leftPosition = 0.0;
     public double rightPosition = 1.0;
     public boolean topStone = false;
     public boolean prevTopStone = false;
-    private final double offset=.05;
+    private final double offset = .05;
     //in: left = 0.0, right = 1.0
     //standby: left = 0.2, right = 0.8
     //drop: left: 1.0, right = 0.0
@@ -35,45 +33,128 @@ public class Arm extends Subsystem {
         rightArm = opMode.hardwareMap.servo.get("rightArm");
         stoneSensor = opMode.hardwareMap.get(LynxI2cColorRangeSensor.class, "stoneSensor");
         stoneSensor.initialize();
-        armPosition = 2;
+        armPos = 2;
     }
 
-    public void armFlipOut(boolean out){
+//    public void armFlipOut(boolean out) {
+//
+//        topStone = Agobot.slides.getPosition() > (6 * 4 * Slides.ENCODER_PER_INCH);
+//
+//        if (topStone && !prevTopStone) {
+//
+//            if (armPosition > 0 && armPosition < 3) {
+//
+//                armPosition++;
+//            }
+//        } else if (!topStone && prevTopStone) {
+//
+//            if (armPosition > 1) {
+//
+//                armPosition--;
+//            }
+//        }
+//
+//        double left = 0.0;
+//        double right = 1.0;
+//
+//        if(out && armPosition > 0){
+//            armPosition--;
+//        }else if(!out && !getArmPosition().equals("in")){
+//            armPosition++;
+//        }
+//
+//        if (topStone) {
+//
+//            switch(armPosition){
+//                case 0:
+//                    //drop
+//                    left = 0.05;
+//                    right = 0.95;
+//                    break;
+//                case 1:
+//                    //intermediate 2
+//                    left = 0.22;
+//                    right = 0.78;
+//                    break;
+//                case 2:
+//                    //standby // intermediate 1
+//                    left = 0.92;
+//                    right = 0.08;
+//                    break;
+//                case 3:
+//                    //in
+//                    left = 1;
+//                    right = 0;
+//                    break;
+//            }
+//        } else {
+//
+//            switch(armPosition){
+//                case 0:
+//                    //drop
+//                    left = 0.05;
+//                    right = 0.95;
+//                    break;
+//                case 1:
+//                    //standby
+//                    left = 0.92;
+//                    right = 0.08;
+//                    break;
+//                case 2:
+//                    //in
+//                    left = 1;
+//                    right = 0;
+//                    break;
+////                default:
+////                    // why is it here
+////                    left = 1;
+////                    right = 0;
+////                    armPosition = 2;
+////                    break;
+//            }
+//        }
+//
+//        leftArm.setPosition(left);
+//        leftPosition = left;
+//        rightArm.setPosition(right);
+//        rightPosition = right;
+//
+//        prevTopStone = topStone;
+//    }
 
-        topStone = Agobot.slides.getPosition() > (6 * 4 * Slides.ENCODER_PER_INCH);
-
-        if (topStone && !prevTopStone) {
-
-            if (armPosition > 0 && armPosition < 3) {
-
-                armPosition++;
-            }
-        } else if (!topStone && prevTopStone) {
-
-            if (armPosition > 1) {
-
-                armPosition--;
-            }
-        }
+    public void armFlipOut(boolean out) {
 
         double left = 0.0;
         double right = 1.0;
 
+        topStone = Agobot.slides.getPosition() > (6 * 4 * Slides.ENCODER_PER_INCH);
 
+        if (!topStone) {
 
-        if(out && armPosition > 0){
-            armPosition--;
-        }else if(!out && !getArmPosition().equals("in")){
-            armPosition++;
+            if (armPos == 0 && !out) {
+
+                armPos++;
+            }
+
+            if (armPos == 2 && out) {
+
+                armPos--;
+            }
         }
 
-        if (topStone) {
+        if (!out && armPos < 3) {
 
-            switch(armPosition){
+            armPos++;
+        } else if (out && armPos > 0) {
+
+            armPos--;
+        }
+
+        switch(armPos){
                 case 0:
                     //drop
-                    left = 0.1;
-                    right = 0.9;
+                    left = 0.05;
+                    right = 0.95;
                     break;
                 case 1:
                     //intermediate 2
@@ -82,8 +163,8 @@ public class Arm extends Subsystem {
                     break;
                 case 2:
                     //standby // intermediate 1
-                    left = 0.87;
-                    right = 0.13;
+                    left = 0.92;
+                    right = 0.08;
                     break;
                 case 3:
                     //in
@@ -91,54 +172,65 @@ public class Arm extends Subsystem {
                     right = 0;
                     break;
             }
-        } else {
 
-            switch(armPosition){
-                case 0:
-                    //drop
-                    left = 0.05;
-                    right = 0.95;
-                    break;
-                case 1:
-                    //standby
-                    left = 0.92;
-                    right = 0.08;
-                    break;
-                case 2:
-                    //in
-                    left = 1;
-                    right = 0;
-                    break;
-//                default:
-//                    // why is it here
-//                    left = 1;
-//                    right = 0;
-//                    armPosition = 2;
-//                    break;
-            }
+            leftArm.setPosition(left);
+            leftPosition = left;
+            rightArm.setPosition(right);
+            rightPosition = right;
+    }
+
+    public String getArmPosition() {
+
+        String armPos = "";
+
+//        if (topStone) {
+//
+//            armPos = extendPositions[armPosition];
+//        } else {
+//
+//
+//        }
+        armPos = armPosition.values()[this.armPos].toString();
+
+        return armPos;
+    }
+
+    public void setArmPos(armPosition pos) {
+
+        double left = 0.0;
+        double right = 1.0;
+
+        switch(pos){
+            case drop:
+                //drop
+                left = 0.05;
+                right = 0.95;
+                armPos = 0;
+                break;
+            case topstone:
+                //intermediate 2
+                left = 0.22;
+                right = 0.78;
+                armPos = 1;
+                break;
+            case standby:
+                //standby // intermediate 1
+                left = 0.92;
+                right = 0.08;
+                armPos = 2;
+                break;
+            case in:
+                //in
+                left = 1;
+                right = 0;
+                armPos = 3;
+                break;
         }
 
         leftArm.setPosition(left);
         leftPosition = left;
         rightArm.setPosition(right);
         rightPosition = right;
-
-        prevTopStone = topStone;
-    }
-
-    public String getArmPosition(){
-
-        String armPos = "";
-
-        if (topStone) {
-
-            armPos = extendPositions[armPosition];
-        } else {
-
-            armPos = armPositions[armPosition];
-        }
-
-        return armPos;
     }
 
     public double getStonePosition() {
@@ -149,7 +241,7 @@ public class Arm extends Subsystem {
     public boolean isStoneIn() {
 
         // this tries to check if the stone is within 5cm and tries to compare its color to a manually computed RGB value
-        return (getStonePosition() < 70 && isColor(stoneSensor.red(), stoneSensor.green(), stoneSensor.blue(), 16389122));
+        return (getStonePosition() < 70);
     }
 
     public boolean isColor(int red, int green, int blue, int rgbRef) {

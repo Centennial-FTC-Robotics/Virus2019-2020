@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.openftc.revextensions2.RevBulkData;
 import org.virus.agobot.Agobot;
 import org.virus.agobot.PIDControllers;
 import org.virus.util.Vector2D;
@@ -165,7 +164,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
 //            telemetry.addData("leftStick: ", leftStick.toString());
            // telemetry.addData("Heading: ", Agobot.drivetrain.getHeading());
-            telemetry.addData("Arm State Number", Agobot.arm.armPosition);
+            telemetry.addData("Arm State Number", Agobot.arm.armPos);
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
             telemetry.addData("Slide right Pos", Agobot.slides.slideRight.getCurrentPosition());

@@ -46,7 +46,7 @@ public class TestArm extends LinearOpMode {
             telemetry.addData("Color RGB int output", Agobot.arm.stoneSensor.argb());
             telemetry.addData("Distance", Agobot.arm.getStonePosition());
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
-            telemetry.addData("Arm State Number", Agobot.arm.armPosition);
+            telemetry.addData("Arm State Number", Agobot.arm.armPos);
             telemetry.addData("Arm State", Agobot.arm.getArmPosition());
             telemetry.addData("Slide Position", Agobot.slides.getPosition());
 //            telemetry.addData("Left Arm Position", Agobot.arm.leftPosition);
