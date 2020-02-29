@@ -241,7 +241,7 @@ public class Arm extends Subsystem {
     public boolean isStoneIn() {
 
         // this tries to check if the stone is within 5cm and tries to compare its color to a manually computed RGB value
-        return (getStonePosition() < 70);
+        return (getStonePosition() < 75);
     }
 
     public boolean isColor(int red, int green, int blue, int rgbRef) {

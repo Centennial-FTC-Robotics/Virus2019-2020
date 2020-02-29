@@ -10,9 +10,12 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
 import org.virus.agobot.Arm;
 import org.virus.agobot.PIDControllers;
+import org.virus.purepursuit.PurePursuitPath;
+import org.virus.purepursuit.Waypoint;
 import org.virus.util.Vector2D;
 
 import java.io.File;
+import java.util.ArrayList;
 
 @Autonomous(group = "Autonomous", name = "Red Straight")
 public class RedStraight2S extends LinearOpMode {
@@ -76,13 +79,19 @@ public class RedStraight2S extends LinearOpMode {
 
         goToPos.sub(new Vector2D(angle, 6.0, true));
 
+        ArrayList<Waypoint> stone1Waypoints = new ArrayList<>();
+        stone1Waypoints.add(new Waypoint(63, -36, Math.toDegrees(angle)));
+        //stone1Waypoints.add(new Waypoint(Vector2D.sub(goToPos,new Vector2D(5,angle, true)), Math.toDegrees(angle)));
+        stone1Waypoints.add(new Waypoint(goToPos, Math.toDegrees(angle)));
+        PurePursuitPath stone1 = new PurePursuitPath(stone1Waypoints);
+
         Agobot.intake.runIntake(1);
         Agobot.intake.getLeft().setPower(1);
         Agobot.intake.getRight().setPower(1);
 
         //run diagonal at stones
         double timeCondition = Agobot.clock.milliseconds();
-        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && opModeIsActive() && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(angle), 0.4, 1.5)  && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && opModeIsActive() && Agobot.drivetrain.followPath(stone1, 0.4)  && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             telemetry.addData("Target", goToPos);
             telemetry.addData("Current", Agobot.drivetrain.odometry.currentPosition());
             telemetry.update();
@@ -90,6 +99,14 @@ public class RedStraight2S extends LinearOpMode {
 //            Agobot.intake.getLeft().setPower(1);
 //            Agobot.intake.getRight().setPower(1);
         }
+//        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && opModeIsActive() && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(angle), 0.4, 1.5)  && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+//            telemetry.addData("Target", goToPos);
+//            telemetry.addData("Current", Agobot.drivetrain.odometry.currentPosition());
+//            telemetry.update();
+////            Agobot.intake.runIntake(1);
+////            Agobot.intake.getLeft().setPower(1);
+////            Agobot.intake.getRight().setPower(1);
+//        }
 
         double startIntake = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while (Agobot.clock.milliseconds() < (startIntake + 800) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
@@ -106,6 +123,22 @@ public class RedStraight2S extends LinearOpMode {
         Agobot.intake.runIntake(0);
 
         Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
+
+//        ArrayList<Waypoint> toFoundation1Waypoints = new ArrayList<>();
+//        toFoundation1Waypoints.add(new Waypoint(goToPos, Math.toDegrees(angle)));
+//        toFoundation1Waypoints.add(new Waypoint(42, goToPos.getComponent(1), 180));
+//        toFoundation1Waypoints.add(new Waypoint(38.5, -20, 270));
+//        toFoundation1Waypoints.add(new Waypoint(38, 20, 270));
+//        toFoundation1Waypoints.add(new Waypoint(38, 44, 0));
+//        //waypoints.add(new Waypoint(31.5, 44, 0));
+//        PurePursuitPath toFoundation1 = new PurePursuitPath(toFoundation1Waypoints);
+//
+//        while(Agobot.drivetrain.followPath(toFoundation1, 0.6) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
+////            if (toFoundation1.currentIndex() == 4){
+////                PIDControllers.xController.changeConstants(.1f, .6f, 0.001f, 0.3f);
+////                PIDControllers.yController.changeConstants(.1f, .6f, 0.001f, 0.3f);
+////            }
+//        }
 
         // move back out of the way
         while (Agobot.drivetrain.goToPosition(new Vector2D(38, goToPos.getComponent(1)), 0, 1, 1.3, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) { }
@@ -174,7 +207,7 @@ public class RedStraight2S extends LinearOpMode {
         }
 
         Vector2D afterDeliverVector = Vector2D.add(goToPos, new Vector2D(16.5, 16));
-        goToPos.add(new Vector2D(45, 2.5, false)); // center of robot is 8 inches away from stone
+        goToPos.add(new Vector2D(45, 2, false)); // center of robot is 8 inches away from stone
 
         while (Agobot.drivetrain.goToPosition(afterDeliverVector, 225, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.intake.runIntake(-1);

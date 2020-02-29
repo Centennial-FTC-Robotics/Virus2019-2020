@@ -8,12 +8,10 @@ import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
 
-//@Autonomous(group = "Autonomous", name = "Odometry Demo")
+@Autonomous(group = "Autonomous", name = "Odometry Test")
 
-public class OdoDemo extends LinearOpMode {
-    double maxSpeed = 1;
-    Vector2D motorSpeeds;
-    Vector2D currentPosition = new Vector2D(0,0);
+public class OdoTest extends LinearOpMode {
+    double maxSpeed = 0.4;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,7 +19,7 @@ public class OdoDemo extends LinearOpMode {
 //        Agobot.drivetrain.setAllRunUsingEncoders();
         //inits all hardware
         Agobot.drivetrain.initializeIMU();
-        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(63, -36), 179);
+        Agobot.drivetrain.odometry.setStartLocation(new Vector2D(63, -36), 270);
 
         waitForStart();
 
@@ -32,7 +30,7 @@ public class OdoDemo extends LinearOpMode {
 //        }
 
         double newHeading = 0;
-        while(Agobot.drivetrain.goToPosition(new Vector2D(63, -60), 0, maxSpeed));
+        while(Agobot.drivetrain.goToPosition(new Vector2D(31, -43), 225, maxSpeed));
         //while(Agobot.drivetrain.goToPosition(new Vector2D(-12,0), 90, maxSpeed));
 //        while(opModeIsActive()){
 //            currentPosition = Agobot.drivetrain.updatePosition();

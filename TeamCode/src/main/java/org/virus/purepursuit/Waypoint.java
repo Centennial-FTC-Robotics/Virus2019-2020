@@ -1,10 +1,17 @@
 package org.virus.purepursuit;
 
+import org.virus.util.Vector2D;
+
 public class Waypoint extends Point{
     private double heading;
 
     public Waypoint(double x, double y, double heading){
         super(x, y);
+        this.heading = heading;
+    }
+
+    public Waypoint(Vector2D position, double heading){
+        super(position);
         this.heading = heading;
     }
 

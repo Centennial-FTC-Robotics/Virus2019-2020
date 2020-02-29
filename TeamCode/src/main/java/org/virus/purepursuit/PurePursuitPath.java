@@ -26,6 +26,10 @@ public class PurePursuitPath {
         return intersections;
     }
 
+    public int currentIndex(){
+        return currentIndex;
+    }
+
     public IntersectionPoint findApproachPoint(Vector2D robotPosition, double lookaheadRadius){
         ArrayList<IntersectionPoint> intersections = findIntersections(robotPosition, lookaheadRadius);
         IntersectionPoint approachPoint;
