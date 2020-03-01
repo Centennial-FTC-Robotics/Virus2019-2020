@@ -10,7 +10,7 @@ import org.virus.util.Vector2D;
 
 import java.util.ArrayList;
 
-@Autonomous(group = "Autonomous", name = "Pure Pursuit Auto")
+//@Autonomous(group = "Autonomous", name = "Pure Pursuit Auto")
 public class PurePursuit extends LinearOpMode {
 
     ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();

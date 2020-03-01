@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
-
-@Autonomous(group = "Autonomous", name = "Odometry Test")
+@Disabled
+//@Autonomous(group = "Autonomous", name = "Odometry Test")
 
 public class OdoTest extends LinearOpMode {
     double maxSpeed = 0.4;

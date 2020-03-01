@@ -7,7 +7,7 @@ import org.virus.vision.StripDetector;
 
 import java.util.Arrays;
 
-@TeleOp(group = "TeleOp", name = "OpenCV Test")
+//@TeleOp(group = "TeleOp", name = "OpenCV Test")
 public class OCVTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

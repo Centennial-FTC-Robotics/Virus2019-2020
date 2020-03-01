@@ -9,7 +9,7 @@ import org.virus.util.Vector2D;
 
 import java.util.Arrays;
 
-@TeleOp(group = "TeleOp", name = "Arm Tester")
+//@TeleOp(group = "TeleOp", name = "Arm Tester")
 public class TestArm extends LinearOpMode {
 
     double gp1RightTriggerPrev = 0;

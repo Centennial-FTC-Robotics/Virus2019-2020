@@ -60,6 +60,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
         rightStick = new Vector2D((double) gamepad1.right_stick_x, (double) gamepad1.right_stick_y);
         while(opModeIsActive()) {
 
+            Agobot.arm.setArmPos(Agobot.arm.leftPosition, Agobot.arm.rightPosition);
+
             if (gamepad1.a && gamepad1.b && gamepad1.dpad_left && gamepad1.dpad_up) {
 
                 driverHeading = Agobot.drivetrain.odometry.currentHeading();
@@ -107,11 +109,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
             if(gamepad2.left_bumper && gamepad2.right_bumper){
                 Agobot.intake.deployIntake();
             }else if(gamepad2.right_bumper){
-                Agobot.intake.runIntake(1);
+                Agobot.intake.runIntake(0.8);
             }else if(gamepad2.left_bumper){
                 Agobot.intake.runIntake(-0.3);
-            }
-            else{
+            } else{
                 Agobot.intake.runIntake(0);
             }
 

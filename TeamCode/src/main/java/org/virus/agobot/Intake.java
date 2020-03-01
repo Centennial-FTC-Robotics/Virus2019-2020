@@ -83,7 +83,7 @@ public class Intake extends Subsystem {
 //        }
 //        return !intakeDeployed; //so that it returns true until it's done, when it returns false
 
-        runIntake(1, 0);
+        runIntake(1, -1);
 
 //        double startDeploy = Agobot.clock.milliseconds();
 //        while (Agobot.clock.milliseconds() < (startDeploy + 300) && opModeRef.opModeIsActive()) {}

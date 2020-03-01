@@ -11,7 +11,7 @@ import org.virus.util.Vector2D;
 
 import java.io.File;
 
-@Autonomous(name = "Red Bridge", group = "Auto")
+//@Autonomous(name = "Red Bridge", group = "Auto")
 public class RedBridge extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(63, -12); //against wall to the right
     private double startHeading = 270; //straight left

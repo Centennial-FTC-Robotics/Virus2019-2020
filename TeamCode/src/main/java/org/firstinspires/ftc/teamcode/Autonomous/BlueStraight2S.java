@@ -54,6 +54,7 @@ public class BlueStraight2S extends LinearOpMode {
         Agobot.autoStart();
 
         // deploy intake as the very first action
+        Agobot.dragger.drag(0.5);
         Agobot.grabber.grab(false);
         Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
         Agobot.intake.deployIntake();
@@ -199,14 +200,14 @@ public class BlueStraight2S extends LinearOpMode {
             goToPos = Vector2D.add(skystonePositions[2], stone2Offset);
         }
 
-        Vector2D afterDeliverOffset = new Vector2D(relativeSkystonePos[1].getTheta(),-16, true);
+        Vector2D afterDeliverOffset = new Vector2D(-13, 8);
         Vector2D afterDeliverVector = Vector2D.add(goToPos, afterDeliverOffset);
-        //goToPos.add(new Vector2D(0, 2, false)); // center of robot is 8 inches away from stone
+        goToPos.add(new Vector2D(0, 8));
 
         ArrayList<Waypoint> backForStone2Waypoints = new ArrayList<>();
-        backForStone2Waypoints.add(new Waypoint(42,30, 270));
-        backForStone2Waypoints.add(new Waypoint(42, -10, 270));
-        backForStone2Waypoints.add(new Waypoint(afterDeliverVector, Math.toDegrees(relativeSkystonePos[1].getTheta()) + 180));
+        backForStone2Waypoints.add(new Waypoint(-42,30, 270));
+        backForStone2Waypoints.add(new Waypoint(-42, -10, 270));
+        backForStone2Waypoints.add(new Waypoint(afterDeliverVector, 315));
         //backForStone2Waypoints.add(new Waypoint(goToPos, 225));
         PurePursuitPath backForStone2 = new PurePursuitPath(backForStone2Waypoints);
 
@@ -229,7 +230,7 @@ public class BlueStraight2S extends LinearOpMode {
 
         //run head-on at stones
         timeCondition = Agobot.clock.milliseconds();
-        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(relativeSkystonePos[1].getTheta()), 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, 315, 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
             Agobot.intake.runIntake(1);
             Agobot.intake.getLeft().setPower(1);

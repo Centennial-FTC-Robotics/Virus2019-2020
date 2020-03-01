@@ -13,7 +13,7 @@ import org.virus.util.Vector2D;
 import java.io.File;
 import java.util.Arrays;
 
-@Autonomous(name = "Red Depot", group = "Auto")
+//@Autonomous(name = "Red Depot", group = "Auto")
 public class RedDepot extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right

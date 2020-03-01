@@ -14,7 +14,7 @@ import org.virus.vision.StripDetector;
 import java.io.File;
 import java.util.Arrays;
 
-@Autonomous(name = "BD2S HEAD ON", group = "Auto")
+//@Autonomous(name = "BD2S HEAD ON", group = "Auto")
 public class BD2SHeadOn extends LinearOpMode {
 
     //NOT DONE!!!!!!! -Ere

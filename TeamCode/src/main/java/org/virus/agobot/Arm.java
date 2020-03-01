@@ -233,6 +233,14 @@ public class Arm extends Subsystem {
         rightPosition = right;
     }
 
+    public void setArmPos(double leftPos, double rightPos) {
+
+        leftArm.setPosition(leftPos);
+        leftPosition = leftPos;
+        rightArm.setPosition(rightPos);
+        rightPosition = rightPos;
+    }
+
     public double getStonePosition() {
 
         return stoneSensor.getDistance(DistanceUnit.MM);

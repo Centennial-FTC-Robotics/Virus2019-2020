@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Autonomous(name = "RD2S HEAD ON", group = "Auto")
+//@Autonomous(name = "RD2S HEAD ON", group = "Auto")
 public class RD2SHeadOn extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right

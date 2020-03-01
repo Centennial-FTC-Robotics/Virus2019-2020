@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.virus.superclasses.Subsystem;
 
 public class Parker extends Subsystem {
-    Servo parkingServo;
+
+    public Servo parkingServo;
 
     @Override
     public void initialize(LinearOpMode opMode) {

@@ -14,7 +14,7 @@ import org.virus.vision.StripDetector;
 import java.io.File;
 import java.util.Arrays;
 
-@Autonomous(name = "Blue Depot 2 Stones", group = "Auto")
+//@Autonomous(name = "Blue Depot 2 Stones", group = "Auto")
 public class BlueDepot2Stones extends LinearOpMode {
 
     //NOT DONE!!!!!!! -Ere

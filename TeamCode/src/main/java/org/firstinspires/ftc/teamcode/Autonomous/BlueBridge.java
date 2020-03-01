@@ -12,7 +12,7 @@ import org.virus.util.Vector2D;
 
 import java.io.File;
 
-@Autonomous(name = "Blue Bridge", group = "Auto")
+//@Autonomous(name = "Blue Bridge", group = "Auto")
 public class BlueBridge extends LinearOpMode {
     private Vector2D startPosition = new Vector2D(-63, -12); //against wall to the right
     private double startHeading = 90; //straight left
