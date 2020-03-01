@@ -40,7 +40,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             driverHeading = 90;
         }else{ // if there is data, assume it's properly formatted I guess. Thanks Keertik...
             autoData = importedAutoData.split(",");
-            if(autoData[0] == "Red"){
+            if(autoData[0].equals("Red")){
                 driverHeading = 180;
             }else{
                 driverHeading = 0;
@@ -72,9 +72,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
 //            telemetry.addData("lBack:", diagSpeed2);
 //            telemetry.addData("rFront:", diagSpeed2);
 //            telemetry.addData("rBack:", diagSpeed1);
-            if (!Arrays.equals(leftStick.getComponents(), new double[]{0, 0}) || !Arrays.equals(rightStick.getComponents(), new double[]{0, 0})) {
-                telemetry.update();
-            }
+//            if (!Arrays.equals(leftStick.getComponents(), new double[]{0, 0}) || !Arrays.equals(rightStick.getComponents(), new double[]{0, 0})) {
+//                telemetry.update();
+//            }
 
             speedMultiplier = 1 - (0.7 * gamepad1.left_trigger);
 
@@ -139,6 +139,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
             } else {
 
                 snap90Correction = 0;
+            }
+
+            if(gamepad1.x && gamepad1.y){
+                Agobot.parker.extend(true);
             }
 
             //TODO: dpad stone heights

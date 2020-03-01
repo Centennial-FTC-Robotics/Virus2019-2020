@@ -22,9 +22,10 @@ public class Agobot extends Robot {
     public static Arm arm = new Arm();
     public static FoundationDragger dragger = new FoundationDragger();
     public static Capstone capstone = new Capstone();
+    public static Parker parker = new Parker();
 
     public static ElapsedTime clock = new ElapsedTime();
-    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger, capstone, tracker};
+    static Subsystem[] subsystems = {drivetrain, slides, intake, grabber, arm, dragger, capstone, parker, tracker}; // make tracker always be last so initialize without vision will work
     // robot variables
     public static String alliance;
     public static double autoStarted = 0;
@@ -35,7 +36,7 @@ public class Agobot extends Robot {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        for(int i=0; i < subsystems.length-1; i++){
+        for(int i=0; i < subsystems.length - 1; i++){
             subsystems[i].initialize(opMode);
         }
     }

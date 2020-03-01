@@ -73,7 +73,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     Vector2D motorSpeeds;
     Vector2D robotCentricMvmt;
     double minSpeed = 0.05;
-    double lookaheadRadius = 10;
+    double lookaheadRadius = 9;
 
 //    Odometry odometry = new Odometry();
     @Override

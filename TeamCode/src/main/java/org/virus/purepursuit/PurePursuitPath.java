@@ -20,8 +20,14 @@ public class PurePursuitPath {
 
     public ArrayList<IntersectionPoint> findIntersections(Vector2D robotPosition, double lookaheadRadius){
         ArrayList<IntersectionPoint> intersections = new ArrayList<>();
-        for(PathComponent component: components){
-            Set<IntersectionPoint> indivInter = component.findIntersections(robotPosition, lookaheadRadius);
+        int lookaheadIndex;
+        if(currentIndex + 2 < components.size()){
+            lookaheadIndex = currentIndex + 2;
+        }else{
+            lookaheadIndex = components.size();
+        }
+        for(int i = currentIndex; i < lookaheadIndex; i++){
+            Set<IntersectionPoint> indivInter = components.get(i).findIntersections(robotPosition, lookaheadRadius);
             intersections.addAll(indivInter);
         }
         return intersections;

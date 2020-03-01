@@ -69,10 +69,12 @@ public class Line extends PathComponent{
 
         double discriminant = Math.pow(b, 2) - 4*a*c;
         if(discriminant >= 0){
-            double t1 = Range.clip((-b - Math.sqrt(discriminant))/(2*a), 0, 1);
-            double t2 = Range.clip((-b + Math.sqrt(discriminant))/(2*a), 0, 1);
-            intersections.add(new IntersectionPoint(startPoint.getX() + xSlope*t1, startPoint.getY() + ySlope*t1, normalizeAngle(startPoint.getHeading() + headingSlope*t1), index));
-            intersections.add(new IntersectionPoint(startPoint.getX() + xSlope*t2, startPoint.getY() + ySlope*t2, normalizeAngle(startPoint.getHeading() + headingSlope*t2), index));
+            Set<Double> tValues = new LinkedHashSet<>();
+            tValues.add((-b - Math.sqrt(discriminant))/(2*a));
+            tValues.add((-b + Math.sqrt(discriminant))/(2*a));
+            for(double t: tValues) {
+                intersections.add(new IntersectionPoint(startPoint.getX() + xSlope*Range.clip(t, 0, 1), startPoint.getY() + ySlope*Range.clip(t, 0, 1), normalizeAngle(startPoint.getHeading() + headingSlope*Range.clip(t, 0, 1)), index));
+            }
         }
         return intersections;
     }

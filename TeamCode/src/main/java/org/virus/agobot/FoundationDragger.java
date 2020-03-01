@@ -2,6 +2,7 @@ package org.virus.agobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.openftc.revextensions2.ExpansionHubServo;
 import org.virus.superclasses.Subsystem;
@@ -38,5 +39,13 @@ public class FoundationDragger extends Subsystem {
             leftDragger.setPosition(1 - upPosition);
             position = upPosition;
         }
+    }
+
+    public void drag(double position) {
+
+        position = Range.clip(position, 0, 1);
+
+        rightDragger.setPosition(position);
+        leftDragger.setPosition(1 - position);
     }
 }
