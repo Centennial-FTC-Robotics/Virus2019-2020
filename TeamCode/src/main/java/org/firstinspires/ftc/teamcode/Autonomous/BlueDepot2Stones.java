@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
+import org.virus.agobot.Arm;
 import org.virus.agobot.PIDControllers;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
@@ -14,7 +15,7 @@ import org.virus.vision.StripDetector;
 import java.io.File;
 import java.util.Arrays;
 
-//@Autonomous(name = "Blue Depot 2 Stones", group = "Auto")
+@Autonomous(name = "Blue Depot 2 Stones", group = "Auto")
 public class BlueDepot2Stones extends LinearOpMode {
 
     //NOT DONE!!!!!!! -Ere
@@ -56,7 +57,7 @@ public class BlueDepot2Stones extends LinearOpMode {
 
         // deploy intake as the very first action
         Agobot.grabber.grab(false);
-        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
         Agobot.intake.deployIntake();
 
 //        waitForStart();

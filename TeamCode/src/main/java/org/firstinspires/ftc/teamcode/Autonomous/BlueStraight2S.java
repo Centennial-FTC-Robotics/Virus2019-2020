@@ -14,7 +14,7 @@ import org.virus.util.Vector2D;
 import java.io.File;
 import java.util.ArrayList;
 
-@Autonomous(group = "Autonomous", name = "Blue Straight")
+//@Autonomous(group = "Autonomous", name = "Blue Straight")
 public class BlueStraight2S extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(-63, -36); //against wall to the right

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
+import org.virus.agobot.Arm;
 import org.virus.agobot.PIDControllers;
 import org.virus.purepursuit.PurePursuitPath;
 import org.virus.purepursuit.Waypoint;
@@ -17,7 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//@Autonomous(name = "Red Depot 2 Stones", group = "Auto")
+@Autonomous(name = "Red Depot 2 Stones", group = "Auto")
 public class RedDepot2Stones extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -36); //against wall to the right
@@ -58,7 +59,7 @@ public class RedDepot2Stones extends LinearOpMode {
 
         // deploy intake as the very first action
         Agobot.grabber.grab(false);
-        Agobot.arm.armFlipOut(true); //go from in to standby
+        Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
         Agobot.intake.deployIntake();
 
         //COLLECT SKYSTONE #1 & DELIVER------------------------------------------------------------------------------------------------

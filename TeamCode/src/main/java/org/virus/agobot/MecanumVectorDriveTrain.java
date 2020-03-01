@@ -555,7 +555,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         approachPoint = path.findApproachPoint(currentPosition, lookaheadRadius);
         double remainingPathDist = path.distanceAlongPath(currentPosition, approachPoint);
         Vector2D approachRel = new Vector2D(Vector2D.sub(approachPoint.toVector(), currentPosition).getTheta(), remainingPathDist, true);
-        return goToPosition(Vector2D.add(approachRel, currentPosition), approachPoint.getHeading(), maxSpeed);
+        return goToPosition(Vector2D.add(approachRel, currentPosition), approachPoint.getHeading(), maxSpeed,1);
     }
 
     public boolean followPathFacingForward(PurePursuitPath path, double maxSpeed){

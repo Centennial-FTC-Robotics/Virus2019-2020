@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
-@Autonomous(name = "ISTFG Red", group = "Auto")
+@Autonomous(name = "ISTFG Backwards", group = "Auto")
 public class ISwearToFrickinGodRed extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -12); //against wall to the right
@@ -21,7 +21,7 @@ public class ISwearToFrickinGodRed extends LinearOpMode {
 
         waitForStart();
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(60, 0), startHeading, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(62, 0), startHeading, 0.6)){
 
         }
     }
