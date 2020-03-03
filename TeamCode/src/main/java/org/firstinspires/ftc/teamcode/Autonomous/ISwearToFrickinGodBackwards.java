@@ -7,7 +7,7 @@ import org.virus.agobot.Agobot;
 import org.virus.util.Vector2D;
 
 @Autonomous(name = "ISTFG Backwards", group = "Auto")
-public class ISwearToFrickinGodRed extends LinearOpMode {
+public class ISwearToFrickinGodBackwards extends LinearOpMode {
 
     private Vector2D startPosition = new Vector2D(63, -12); //against wall to the right
     private double startHeading = 270; //straight left

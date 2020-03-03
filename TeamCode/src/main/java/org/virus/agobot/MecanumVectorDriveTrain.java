@@ -47,7 +47,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
     private DcMotorEx rFront;
     private DcMotorEx lBack;
     private DcMotorEx rBack;
-    private BNO055IMU imu;
+    public BNO055IMU imu;
     float initialHeading;
     float initialPitch;
     float initialRoll;

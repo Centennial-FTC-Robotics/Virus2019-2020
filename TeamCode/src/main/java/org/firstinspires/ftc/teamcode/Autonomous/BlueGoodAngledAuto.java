@@ -43,7 +43,6 @@ public class BlueGoodAngledAuto extends LinearOpMode {
         double y = -68;
 
         for (int p = 0; p < 6; p++) {
-
             skystonePositions[p] = new Vector2D(x, y + (p * 8));
             relativeSkystonePos[p] = Vector2D.sub(new Vector2D(skystonePositions[p]), startPosition);
         }

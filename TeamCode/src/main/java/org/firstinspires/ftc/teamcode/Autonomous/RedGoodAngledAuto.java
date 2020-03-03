@@ -38,16 +38,7 @@ public class RedGoodAngledAuto extends LinearOpMode {
         Agobot.drivetrain.initializeIMU();
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
 
-        //generate skystone positions
-        double x = 22;
-        double y = -68;
-
-        for (int p = 0; p < 6; p++) {
-
-            skystonePositions[p] = new Vector2D(x, y + (p * 8));
-            relativeSkystonePos[p] = Vector2D.sub(new Vector2D(skystonePositions[p]), startPosition);
-        }
-
+        generateSkyStonePositions();
 
         //SCAN STONE-------------------------------------------------------------------------------------------------------------------
         while (!isStarted()) {
@@ -57,14 +48,15 @@ public class RedGoodAngledAuto extends LinearOpMode {
         }
 
         waitForStart();
-        telemetry.speak("gamer time");
+
         Agobot.autoStart();
 
-        // deploy intake as the very first action
+        //First actions: dragger up, grabber is release, arm to standby, deploy intake
         Agobot.dragger.drag(0.5);
         Agobot.grabber.grab(false);
         Agobot.arm.setArmPos(Arm.armPosition.standby); //go from in to standby
         Agobot.intake.deployIntake();
+
 
         Vector2D relativeMvmt = Vector2D.add(relativeSkystonePos[2], stone1Offset);
         double angle = relativeMvmt.getTheta();
@@ -72,11 +64,8 @@ public class RedGoodAngledAuto extends LinearOpMode {
         Vector2D goToPos = Vector2D.add(startPosition, new Vector2D(0, -8));
 
         if (skyStoneLocation.equals("Right")) {
-
             goToPos.add(new Vector2D(0, 8));
-
         } else if (skyStoneLocation.equals("Left")) {
-
             Vector2D finalV = new Vector2D(22, -60);
             goToPos = Vector2D.add(finalV, new Vector2D(16, 0));
             relativeMvmt = Vector2D.sub(finalV, goToPos);
@@ -85,7 +74,6 @@ public class RedGoodAngledAuto extends LinearOpMode {
         relativeMvmt.sub(new Vector2D(angle, 6.0, true));
 
         if (!skyStoneLocation.equals("Left")) {
-
             ArrayList<Waypoint> stone1Waypoints = new ArrayList<>();
             stone1Waypoints.add(new Waypoint(63, -36, 270));
             stone1Waypoints.add(new Waypoint(goToPos, Math.toDegrees(angle)));
@@ -120,14 +108,6 @@ public class RedGoodAngledAuto extends LinearOpMode {
 
             }
         }
-//        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && opModeIsActive() && Agobot.drivetrain.goToPosition(goToPos, Math.toDegrees(angle), 0.4, 1.5)  && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
-//            telemetry.addData("Target", goToPos);
-//            telemetry.addData("Current", Agobot.drivetrain.odometry.currentPosition());
-//            telemetry.update();
-////            Agobot.intake.runIntake(1);
-////            Agobot.intake.getLeft().setPower(1);
-////            Agobot.intake.getRight().setPower(1);
-//        }
 
         double startIntake = Agobot.clock.milliseconds(); // wait a second for the block to be taken in
         while (Agobot.clock.milliseconds() < (startIntake + 800) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
@@ -162,19 +142,6 @@ public class RedGoodAngledAuto extends LinearOpMode {
                 PIDControllers.yController.changeConstants(.08f, .15f, 0.001f, 0.2f);
             }
         }
-
-//        // move back out of the way
-//        while (Agobot.drivetrain.goToPosition(new Vector2D(38, goToPos.getComponent(1)), 0, 1, 1.3, 1.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) { }
-//
-//        //go to foundation
-//        while (Agobot.drivetrain.goToPosition(new Vector2D(38, 44), 0, 1, 1.5, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) { }
-//
-//        //get closer to foundation
-//        PIDControllers.xController.changeConstants(.1f, .6f, 0.001f, 0.3f);
-//        PIDControllers.yController.changeConstants(.1f, .6f, 0.001f, 0.3f);
-//        while (Agobot.drivetrain.goToPosition(new Vector2D(31.5, 44), 0, 0.3, 1) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
-//
-//        }
         Agobot.arm.setArmPos(Arm.armPosition.drop);
 
         //DRAG FOUNDATION CLOSE------------------------------------------------------------------------------------------------
@@ -232,13 +199,11 @@ public class RedGoodAngledAuto extends LinearOpMode {
         Vector2D afterDeliverOffset = new Vector2D(16, 7);
         Vector2D afterDeliverVector = Vector2D.add(goToPos, afterDeliverOffset);
         goToPos.add(new Vector2D(0, 8));
-        //goToPos.add(new Vector2D(0, 2, false)); // center of robot is 8 inches away from stone
 
         ArrayList<Waypoint> backForStone2Waypoints = new ArrayList<>();
         backForStone2Waypoints.add(new Waypoint(41,30, 270));
         backForStone2Waypoints.add(new Waypoint(41, -10, 270));
         backForStone2Waypoints.add(new Waypoint(afterDeliverVector, 225));
-        //backForStone2Waypoints.add(new Waypoint(goToPos, 225));
         PurePursuitPath backForStone2 = new PurePursuitPath(backForStone2Waypoints);
 
         while(Agobot.drivetrain.followPath(backForStone2, 0.7) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
@@ -252,13 +217,6 @@ public class RedGoodAngledAuto extends LinearOpMode {
                 Agobot.intake.getRight().setPower(0.7);
             }
         }
-
-//        while (Agobot.drivetrain.goToPosition(afterDeliverVector, 225, 1, 1.125) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
-//            Agobot.intake.runIntake(-1);
-//            Agobot.intake.getLeft().setPower(-1);
-//            Agobot.intake.getRight().setPower(-1);
-//        }
-//
         //run head-on at stones
         double timeCondition = Agobot.clock.milliseconds();
         while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(Vector2D.add(goToPos, new Vector2D(-2, 0)), 225, 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
@@ -312,26 +270,22 @@ public class RedGoodAngledAuto extends LinearOpMode {
         while (Agobot.clock.milliseconds() < startRetract + 400 && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
         }
 
-//        //Change PID constants for pushing foundation
-//        PIDControllers.xController.changeConstants(.09f,.3f ,0.001f,0.3f);
-//        PIDControllers.yController.changeConstants(.09f,.3f ,0.001f,0.3f);
-//        //PIDControllers.headingController.changeConstants(-.09f, -.012f,-.001f, .2f);
-//
-//        //PUSH FOUNDATION TO BUILD SITE------------------------------------------------------------------------------------------------
-//        while(Agobot.drivetrain.goToPosition(new Vector2D(40, 40), 270, 0.6) && opModeIsActive()){
-//
-//        }
-//
-//        //Revert PID constants back to normal
-//        //PIDControllers.headingController.changeConstants(-.065f, -.009f,-.001f, .1f);
-//        PIDControllers.xController.changeConstants(.07f,.16f ,0.001f,0.15f);
-//        PIDControllers.yController.changeConstants(.07f,.16f ,0.001f,0.15f);
-
         //PARK------------------------------------------------------------------------------------------------
         while (Agobot.drivetrain.goToPosition(new Vector2D(parkingX, 0), 270, 0.6) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
             Agobot.slides.slides(0);
         }
 
         ReadWriteFile.writeFile(opModeData, "Red," + Agobot.drivetrain.odometry.currentPosition().getComponent(0) + "," + Agobot.drivetrain.odometry.currentPosition().getComponent(1) + "," + Agobot.drivetrain.odometry.currentHeading());
+    }
+
+    public void generateSkyStonePositions(){
+        //generate skystone positions
+        double x = 22;
+        double y = -68;
+
+        for (int p = 0; p < 6; p++) {
+            skystonePositions[p] = new Vector2D(x, y + (p * 8));
+            relativeSkystonePos[p] = Vector2D.sub(new Vector2D(skystonePositions[p]), startPosition);
+        }
     }
 }
