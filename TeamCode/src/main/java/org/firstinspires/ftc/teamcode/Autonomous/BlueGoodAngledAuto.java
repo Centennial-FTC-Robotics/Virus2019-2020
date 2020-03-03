@@ -147,8 +147,8 @@ public class BlueGoodAngledAuto extends LinearOpMode {
         ArrayList<Waypoint> toFoundation1Waypoints = new ArrayList<>();
         toFoundation1Waypoints.add(new Waypoint(goToPos, Math.toDegrees(angle)));
         toFoundation1Waypoints.add(new Waypoint(-48, goToPos.getComponent(1), 0));
-        toFoundation1Waypoints.add(new Waypoint(-38, -20, 270));
-        toFoundation1Waypoints.add(new Waypoint(-38, 20, 270));
+        toFoundation1Waypoints.add(new Waypoint(-35.5, -20, 270));
+        toFoundation1Waypoints.add(new Waypoint(-35.5, 20, 270));
         toFoundation1Waypoints.add(new Waypoint(-42, 45, 180));
         toFoundation1Waypoints.add(new Waypoint(-31.5, 45, 180));
         PurePursuitPath toFoundation1 = new PurePursuitPath(toFoundation1Waypoints);
@@ -156,7 +156,7 @@ public class BlueGoodAngledAuto extends LinearOpMode {
         double lmao = .65;
         while(Agobot.drivetrain.followPath(toFoundation1, lmao) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
             if (toFoundation1.currentIndex() == 4){ //going to (31.5, 44)
-                lmao=.4;
+                lmao = 0.3;
                 PIDControllers.xController.changeConstants(.07f, .15f, 0.001f, 0.2f);
                 PIDControllers.yController.changeConstants(.07f, .15f, 0.001f, 0.2f);
             }

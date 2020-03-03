@@ -24,8 +24,8 @@ public class RedGoodAngledAuto extends LinearOpMode {
     private double startHeading = 270; //straight left
     private String skyStoneLocation = "Middle";
     private int resetTime = 29500;
-    private Vector2D stone1Offset = new Vector2D(0.5, 5);
-    private Vector2D stone2Offset = new Vector2D(0, 4.5);
+    private Vector2D stone1Offset = new Vector2D(-1.5, 5);
+    private Vector2D stone2Offset = new Vector2D(0, 4);
     File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
     private Vector2D[] skystonePositions = new Vector2D[6];
     private Vector2D[] relativeSkystonePos = new Vector2D[6];
@@ -89,7 +89,7 @@ public class RedGoodAngledAuto extends LinearOpMode {
             ArrayList<Waypoint> stone1Waypoints = new ArrayList<>();
             stone1Waypoints.add(new Waypoint(63, -36, 270));
             stone1Waypoints.add(new Waypoint(goToPos, Math.toDegrees(angle)));
-            stone1Waypoints.add(new Waypoint(Vector2D.add(goToPos, relativeMvmt), Math.toDegrees(angle)));
+            stone1Waypoints.add(new Waypoint(Vector2D.add(Vector2D.add(goToPos, relativeMvmt), new Vector2D(-2, 0)), Math.toDegrees(angle)));
             PurePursuitPath stone1 = new PurePursuitPath(stone1Waypoints);
 
             //run diagonal at stones
@@ -116,7 +116,7 @@ public class RedGoodAngledAuto extends LinearOpMode {
             Agobot.intake.getRight().setPower(0.8);
 
             double timeCondition = Agobot.clock.milliseconds();
-            while ((Agobot.clock.milliseconds() < timeCondition + 2500) && Agobot.drivetrain.goToPosition(Vector2D.add(goToPos, relativeMvmt), 217, 0.4, 1.5, 2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+            while ((Agobot.clock.milliseconds() < timeCondition + 2500) && Agobot.drivetrain.goToPosition(Vector2D.add(Vector2D.add(goToPos, relativeMvmt), new Vector2D(-2, 0)), 217, 0.4, 1.5, 2) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
             }
         }
@@ -157,7 +157,7 @@ public class RedGoodAngledAuto extends LinearOpMode {
         double lmao = .65d;
         while(Agobot.drivetrain.followPath(toFoundation1, lmao) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))){
             if (toFoundation1.currentIndex() == 4){ //going to (31.5, 44)
-                lmao=.4d;
+                lmao = 0.3d;
                 PIDControllers.xController.changeConstants(.08f, .15f, 0.001f, 0.2f);
                 PIDControllers.yController.changeConstants(.08f, .15f, 0.001f, 0.2f);
             }
@@ -261,7 +261,7 @@ public class RedGoodAngledAuto extends LinearOpMode {
 //
         //run head-on at stones
         double timeCondition = Agobot.clock.milliseconds();
-        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(goToPos, 225, 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
+        while ((Agobot.clock.milliseconds() < timeCondition + 2000) && Agobot.drivetrain.goToPosition(Vector2D.add(goToPos, new Vector2D(-2, 0)), 225, 0.5) && opModeIsActive() && (Agobot.clock.milliseconds() < (Agobot.autoStarted + resetTime))) {
 
             Agobot.intake.runIntake(0.7);
             Agobot.intake.getLeft().setPower(0.7);

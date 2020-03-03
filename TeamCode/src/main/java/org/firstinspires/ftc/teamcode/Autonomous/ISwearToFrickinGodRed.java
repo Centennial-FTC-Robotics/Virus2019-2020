@@ -21,7 +21,7 @@ public class ISwearToFrickinGodRed extends LinearOpMode {
 
         waitForStart();
 
-        while(Agobot.drivetrain.goToPosition(new Vector2D(62, 0), startHeading, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(62, 0), startHeading, 0.6) && opModeIsActive()){
 
         }
     }
