@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Testing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
-@Disabled
+@TeleOp
 //@Autonomous(group = "Autonomous", name = "Odometry Test")
 
 public class OdoTest extends LinearOpMode {
@@ -30,13 +31,18 @@ public class OdoTest extends LinearOpMode {
 
         double newHeading = 90;
 
-        turn(90);
+        while(Agobot.drivetrain.goToPosition(new Vector2D(0,0), 270, 0.6)){
 
-        telemetry.addData("Change in angle", getHeading());
-        telemetry.addData("lEncoder", Agobot.drivetrain.odometry.getlEncoderCounts());
-        telemetry.addData("rEncoder", Agobot.drivetrain.odometry.getrEncoderCounts());
-        telemetry.addData("bEncoder", Agobot.drivetrain.odometry.getbEncoderCounts());
-        telemetry.update();
+        }
+
+        while (opModeIsActive()) {
+
+            telemetry.addData("Change in angle", getHeading());
+            telemetry.addData("lEncoder", Agobot.drivetrain.odometry.getlEncoderCounts());
+            telemetry.addData("rEncoder", Agobot.drivetrain.odometry.getrEncoderCounts());
+            telemetry.addData("bEncoder", Agobot.drivetrain.odometry.getbEncoderCounts());
+            telemetry.update();
+        }
 
     }
 
@@ -72,6 +78,7 @@ public class OdoTest extends LinearOpMode {
     }
 
     public void turn(double targetAngle){
+        Agobot.drivetrain.updatePosition();
         double currentAngle = getHeading();
         int direction;
         double turnRate = 0;
