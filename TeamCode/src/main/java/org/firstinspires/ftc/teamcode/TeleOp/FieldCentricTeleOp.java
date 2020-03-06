@@ -4,6 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
 import org.virus.agobot.PIDControllers;
@@ -174,6 +178,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
             telemetry.addData("Arm Position", Agobot.arm.getArmPosition());
             telemetry.addData("Slide right Pos", Agobot.slides.slideRight.getCurrentPosition());
             telemetry.addData("Slide left Pos", Agobot.slides.slideLeft.getCurrentPosition());
+            telemetry.addData("Change in angle", getHeading());
+            telemetry.addData("lEncoder", Agobot.drivetrain.odometry.getlEncoderCounts());
+            telemetry.addData("rEncoder", Agobot.drivetrain.odometry.getrEncoderCounts());
+            telemetry.addData("bEncoder", Agobot.drivetrain.odometry.getbEncoderCounts());
 //            telemetry.addData("Arm Number", Agobot.arm.armPosition);
 //            telemetry.addData("GamePad 2 Left Joystick Y", gamepad2.left_stick_y);
 //            telemetry.addData("Slide Target Pos", Agobot.slides.holdSlidePos);
@@ -196,5 +204,10 @@ public class FieldCentricTeleOp extends LinearOpMode {
         double magnitude = Math.sqrt(Math.pow(lefty, 2) + Math.pow(leftx, 2));
 
         motorSpeeds = new Vector2D((lefty+leftx)*magnitude/scalar, (lefty-leftx)*magnitude/scalar);
+    }
+
+    public double getHeading(){
+        Orientation currentOrientation = Agobot.drivetrain.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return currentOrientation.firstAngle;
     }
 }

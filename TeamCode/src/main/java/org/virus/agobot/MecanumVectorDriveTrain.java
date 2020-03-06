@@ -363,11 +363,20 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         Left1=Left1+steerMagnitude;
         Right0=Right0-steerMagnitude;
         Right1=Right1-steerMagnitude;
+
+        double maxValue = Math.abs(Math.max(Math.max(Math.max(Left0,Left1),Right0),Right1));
+        if(maxValue > 1){
+            Left0 = (Left0 / maxValue) * maxPower;
+            Left1 = (Left1 / maxValue) * maxPower;
+            Right0 = (Right0 / maxValue) * maxPower;
+            Right1 = (Right1 / maxValue) * maxPower;
+        }
+
         //make sure no exception thrown if power > 0
-        Left0 = Range.clip(Left0, -maxPower, maxPower);
-        Left1 = Range.clip(Left1, -maxPower, maxPower);
-        Right0 = Range.clip(Right0, -maxPower, maxPower);
-        Right1 = Range.clip(Right1, -maxPower, maxPower);
+//        Left0 = Range.clip(Left0, -maxPower, maxPower);
+//        Left1 = Range.clip(Left1, -maxPower, maxPower);
+//        Right0 = Range.clip(Right0, -maxPower, maxPower);
+//        Right1 = Range.clip(Right1, -maxPower, maxPower);
 
         if(Math.abs(Left0 - prevLeft0) > threshold){
             lFront.setPower(Left0);

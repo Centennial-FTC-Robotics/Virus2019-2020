@@ -13,11 +13,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.virus.agobot.Agobot;
 import org.virus.util.PIDController;
 import org.virus.util.Vector2D;
-@TeleOp
+@Disabled
 //@Autonomous(group = "Autonomous", name = "Odometry Test")
 
 public class OdoTest extends LinearOpMode {
-    double maxSpeed = 0.4;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,9 +28,7 @@ public class OdoTest extends LinearOpMode {
         waitForStart();
 
 
-        double newHeading = 90;
-
-        while(Agobot.drivetrain.goToPosition(new Vector2D(0,0), 270, 0.6)){
+        while(Agobot.drivetrain.goToPosition(new Vector2D(0,0), 45, 0.6)){
 
         }
 
