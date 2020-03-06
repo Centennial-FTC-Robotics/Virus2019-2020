@@ -17,12 +17,13 @@ public class Vector2D {
 
     public Vector2D(double newTheta, double newMag, boolean isRad) {
 
+        R = newMag;
+        theta = newTheta;
+
         if (!isRad) {
             theta = Math.toRadians(theta);
         }
 
-        R = newMag;
-        theta = newTheta;
         genComp();
     }
 
