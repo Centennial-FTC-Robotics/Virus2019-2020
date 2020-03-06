@@ -47,8 +47,8 @@ public class Odometry extends Subsystem {
 
 
     final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
-    final static double RADIUS = 12.80873957/2.0 * 722.0/720.0;/*14.553420608108109/2.0   * 928.0/1080.0;*/
-    final static double BENCODER_OFFSET = 4956.20177;
+    final static double RADIUS = 6.4054;
+    final static double BENCODER_RADIUS = 6.7581;
     Vector2D fieldCentricDelta;
     Vector2D robotCentricDelta;
 
@@ -131,7 +131,7 @@ public class Odometry extends Subsystem {
             deltay = (deltalEncoder + deltarEncoder)/2;
         }else{
             double turnRadius = RADIUS*ENCODER_COUNTS_PER_INCH*(deltalEncoder + deltarEncoder)/(deltarEncoder - deltalEncoder);
-            double strafeRadius = deltabEncoder/deltaHeading - BENCODER_OFFSET;
+            double strafeRadius = deltabEncoder/deltaHeading - BENCODER_RADIUS*ENCODER_COUNTS_PER_INCH;
 
             deltax = turnRadius*(Math.cos(deltaHeading) - 1) + strafeRadius*Math.sin(deltaHeading);
             deltay = turnRadius*Math.sin(deltaHeading) + strafeRadius*(1 - Math.cos(deltaHeading));
