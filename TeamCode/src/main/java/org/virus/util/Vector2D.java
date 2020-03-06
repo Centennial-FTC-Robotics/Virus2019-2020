@@ -174,7 +174,7 @@ public class Vector2D {
         double angle = term_one.getTheta();
         double scalar = term_one.getMag();
 
-        return new Vector2D(angle, scalar * newScalar);
+        return new Vector2D(angle, scalar * newScalar, true);
     }
 
     public void zero() {

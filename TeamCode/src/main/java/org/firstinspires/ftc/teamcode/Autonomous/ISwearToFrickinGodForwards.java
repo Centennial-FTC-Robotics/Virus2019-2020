@@ -20,9 +20,15 @@ public class ISwearToFrickinGodForwards extends LinearOpMode {
         Agobot.drivetrain.odometry.setStartLocation(startPosition, startHeading);
 
         waitForStart();
-
+        double deployTime = Agobot.clock.milliseconds();
         while(Agobot.drivetrain.goToPosition(new Vector2D(-62, 0), startHeading, 0.6, 0.5) && opModeIsActive()){
 
+        }
+        while (Agobot.clock.milliseconds()-deployTime<25000){
+
+        }
+        while(opModeIsActive()){
+            Agobot.intake.deployIntake();
         }
     }
 }
