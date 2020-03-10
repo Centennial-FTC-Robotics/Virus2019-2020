@@ -365,7 +365,7 @@ public class MecanumVectorDriveTrain extends Drivetrain {
         Right1=Right1-steerMagnitude;
 
         double maxValue = Math.abs(Math.max(Math.max(Math.max(Left0,Left1),Right0),Right1));
-        if(maxValue > 1){
+        if(maxValue > maxPower){
             Left0 = (Left0 / maxValue) * maxPower;
             Left1 = (Left1 / maxValue) * maxPower;
             Right0 = (Right0 / maxValue) * maxPower;
@@ -446,16 +446,24 @@ public class MecanumVectorDriveTrain extends Drivetrain {
 
         double diagSpeed1 = 0;
         double diagSpeed2 = 0;
-        if (motorSpeeds.getComponent(0) > 0) {
-            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), minSpeed, maxSpeed);
-        }else if(motorSpeeds.getComponent(0) < 0){
-            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, -minSpeed);
+//        if (motorSpeeds.getComponent(0) > 0) {
+//            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), minSpeed, maxSpeed);
+//        }else if(motorSpeeds.getComponent(0) < 0){
+//            diagSpeed1 = Range.clip(motorSpeeds.getComponent(0), -maxSpeed, -minSpeed);
+//        }
+//        if (motorSpeeds.getComponent(1) > 0) {
+//            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), minSpeed, maxSpeed);
+//        }else if(motorSpeeds.getComponent(1) < 0){
+//            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, -minSpeed);
+//        }
+        diagSpeed1 = motorSpeeds.getComponent(0);
+        diagSpeed2 = motorSpeeds.getComponent(1);
+        double maxValue = Math.max(diagSpeed1, diagSpeed2);
+        if(maxValue > maxSpeed){
+            diagSpeed1 = (diagSpeed1 / maxValue) * maxSpeed;
+            diagSpeed2 = (diagSpeed2 / maxValue) * maxSpeed;
         }
-        if (motorSpeeds.getComponent(1) > 0) {
-            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), minSpeed, maxSpeed);
-        }else if(motorSpeeds.getComponent(1) < 0){
-            diagSpeed2 = Range.clip(motorSpeeds.getComponent(1), -maxSpeed, -minSpeed);
-        }
+
         steerMag=Range.clip(steerMag, -maxSpeed * .8d, maxSpeed *.8d);
 
         if ((robotCentricMvmt.getComponent(0) != 0) || (robotCentricMvmt.getComponent(1) != 0)){

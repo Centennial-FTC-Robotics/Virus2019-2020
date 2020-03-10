@@ -46,7 +46,7 @@ public class Odometry extends Subsystem {
     public double headingCorrection=0;
 
 
-    final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*1.0*Math.PI);
+    final static double ENCODER_COUNTS_PER_INCH = 4096.0/(2.0*Math.PI*1.0);
     final static double RADIUS = 6.4054;
     final static double BENCODER_RADIUS = 6.7581;
     Vector2D fieldCentricDelta;
