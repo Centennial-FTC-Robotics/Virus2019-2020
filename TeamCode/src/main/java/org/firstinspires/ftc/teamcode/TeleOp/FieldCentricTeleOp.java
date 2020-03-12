@@ -10,11 +10,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.virus.agobot.Agobot;
+import org.virus.agobot.Arm;
 import org.virus.agobot.PIDControllers;
 import org.virus.util.Vector2D;
 
 import java.io.File;
-import java.util.Arrays;
 
 @TeleOp(group = "TeleOP", name = "FieldCentricTeleOp")
 public class FieldCentricTeleOp extends LinearOpMode {
@@ -26,6 +26,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
     double gp1RightTriggerPrev = 0;
     double gp2LeftTriggerPrev = 0;
     double gp2rightTriggerPrev = 0;
+    boolean gp2upPrev = false;
+    boolean gp2downPrev = false;
     private File opModeData = AppUtil.getInstance().getSettingsFile("opModeData.txt");
     String importedAutoData;
     String[] autoData = new String[4];
@@ -33,6 +35,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
     double startHeading;
     double driverHeading;
     double snap90Correction = 0;
+    int towerHeight = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -150,21 +154,29 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 Agobot.parker.extend(true);
             }
 
-            //TODO: dpad stone heights
-            int startStoneHeight = 24;
-            //TODO: test for what encoder values mean 1 stone height
-            int stoneHeight = 340;
-            /*int currentSlideHeight = Agobot.slides.getPosition();
-            if(gamepad2.dpad_up){
-                Agobot.slides.slides(currentSlideHeight + stoneHeight);
+
+
+            if(gamepad2.dpad_up && !gp2upPrev){ //if pressed this loop but not in the previous one
+                towerHeight++;
+                Agobot.slides.goToStoneHeight(towerHeight);
+                if(Math.abs(Agobot.slides.getPosition() - Agobot.slides.stoneHeight(towerHeight)) < 100){ //when slides are almost there, flip the arm
+                    if(towerHeight < 8){
+                        Agobot.arm.setArmPos(Arm.armPosition.drop);
+                    }else{
+                        Agobot.arm.setArmPos(Arm.armPosition.topstone);
+                    }
+                }
             }
-            if(gamepad2.dpad_down){
-                Agobot.slides.slides(currentSlideHeight - stoneHeight);
-            }*/
+            if(gamepad2.dpad_down && !gp2downPrev){ //pondering whether I want this going down a stone or retracting all the way
+                towerHeight--;
+                Agobot.slides.goToStoneHeight(towerHeight);
+            }
 
             gp1RightTriggerPrev = gamepad1.right_trigger;
             gp2LeftTriggerPrev = gamepad2.left_trigger;
             gp2rightTriggerPrev = gamepad2.right_trigger;
+            gp2upPrev = gamepad2.dpad_up;
+            gp2downPrev = gamepad2.dpad_down;
 
 //            telemetry.addData("cool if statement", Math.abs((Agobot.drivetrain.odometry.currentHeading() / 90.0) - Math.round(Agobot.drivetrain.odometry.currentHeading() / 90.0)));
 //            telemetry.addData("Right Trigger gp1", gamepad1.right_trigger);

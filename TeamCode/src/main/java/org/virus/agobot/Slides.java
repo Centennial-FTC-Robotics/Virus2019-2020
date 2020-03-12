@@ -22,6 +22,8 @@ public class Slides extends Subsystem {
 
 
     public static final double ENCODER_PER_INCH = 28 * 19.2 * (30f / 48f) * (1 / (2 * Math.PI * 0.9842519685)); // should be 54.33167785 encoder counts/inch
+    public final double STONE_HEIGHT = 4.0;
+    public final double PEG_OFFSET = 2.0; //how much higher than the stone to go
 
     //public int position = 0;
     double prevPower = 0;
@@ -88,5 +90,14 @@ public class Slides extends Subsystem {
             }
         }
         prevPower = power;
+    }
+
+    public boolean goToStoneHeight(int stoneNumber){
+        int slideHeight = stoneHeight(stoneNumber);
+        return slides(slideHeight);
+    }
+
+    public int stoneHeight(int stoneNumber){
+        return (int)(ENCODER_PER_INCH*((stoneNumber - 1)*STONE_HEIGHT + PEG_OFFSET));
     }
 }
