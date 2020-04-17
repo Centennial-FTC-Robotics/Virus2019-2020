@@ -237,7 +237,11 @@ public class Vector2D {
         theta = (theta + radians) % (2 * Math.PI);
         genComp();
     }
-
+    public String toStringWithoutWeirdBracketThingsSoThatTheLoggerCanWork(){
+        String vector = "";
+        vector = components[0]+","+components[1];
+        return vector;
+    }
     public String toString() {
 
         String vector = name + ": <";

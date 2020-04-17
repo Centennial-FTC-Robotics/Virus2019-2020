@@ -48,7 +48,12 @@ public class RobotLogger {
             log+=timeStamps.get(i);
             log+=",";
             for (int j=0; j<data.length; j++){
-                log+=data[j].get(i);
+                if(j==0){
+                    log+=((Vector2D)data[0].get(i)).toStringWithoutWeirdBracketThingsSoThatTheLoggerCanWork();
+                }
+                else{
+                    log+=data[j].get(i);
+                }
                 log+=",";
             }
             log+="\n";
