@@ -29,11 +29,9 @@ public class OdoTest extends LinearOpMode {
 
 
         while(Agobot.drivetrain.goToPosition(new Vector2D(0,0), 45, 0.6)){
-
         }
 
         while (opModeIsActive()) {
-
             telemetry.addData("Change in angle", getHeading());
             telemetry.addData("lEncoder", Agobot.drivetrain.odometry.getlEncoderCounts());
             telemetry.addData("rEncoder", Agobot.drivetrain.odometry.getrEncoderCounts());
